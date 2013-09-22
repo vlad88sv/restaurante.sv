@@ -1,0 +1,47 @@
+* {
+    background: none !important;
+    color: black !important;
+    font-size: 12px;
+}
+
+hr {
+    display: none;
+}
+.producto {
+}
+
+.mesa {
+}
+
+div#pedidos {
+}
+
+div.orden {
+
+}
+
+
+span.grupo {
+    position: inherit;
+    font-size: 1.2em;
+}
+
+span.tiempo {
+    display: none;
+}
+
+
+div.pedido {
+    margin: 4px;
+    padding: 4px;
+    position: relative;
+}
+
+div.pedido:before {
+    content: "► ";
+    float: left;
+    margin-right: 2px;
+}
+div.mucho_tiempo {
+    border: 1px solid red !important;
+}

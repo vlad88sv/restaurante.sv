@@ -1,0 +1,55 @@
+* {
+    background: none !important;
+    color: black !important;
+    font-size: 14px;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family:  "Helvetica", sans-serif;
+}
+body {
+    width: 200px;
+}
+
+hr {
+    display: none;
+}
+.producto {
+}
+
+.mesa {
+}
+
+div#pedidos {
+}
+
+div.orden {
+    border: 1px solid black;
+    height: 10cm;
+}
+
+
+span.grupo {
+    position: inherit;
+    font-size: 1.2em !important;
+}
+
+span.tiempo {
+    display: none;
+}
+
+
+div.pedido {
+    position: relative;
+}
+
+div.pedido:before {
+    content: "";
+}
+
+ul li {
+    padding-left: 20px !important;
+}
+
+div.mucho_tiempo {
+    border: 1px solid red !important;
+}

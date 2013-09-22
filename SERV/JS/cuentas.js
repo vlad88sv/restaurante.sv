@@ -1,0 +1,231 @@
+_ordenes = {}; // Objeto donde mantenemos las ordenes en presentación
+_productos = {};
+
+function rsv_solicitar(peticion, data, funcion) {
+    var ret_json;
+    var objetivo = {TPL: peticion};
+        
+    $.post('/SERV/?ref='+peticion, $.extend(objetivo,data), function(retorno){
+        if ( typeof retorno.error != 'undefined' && retorno.error !== '' ) console.log(retorno.error);
+        funcion(retorno);
+    }, 'json');
+    return ret_json;
+}
+
+function cuenta_agregarOrden(objetivo, grupo, modo)
+{
+    // Modo = 0 : normal
+    // Modo = 1 : historial
+    
+    var botones = '';
+    botones += '<span class="cancelar_pedido" title="Cancelar este pedido">X</span>&nbsp;';
+    var orden = $('<div class="orden" />');
+    var total = 0.00;
+    var html = '';
+    var controles = '<button class="imp_tiquete">Tiquete</button><button class="cerrar_cuenta">Cerrar</button><button class="anular_cuenta">Anular</button>';
+
+    if ( modo == 0 && _ordenes[grupo][0].flag_tiquetado == '1')
+    {
+       orden.addClass('pago_pendiente');
+    }
+
+    if (modo == 1)
+    {
+        controles = '<button class="imp_tiquete">Tiquete</button><button class="abrir_cuenta">Abrir</button><button class="anular_cuenta">Anular</button>';
+        html += '<div class="cuenta">Cerrado: ' + _ordenes[grupo][0].fechahora_pagado+ ' | Cuenta: '+_ordenes[grupo][0].cuenta+'</div>';
+       
+        if (_ordenes[grupo][0].flag_anulado == '1')
+        {
+            html += '<div class="cuenta" style="background-color:white;color:red;text-align:center;font-size:14px;font-weight:bold;">¡esta cuenta fue anulada!</div>';
+        }
+        
+    }
+
+    if (_ordenes[grupo][0].flag_nopropina == '1')
+    {
+        html += '<div class="cuenta" style="background-color:pink;color:red;text-align:center;font-size:14px;font-weight:bold;">sin propina</div>';
+    }
+    
+    if (_ordenes[grupo][0].flag_exento == '1')
+    {
+        html += '<div class="cuenta" style="background-color:yellow;color:black;text-align:center;font-size:14px;font-weight:bold;">sin IVA</div>';
+    }
+    
+    if (_ordenes[grupo][0].historial != null)
+    {
+        for (historia in _ordenes[grupo][0].historial) {
+            html += '<div class="cuenta" style="background-color:yellow;color:black;text-align:center;font-size:14px;font-weight:bold;">';
+            html += _ordenes[grupo][0].historial[historia].hora + ' :: ' + _ordenes[grupo][0].historial[historia].accion + ' :: ' + _ordenes[grupo][0].historial[historia].nota;
+            html += '</div>';
+        }
+    }
+
+    html += '<table class="encabezado_orden">';
+    html += '<tr>';
+    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa">'+_ordenes[grupo][0].ID_mesa+'</button> → <strong>'+_ordenes[grupo][0].nombre_mesero+'</strong></td>';
+    html += '<td class="botones">' + controles + '</td>';
+    html += '<td class="precio_precalculo"></td>';
+    html += '<td class="precio"></td>';
+    html += '</tr>';
+    html += '</table>';
+    
+    if ( modo == 0) {
+        html += '<div class="cuenta controles_seleccion">';
+        html += 'SELECCIONADOS: <button class="btn_separar_cuenta">separar cuenta</button>&nbsp;<button class="btn_cambiar_mesa">cambiar mesa</button>';
+        html += '</div>';
+    }
+    
+    orden.append(html);
+    
+    orden.attr('id','o_'+grupo);
+    orden.attr('id_mesa',_ordenes[grupo][0].ID_mesa);
+    orden.attr('cuenta',_ordenes[grupo][0].cuenta);
+    
+    for (x in _ordenes[grupo])
+    {
+        var pedido = $('<div class="pedido" />');
+        pedido.attr('id','p_'+grupo+_ordenes[grupo][x].ID_pedido);
+        pedido.attr('id_pedido',_ordenes[grupo][x].ID_pedido);
+        
+        pedido.append('<div class="producto" />');
+        
+        var hora_entregado = '';
+	/*
+	if (_ordenes[grupo][x].fechahora_elaborado !== '0000-00-00 00:00:00') {
+            hora_entregado += '→' + Date.parse(_ordenes[grupo][x].fechahora_elaborado).toString('HH:mm');
+        }
+        */
+        if (_ordenes[grupo][x].fechahora_entregado !== '0000-00-00 00:00:00') {
+            hora_entregado += '→' + Date.parse(_ordenes[grupo][x].fechahora_entregado).toString('HH:mm');
+        }
+        
+        var eliminado = '';
+        if ( _ordenes[grupo][x].flag_cancelado == '1' ) {
+            eliminado = ' - <span style="background-color:black;color:red;">ELIMINADO</span>';
+        }
+        
+        var historial = '';
+        if ( _ordenes[grupo][x].historia != null ) {
+            historial = ' - <span class="historia">' + _ordenes[grupo][x].historia + '</span>';
+        }
+        
+        var buffer = '';
+        if ( modo == '0' ) {
+            buffer += '<input class="chk_separar_pedido" type="checkbox" value="'+_ordenes[grupo][x].ID_pedido+'" />&nbsp;';
+        }
+        buffer += '<span class="estado_despacho" title="P = pendiente | D = despachado">' + (_ordenes[grupo][x].flag_despachado === '0' ? 'P' : 'D') + '</span>&nbsp;';
+        buffer += botones;
+        buffer += '<span style="color:yellow;" title="' + _ordenes[grupo][x].ID_orden + ':' + _ordenes[grupo][x].ID_pedido + '">' + _ordenes[grupo][x].nombre_producto + '</span>&nbsp;';
+        buffer += '<span class="editar_pedido">$' + _ordenes[grupo][x].precio_grabado + "</span>";
+        if (!$("#ocultar_fechas").is(':checked'))
+            buffer += '&nbsp;<span class="detalle_hora">[' + Date.parse(_ordenes[grupo][x].fechahora_pedido).toString('HH:mm') + hora_entregado  + ']</span>&nbsp;';
+        buffer += eliminado;
+        buffer += historial;
+
+        pedido.find('.producto').html(buffer);
+                
+        if ('adicionales' in _ordenes[grupo][x] && _ordenes[grupo][x].adicionales.length > 0)
+        {
+            pedido.append('<div class="adicionales" ><ul></ul></div>');
+            for (adicional in _ordenes[grupo][x].adicionales)
+            {
+                pedido.find('.adicionales ul').append('<li>' + _ordenes[grupo][x].adicionales[adicional].nombre  + ' $' + _ordenes[grupo][x].adicionales[adicional].precio_grabado + '</li>');
+                if (_ordenes[grupo][x].flag_cancelado === '0') {
+                    total += parseFloat(_ordenes[grupo][x].adicionales[adicional].precio_grabado);
+                }
+            }
+        }
+
+        if ('remociones' in _ordenes[grupo][x] && _ordenes[grupo][x].remociones.length > 0)
+        {
+            pedido.append('<div class="remociones" ><ul></ul></div>');
+            for (remocion in _ordenes[grupo][x].remociones)
+            {
+                pedido.find('.remociones ul').append('<li>' + _ordenes[grupo][x].remociones[remocion].nombre + '</li>');
+            }
+        }
+
+        if (_ordenes[grupo][x].flag_cancelado === '0') {
+            total += parseFloat(_ordenes[grupo][x].precio_grabado);
+        }
+        
+	if ( ! $("#cuentas_compactas").is(':checked') )
+	    orden.append(pedido);   
+    }    
+   
+    var precio_sin_iva = (total / 1.13).toFixed(2);
+    var iva = (_ordenes[grupo][0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
+    var propina = ( _ordenes[grupo][0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
+    orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
+    
+    total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
+    orden.find('.precio').html( '<span title="Total con IVA y con propina">$' + total.toFixed(2) + '</span>' );
+
+    objetivo.append(orden);
+    
+} // agregarPedido()
+
+function crearTiquete(_datos)
+{
+    var orden = $('<div class="orden" />');
+    orden.append('<p style="font-weight:bold;text-align:center;">7G, S.A. de C.V.</p>');
+    orden.append('<p style="text-align:center;">Plaza volcán, Km. 16.5,<br />Calle al boquerón<br />Santa Tecla, La Libertad</p>');
+    orden.append('<p style="text-align:center;">Tel. Oficinas administrativas:<br />(503) 2243-6017</p>');
+    
+    var total = 0.00;
+    orden.append('<br /><br /><div style="height:1.5em;text-align:center;"><span class="grupo" style="height:1.5em;text-align:center;font-size: 16px; font-weight:bold;">Mesa #'+_datos[0].ID_mesa+'</span></div><br /><br />');
+    
+    for (x in _datos)
+    {
+        var pedido = $('<div class="pedido" style="padding:0px;margin:0px;"  />');
+        
+        pedido.append('<div class="producto" style="padding:0px;margin:0px;" />');
+        
+        pedido.find('.producto').html( _datos[x].nombre_producto.substring(0,23) + ' <div style="z-index:99;float:right;">$' + parseFloat(_datos[x].precio_grabado).toFixed(2) + '</div>' );
+                
+        if ('adicionales' in _datos[x] && _datos[x].adicionales.length > 0)
+        {
+            pedido.append('<div class="adicionales" ><ul style="padding:2px;"></ul></div>');
+            for (adicional in _datos[x].adicionales)
+            {
+                pedido.find('.adicionales ul').append('<li>' + _datos[x].adicionales[adicional].nombre.substring(0,13)  + ' <div style="float:right;z-index:99;">$' + parseFloat(_datos[x].adicionales[adicional].precio_grabado).toFixed(2) + '</div>' + '</li>');
+		total += parseFloat(_datos[x].adicionales[adicional].precio_grabado);
+            }
+        }
+
+        total += parseFloat(_datos[x].precio_grabado);
+        orden.append(pedido);   
+    }
+
+    var date 	= new Date();
+    var date    = date.getUTCFullYear() + '-' + ('00' + (date.getUTCMonth()+1)).slice(-2) + '-' + 
+            ('00' + date.getUTCDate()).slice(-2) + ' ' + 
+            ('00' + date.getUTCHours()).slice(-2) + ':' + 
+            ('00' + date.getUTCMinutes()).slice(-2) + ':' + 
+            ('00' + date.getUTCSeconds()).slice(-2);
+            
+    var precio_sin_iva = (total / 1.13).toFixed(2);
+    var iva = (_datos[0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
+    var propina = ( _datos[0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
+    
+    total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
+    
+    orden.append('<br />');
+    orden.append('<table style="width:100%;" class="totales"></table>');
+    orden.find('table.totales').append('<tr><td>SubTotal:</td><td>' + '$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</td></tr>' );
+    
+    if ( _datos[0].flag_nopropina == '0' )
+        orden.find('table.totales').append('<tr><td>Propina (10%):</td><td>' + '$' + parseFloat(propina).toFixed(2) + '</td></tr>' );
+
+    orden.find('table.totales').append('<tr><td>Total:</td><td>' + '$' + total.toFixed(2) + '</td></tr>' );
+    orden.append('<br /><br /><br /><br /><p style="text-align:center;">La pizzería - Plaza Volcán<br />¡Gracias por su compra!<br /><br />' + date + '</p>');
+    orden.append('<br /><p style="text-align:center;">'+_datos[0].cuenta+'</p>');
+    
+    return orden.html();
+} // crearTiquete()
+
+$(function(){
+    
+    $('.facebox_cerrar').live('click',function(){$.modal.close();});    
+    
+});

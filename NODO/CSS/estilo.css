@@ -1,0 +1,138 @@
+@font-face {
+    font-family: 'BebasNeueRegular';
+    src: url('BebasNeue-webfont.eot');
+    src: url('BebasNeue-webfont.eot?#iefix') format('embedded-opentype'),
+         url('BebasNeue-webfont.woff') format('woff'),
+         url('BebasNeue-webfont.ttf') format('truetype'),
+         url('BebasNeue-webfont.svg#BebasNeueRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html, body
+{
+    font-family:'BebasNeueRegular', Arial, Helvetica, sans-serif; 
+    font-size: 1.0em;
+    height: 100%;
+    width:100%;
+    margin:0;
+    padding: 0;
+    background-color: #202020;
+    color: #EEE;
+    overflow: hidden;
+}
+
+h1
+{
+    font-size: 1em;
+    text-align: center;
+    margin: 2px;
+}
+
+h2
+{
+    font-size: 0.8em;
+    text-align: left;
+    margin: 0px;
+}
+
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+.producto {
+    font-size: 1.7em;
+    white-space: nowrap;
+    overflow: hidden;
+    color: snow;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+.mesa {
+
+}
+
+div#pedidos {
+    height: 100%;
+    overflow: hidden;
+    text-wrap: none;
+    white-space: nowrap;
+}
+
+div#cont_nodo {
+    position: fixed;
+    bottom: 1px;
+    right: 1px;
+    z-index: 99;
+}
+
+select#nodo {
+    font-size: 24px;
+    color: red;
+    font-weight: bold;
+}
+
+div.orden {
+    border-left: 1px solid yellow;
+    border-right: 1px solid yellow;
+    height: 100%;
+    margin: 3px;
+    padding: 3px;
+    display: inline-block !important;
+    vertical-align: top;
+    min-width: 200px;
+    overflow-y: auto;
+    position:relative;
+}
+
+div.orden_despachando {
+    background-color: whitesmoke;
+}
+
+div.pedidos {
+    padding-bottom: 20px;
+}
+
+span.grupo {
+    font-size: 1.5em;
+    position: absolute;
+    color: yellow;
+    left: 10px;
+    top: 5px;
+}
+
+.adicionales ul, .ingredientes ul {
+    padding-left: 5px;
+    margin: 0;
+}
+
+.adicionales ul li, .ingredientes ul li {
+    font-size: 1.3em;
+    padding-left: 5px;
+    margin-left: 20px;
+}
+    
+span.tiempo {
+    font-size:1.5em;
+    position: absolute;
+    color: red;
+    right: 10px;
+    top: 5px;
+}
+
+div.mesero {
+    font-weight: 1em;
+}
+
+div.pedido {
+    border-bottom: 1px solid yellow;
+    margin-bottom: 1px;
+    padding: 0 1px;
+    position: relative;
+}
+
+div.mucho_tiempo {
+    border: 1px solid red !important;
+}

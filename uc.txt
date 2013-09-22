@@ -1,0 +1,3 @@
+print.show_print_progress false
+print.always_print_silent true
+dom.successive_dialog_time_limit 0

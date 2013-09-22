@@ -1,0 +1,7 @@
+En caja:
+-Impresión de facturas
+--------
+
+Logistica:
+- Conseguir printer para kiosko
+- Empaque de fregadero en Castella Sagarra $5.50

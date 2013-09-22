@@ -1,0 +1,4 @@
+La función del servidor es:
+
+Aceptar los datos del cliente móvil (meseros) y los datos de la pantalla de control (cocina) lo mas similarmente posible a una interfaz REST.
+

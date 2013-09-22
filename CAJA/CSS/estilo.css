@@ -1,0 +1,313 @@
+html, body
+{
+    font-family: Verdana, sans-serif; 
+    font-size: 0.9em;
+    height: 100%;
+    width:100%;
+    margin:0;
+    padding: 0;
+    background-color: #000;
+    color: whitesmoke;
+}
+
+h1
+{
+    font-size: 1em;
+    text-align: center;
+    margin: 2px;
+    color: whitesmoke;
+}
+
+h2
+{
+    font-size: 0.8em;
+    text-align: left;
+    margin: 0px;
+}
+
+a {
+    font-style: normal;
+    text-decoration: none;
+    display: block;
+    background-color: black;
+    padding:8px 3px;
+    border-radius: 5px;
+    margin:3px;
+    color:white;
+}
+
+table.ancha {
+    width: 100%;
+    padding: 0 1px;
+}
+
+table.bordes td, table.bordes th {
+    border: 1px solid #FFF;
+}
+
+table.estandar {
+    border-collapse: collapse;
+    vertical-align: middle;                                                                             
+}
+
+table.estandar th {
+    color: yellow;
+}
+
+table.estandar td, table.estandar th {
+    margin:0;
+    padding: 0px;
+}
+
+table.amplia td, table.amplia th {
+    padding: 5px 5px;
+    text-align: center;
+}
+
+table.zebra tr:nth-child(odd) td
+{
+  background-color:#FFE4C6;
+}
+
+
+input, button {
+    text-align: center;
+}
+
+input[type="text"], input[type="number"] {
+    padding: 0;
+    font-weight: bold;
+    color: blue;
+}
+
+input[type=checkbox]
+{
+  vertical-align: middle;
+  padding: 0px;
+  margin: 0px;
+}
+
+.producto {
+    cursor: default;
+}
+
+.producto:hover {
+    border-bottom: 1px solid white;
+}
+
+.mesa {
+
+}
+
+div#pedidos {
+    padding-bottom: 30px;
+}
+
+.detalle_hora {
+    color: #B7B5B5;
+}
+
+.estado_despacho {
+    font-weight: bold;
+    cursor: not-allowed;
+}
+
+.editar_pedido {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.cancelar_pedido {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.contenedor_mesa_mesero {
+    width: 150px;
+}
+
+.cambio_mesa {
+    font-weight: bold;
+    font-size: 18px;
+    
+}
+
+div.orden {
+    background-color: grey;
+    border: 2px solid whitesmoke;
+    margin: 10px 0;
+    padding: 5px;
+    position: relative;
+    vertical-align: top;
+    overflow: auto;
+}
+
+div.orden.ghost {
+    background-color: #333;
+    border: 1px solid whitesmoke;
+    margin: 2px 0;
+    padding: 2px;
+    position: relative;
+    vertical-align: top;
+    overflow: auto;
+    font-size: 10px;
+}
+
+div.orden_compacta {
+    height: 42px;
+    overflow: hidden;
+}
+
+div.pago_pendiente {
+    background: url('../IMG/dinero.gif') grey bottom right no-repeat;
+}
+
+span.grupo {
+    font-size: 1.2em;
+    color: yellow;
+}
+
+table.encabezado_orden {
+    background-color: gainsboro;
+    color: black;
+    width: 100%;
+    margin-bottom: 2px;
+    border: 1px solid black;
+}
+
+table.encabezado_orden td {
+    border: 1px solid white;
+    vertical-align:middle;
+}
+
+table.encabezado_orden .botones {
+    width: 195px;
+    text-align: center;
+}
+
+table.encabezado_orden button {
+ height: 38px;   
+}
+
+.cuenta {
+    background-color: gainsboro;
+    color: black;
+    font-family: courier;
+    padding: 3px;
+    border: 1px solid black;
+}
+
+.controles_seleccion {
+    display: none;
+}
+
+.adicionales ul {
+    margin: 1px 0px;
+    padding-left: 20px;
+    color: lightblue;
+}
+
+ .remociones ul {
+    margin: 1px 0px;
+    padding-left: 20px;
+    color: pink;     
+ }
+    
+.precio {
+    font-size: 18px;
+    font-weight: bold;
+    color: blue;
+    text-align: center;
+}
+
+.precio_precalculo {
+    font-size: 0.9em;
+    text-align: center;
+}
+
+div.pedido {
+    position: relative;
+    text-wrap: none;
+    white-space: nowrap;
+}
+
+.pedido_id {
+    cursor: not-allowed;
+    font-weight: bold;
+}
+
+.historia {
+    background-color:black;
+    color:pink;
+    padding: 0 3px;
+}
+
+.simplemodal-close {background-color: white;}
+#simplemodal-overlay {background-color:#DDD;}
+#simplemodal-container {background-color:#000; border:8px solid #444; padding:12px;}
+
+#cocina p {
+    margin: 0px;
+    padding: 0px;
+}
+
+#cocina .producto {
+    font-size: 1em;
+    white-space: nowrap;
+    overflow: hidden;
+    color: snow;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+#cocina .mesa {
+
+}
+
+#cocina div#pedidos {
+    height: 100%;
+    overflow: hidden;
+}
+
+#cocina div.pedidos {
+}
+
+#cocina span.grupo {
+    font-size:1.3em;
+    position: absolute;
+    color: yellow;
+    left: 10px;
+    top: 5px;
+}
+
+#cocina .adicionales ul, .ingredientes ul {
+    padding-left: 5px;
+    margin: 0;
+}
+
+#cocina .adicionales ul li, .ingredientes ul li {
+    font-size: 0.9em;
+    padding-left: 5px;
+    margin-left: 20px;
+}
+    
+#cocina span.tiempo {
+    font-size:1.3em;
+    position: absolute;
+    color: yellow;
+    right: 10px;
+    top: 5px;
+}
+
+#cocina div.mesero {
+    font-weight: 1em;
+}
+
+#cocina div.pedido {
+    padding: 0 1px;
+    position: relative;
+}
+
+#cocina div.mucho_tiempo {
+    border: 1px solid red !important;
+}

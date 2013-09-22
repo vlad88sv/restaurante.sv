@@ -1,0 +1,306 @@
+html, body
+{
+    font-family: Arial;
+    font-size: 1.0em;
+    margin:0;
+    padding: 0;
+}
+
+hr {
+    margin: 0;
+}
+h1
+{
+    font-size: 1em;
+    text-align: center;
+    margin: 2px;
+}
+
+h2
+{
+    font-size: 0.8em;
+    text-align: left;
+    margin: 0px;
+}
+
+a {
+    font-style: normal;
+    text-decoration: none;
+    display: block;
+    background-color: black;
+    padding:15px 3px;
+    border-radius: 5px;
+    margin:3px;
+    color:white;
+}
+
+label {
+    font-size: 1.3em;
+}
+
+table {
+    border-collapse: collapse;
+    vertical-align: middle;                                                                             
+}
+
+table.ancha {
+    width: 100%;
+}
+
+table td, table th {
+    border: 1px solid #DDD;
+    margin:0;
+    padding: 0;
+}
+
+table.zebra tr:nth-child(odd) td
+{
+  background-color:#FFE4C6;
+}
+
+
+input[type="text"], input[type="number"], button {
+    height: 40px;
+    font-size: 0.8em;
+    text-align: center;
+}
+
+input[type="text"], input[type="number"] {
+    font-size: 1.1em;
+    padding: 0;
+    font-weight: bold;
+    color: blue;
+}
+
+input[type=checkbox]
+{
+  padding: 0px;
+}
+
+ul {
+    padding-left:20px;
+}
+/* ayudantes */
+
+.container {
+    overflow: hidden;
+    clear: both;
+}
+.right {
+    float: right;
+    width: 100px;
+    height: 100%;
+    max-height: 100%;
+}
+.left {
+    float: left;
+    width: 100px;
+    height: 100%;
+    max-height: 100%;
+}
+.middle {
+    margin: 0 100px;
+    height: 100%;
+    max-height: 100%;
+}
+
+/* especificos */
+#seleccion_producto td {
+    vertical-align: top;
+}
+
+#menu {
+    margin-bottom: 4px;
+    width: 100%;
+}
+
+#menu td {
+    text-align: center;
+}
+
+#menu td a {
+    text-align: center;
+    display: block;
+}
+
+#menu_bebidas
+{
+    position: fixed;
+    right: 10px;
+    bottom: 20px;
+    width: 30px;
+}
+#menu_bebidas td {
+    vertical-align: middle;
+}    
+
+#menu_bebidas td a {
+    font-size: 0.8em;
+    text-align: center;
+    display: block;
+    width: 100%;
+    height: 20px;
+    line-height: 20px;
+}
+
+#menu_productos  {
+    position: fixed;
+    bottom: 1px;
+    width: 100%;
+}
+
+#menu_productos td {
+    padding: 0 5px;
+}
+
+#menu_productos td a {
+    display: block;
+    height: 20px;
+    line-height: 20px;
+    width: 100%;
+    text-align: center;
+    font-size:0.6em;
+}
+
+#content {
+    position: relative;
+}
+
+#scroller {
+    position:fixed;
+    left:0;
+    top:65px;
+    bottom: 60px;
+    width:80%;
+    overflow-y: auto;
+}
+
+#info_principal {
+    position:fixed;
+    right:0;
+    top:60px;
+    bottom: 55px;
+    width:20%;
+    overflow-y: auto;
+    border-left:1px solid grey;
+    font-size:0.8em;
+}
+
+#info_extendida {
+    font-size: 1.5em;
+    font-family: monospace;
+}
+
+#pedido .producto {
+    background-color: #EEE;
+    border: 1px #CCC dashed;
+    border-radius: 10px;
+    padding: 10px;
+    height:40px;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+#pedido .foto_producto {
+    width: 128px;
+    height: 128px;
+}
+
+#pedido .fragmento_asiento {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.agregar_producto {
+    display: inline-block;
+    background-color: cornflowerblue;
+    color: snow;
+    font-size: 1.0em;
+    font-weight: bold;
+    border: 4px solid royalblue;
+    margin: 5px;
+    border-radius: 5px;
+    width: auto;
+    position: relative;
+    padding: 4px;
+}
+
+.agregar_producto:hover {
+    color: yellow;
+}
+
+.agregar_producto div {
+    text-wrap: none;
+    white-space: nowrap;
+    position: relative;
+    float:left;
+    cursor: pointer;
+}
+
+.agregar_producto .nombre {
+    min-width:140px;
+    text-align:left;
+    margin-right:2px;
+}
+
+.agregar_producto .precio {
+    width:65px;
+    padding-right:1px;
+    text-align:right;
+}
+
+#simplemodal-overlay {background-color:#DDD;z-index:999;}
+#simplemodal-container {background-color:#FFF; border:8px solid #444; padding:12px;}
+#simplemodal-container button {
+    font-size: 1.2em;
+}
+
+div.orden {
+    border: 1px solid #666;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+    position: relative;
+    display: inline-block !important;
+    vertical-align: top;
+    min-width: 170px;
+}
+
+span.grupo {
+    font-size: 1.2em;
+    position: absolute;
+    color: #666;
+    left: 10px;
+    top: 5px;
+}
+
+.adicionales ul, .ingredientes ul {
+    margin-top: 1px;
+    padding-left: 20px;
+    color: #A5A5A5;
+}
+    
+span.precio {
+    font-size: 1.2em;
+    position: absolute;
+    color: #666;
+    right: 10px;
+    top: 5px;
+    padding-left: 5px;
+}
+
+
+div.pedido {
+    margin: 4px;
+    padding: 0 4px;
+    position: relative;
+}
+
+div.pedido:before {
+    content: "► ";
+    float: left;
+    margin-right: 2px;
+}

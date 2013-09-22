@@ -219,6 +219,7 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
     
             $BUFFER_DB_DATOS['tmpID'] = $tmpID;
             $BUFFER_DB_DATOS['ID_producto'] = $pedido['ID'];
+            $BUFFER_DB_DATOS['precio_original'] = $pedido['precio'];
             $BUFFER_DB_DATOS['precio_grabado'] = $pedido['precio'];
             $BUFFER_DB_DATOS['ID_orden'] = $ID_esta_orden;
             

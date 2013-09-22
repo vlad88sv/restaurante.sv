@@ -4,6 +4,7 @@
     <tr>
         <td style="text-align:left;">Búscar: <input type="text" id="buscar_producto" value="" /></td>
         <td style="text-align: right;vertical-align: middle;">
+            [ <input type="checkbox" id="modo_tactil" value="1" /> <label for="modo_tactil">modo táctil</label> ]&nbsp; 
             <button id="vaciar_cache">Vaciar cache</button>&nbsp;
             <button class="key" key="66" id="borrar_orden">[Ctrl+Alt+b] Borrar</button>&nbsp;
             <button class="key" key="82" id="ver_resumen">[Ctrl+Alt+r] Resumen</button>

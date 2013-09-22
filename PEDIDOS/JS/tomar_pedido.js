@@ -300,12 +300,6 @@ $(function(){
     });
     
     
-    $('.agregar_producto').live('click', function(){
-        var ID_producto = $(this).attr('producto');
-        intentarProductoEnPedido(ID_producto, $(this).attr('nombre'), $(this).attr('precio'));
-    });
-    
-    
     $(".agregar_producto").live('keydown', function(event){
         event.preventDefault();
         var keyCode = event.keyCode || event.which;
@@ -334,11 +328,33 @@ $(function(){
         event.stopPropagation();
     });
     
+    function agregar_producto_accion_directa(objeto){
+        var ID_producto = $(objeto).attr('producto');
+        var _b_orden = {ID: ID_producto, precio: $(objeto).attr('precio'), detalle: $(objeto).attr('nombre'), adicionales: [], ingredientes: []};
+        convertirProductoEnPedido(_b_orden);
+    }
+    
+    function agregar_producto_accion_indirecta(objeto){
+        var ID_producto = $(objeto).attr('producto');
+        intentarProductoEnPedido(ID_producto, $(objeto).attr('nombre'), $(objeto).attr('precio'));
+    }
+    
+    $('.agregar_producto').live('click', function(){
+        if ($("#modo_tactil").is(':checked')) {
+            agregar_producto_accion_directa(this);
+        } else {
+            agregar_producto_accion_indirecta(this);
+        }
+        
+    });
+        
     $('.agregar_producto').live('contextmenu', function(event){
         event.preventDefault();
-        var ID_producto = $(this).attr('producto');
-        var _b_orden = {ID: ID_producto, precio: $(this).attr('precio'), detalle: $(this).attr('nombre'), adicionales: [], ingredientes: []};
-        convertirProductoEnPedido(_b_orden);
+        if ($("#modo_tactil").is(':checked')) {
+            agregar_producto_accion_indirecta(this);
+        } else {
+            agregar_producto_accion_directa(this);
+        }
     });
     
     $('#agregar_producto_aceptar').live('click', function(){

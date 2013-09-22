@@ -69,7 +69,7 @@ function estadisticas() {
          }
          
          $("#tps").html(datos.aux.tps + "'");
-         $("#tms").html(datos.aux.tms + "'");
+         $("#tms").html(datos.aux.tms);
      });
 }
 

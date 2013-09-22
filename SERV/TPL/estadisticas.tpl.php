@@ -51,14 +51,14 @@ $json['aux']['tps'] = (isset($f['tps']) ? ceil($f['tps']).'±'.floor($f['stddev_
 /***********************************************/
 // Tiempo Máximo de Servicio (TMS)
 
-$c = 'SELECT ((TIME_TO_SEC(TIMEDIFF(`fechahora_entregado`, `fechahora_pedido`))) / 60) AS tms FROM `ordenes` WHERE  `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_despachado=1 AND fechahora_entregado <> "0000-00-00 00:00:00" GROUP BY tms ORDER BY tms DESC LIMIT 5';
+$c = 'SELECT CEIL((TIME_TO_SEC(TIMEDIFF(`fechahora_entregado`, `fechahora_pedido`))) / 60) AS tms, COUNT(*) AS tms_count FROM `ordenes` WHERE  `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_despachado=1 AND fechahora_entregado <> "0000-00-00 00:00:00" GROUP BY tms ORDER BY tms DESC LIMIT 15';
 $r = db_consultar($c);
 
 $json['aux']['tms'] = '';
 
 while ($f = db_fetch($r))
 {
-    $json['aux']['tms'] .= round($f['tms'],2).', ';
+    $json['aux']['tms'] .= $f['tms']."'x".$f['tms_count'].', ';
 }
 
 $json['aux']['tms'] = rtrim($json['aux']['tms'],', ');

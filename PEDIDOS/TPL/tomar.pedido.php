@@ -2,7 +2,7 @@
 <?php $_html['titulo'] = 'Tomar pedido'; ?>
 <table style="width:100%;margin: 0px;border-bottom: 4px solid black;">
     <tr>
-        <td style="text-align:left;">Búscar: <input type="text" id="buscar_producto" value="" /></td>
+        <td style="text-align:left;">Búscar: <input class="key enfocar" key="88" type="text" id="buscar_producto" value="" /></td>
         <td style="text-align: right;vertical-align: middle;">
             [ <input type="checkbox" id="modo_tactil" value="1" /> <label for="modo_tactil">modo táctil</label> ]&nbsp; 
             <button id="vaciar_cache">Vaciar cache</button>&nbsp;

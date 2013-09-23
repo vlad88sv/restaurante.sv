@@ -499,9 +499,17 @@ $(function(){
     
     $(document).keydown(function(event){
         var keyCode = event.keyCode || event.which;
+        
         console.log(keyCode);
-        if ( event.altKey == false || event.ctrlKey == false || $('.key[key="'+keyCode+'"]').length == 0) return;
-        $('.key[key="'+keyCode+'"]').click();
+        
+        var objetivo = $('.key[key="'+keyCode+'"]');
+        if ( event.altKey == false || event.ctrlKey == false || objetivo.length == 0) return;
+        
+        if (objetivo.hasClass('enfocar')) {
+            objetivo.focus();
+        } else {
+            objetivo.click();
+        }
         event.stopPropagation();
     });
     

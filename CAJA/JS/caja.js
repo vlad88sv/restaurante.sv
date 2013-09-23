@@ -496,12 +496,13 @@ $(function(){
             buffer += '<p style="color:yellow;">Total compras a cuadrar: $' + datos.aux.total_compras_cuadrar + ' - <span style="color:#666;">solo compras desde el último corte Z</span></p>';
             
             buffer += '<hr /><h1>Corte Z</h1>';
+            buffer += '<table class="ancha">';
+            buffer += '<tr>';
+            buffer += '<td>';
+                
             if (parseFloat(datos.aux.total_pendiente) > 0.00) {
                 buffer += '<p style="color:red;">Error: <span style="color:#666;">no puede hacer Corte Z si hay cuentas abiertas</span></p>';
             } else {
-                buffer += '<table class="ancha">';
-                buffer += '<tr>';
-                buffer += '<td>';
                 buffer += '<form id="frm_cortez">';
                 buffer += '<table>';
                 buffer += '<tr><td>Total a cuadrar:</td><td><input id="total_a_cuadrar" name="total_a_cuadrar" type="text" readonly="readonly" value="'+datos.aux.total_cuadrar+'" /></td></tr>';
@@ -512,24 +513,24 @@ $(function(){
                 buffer += '<tr><td>En caja:</td><td><input id="total_caja" name="total_caja" type="text" value="0.00" /></td></tr>';
                 buffer += '</table>';
                 buffer += '</form>';
-                buffer += '</td>';
-                buffer += '<td style="vertical-align:top;">';
-                buffer += '<h1>Compras</h1>';
-                buffer += '<div id="contenedor_compras">';
-                buffer += '<table class="ancha estandar bordes">';
-                buffer += '<tr><th>Empresa</th><th>Descripción</th><th>Precio</th></tr>';
-                for(compra in datos.aux.compras)
-                {
-                    buffer += '<tr><td>'+datos.aux.compras[compra].empresa+'</td><td>'+datos.aux.compras[compra].descripcion+'</td><td>$'+datos.aux.compras[compra].precio+'</td></tr>';
-                }
-                buffer += '</table>';
-                buffer += '</div>';
-                buffer += '</td>';
-                buffer += '</tr>';
-                buffer += '</table>';
-                
                 buffer += '<button id="cortar">Cortar</button>';
             }
+            
+            buffer += '</td>';
+            buffer += '<td style="vertical-align:top;">';
+            buffer += '<h1>Compras</h1>';
+            buffer += '<div id="contenedor_compras">';
+            buffer += '<table class="ancha estandar bordes">';
+            buffer += '<tr><th>Empresa</th><th>Descripción</th><th>Precio</th></tr>';
+            for(compra in datos.aux.compras)
+            {
+                buffer += '<tr><td>'+datos.aux.compras[compra].empresa+'</td><td>'+datos.aux.compras[compra].descripcion+'</td><td>$'+datos.aux.compras[compra].precio+'</td></tr>';
+            }
+            buffer += '</table>';
+            buffer += '</div>';
+            buffer += '</td>';
+            buffer += '</tr>';
+            buffer += '</table>';
             
             $.modal(buffer);
         });

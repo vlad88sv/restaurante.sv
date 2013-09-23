@@ -112,7 +112,7 @@ function intentarProductoEnPedido(str_producto, str_detalle, str_precio)
     buffer += '<div style="clear:both;height:45px;text-align:center;border-bottom: 4px solid black;margin-bottom:4px;" class="botones_grandes">';
     buffer += '<button id="agregar_producto_aceptar" class="key" key="65" style="float:left;">[Ctrl+Alt+a] Aceptar</button>';
     buffer += '<span style="font-size:1.3em;font-weight:bold;margin:0;padding:0;">' + str_detalle + '</span>';
-    buffer += '<button classstyle="float:right;" class="facebox_cerrar key" key="67">[Ctrl+Alt+c] Cerrar</button>';
+    buffer += '<button style="float:right;" class="facebox_cerrar key" key="67">[Ctrl+Alt+c] Cerrar</button>';
     buffer += '</div>';
     
     buffer += '';    

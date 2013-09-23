@@ -73,6 +73,10 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
         // Reseteamos la prioridad para que pueda volver a escoger el selector
         $ORDEN['prioridad'] = 'baja';
         
+        // Reseteamos el estado de despacho
+        $ORDEN['flag_elaborado'] = 0;
+        $ORDEN['flag_despachado'] = 0;
+        
         // Reseteamos el nodo afin
         $ORDEN['nodo'] = '';
         

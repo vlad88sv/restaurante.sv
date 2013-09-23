@@ -54,6 +54,15 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
     
     foreach($PEDIDOS as $tmpID => $pedido)
     {
+        // Reseteamos el registro para que pueda volver a escoger el selector
+        $ID_esta_orden = 0;
+        
+        // Reseteamos la prioridad para que pueda volver a escoger el selector
+        $ORDEN['prioridad'] = 'baja';
+        
+        // Reseteamos el estado de despacho
+        $ORDEN['flag_elaborado'] = 0;
+        $ORDEN['flag_despachado'] = 0;
         
         if ($MODO == 1)
         {
@@ -67,15 +76,6 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
             $ORDEN['fechahora_entregado'] = $ORDEN_PREVIA['fechahora_entregado'];
         }
         
-        // Reseteamos el registro para que pueda volver a escoger el selector
-        $ID_esta_orden = 0;
-        
-        // Reseteamos la prioridad para que pueda volver a escoger el selector
-        $ORDEN['prioridad'] = 'baja';
-        
-        // Reseteamos el estado de despacho
-        $ORDEN['flag_elaborado'] = 0;
-        $ORDEN['flag_despachado'] = 0;
         
         // Reseteamos el nodo afin
         $ORDEN['nodo'] = '';

@@ -172,8 +172,9 @@ $(function(){
 	    
             for(x in datos.aux.pendientes)
             {
+		var cuenta = datos.aux.pendientes[x][0].cuenta;
                 var html = crearTiquete(datos.aux.pendientes[x]);
-                rsv_solicitar('tiquete_pendientes',{imprimir: html , cuenta: ( "MESA - " + $('#mesa').val() ), estacion: 'comandas'},function(datos){});
+                rsv_solicitar('tiquete_pendientes',{imprimir: html , cuenta: cuenta, estacion: 'comandas', nota: 'impresión de tiquete - desde despacho'},function(datos){});
             }
 	    $('#mesa').val('');
        });

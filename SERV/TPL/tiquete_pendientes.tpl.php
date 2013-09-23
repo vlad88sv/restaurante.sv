@@ -18,7 +18,11 @@ if (isset($_POST['imprimir']))
             {
                 $DATOS['grupo'] = 'ORDENES';
                 $DATOS['accion'] = 'TIQUETE';
-                $DATOS['nota'] = 'impresión de tiquete';
+                
+                if (empty($_POST['nota']))
+                    $DATOS['nota'] = 'impresión de tiquete';
+                else
+                    $DATOS['nota'] = $_POST['nota'];
                 
                 $DATOS['fechahora'] = mysql_datetime();
                 $DATOS['cuenta'] = $cuenta;

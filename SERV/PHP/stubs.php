@@ -205,10 +205,14 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
             $ID_esta_orden = $ID_orden_entradas_horno;
         }
         
+        // Todo lo demas que no va hacia ningun nodo es autodespachado
+        
         if ($ID_esta_orden == 0)
         {
             if ($ID_orden == 0)
             {
+                $ORDEN['flag_elaborado'] = 1;
+                $ORDEN['flag_despachado'] = 1;
                 $ID_orden = db_agregar_datos('ordenes', $ORDEN);
             }
             

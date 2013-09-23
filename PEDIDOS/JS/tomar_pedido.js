@@ -1,5 +1,6 @@
 _orden = [];
 _b_orden = [];
+_meseros = [];
 ID_mesero_busqueda = '';
 
 function MostrarRejillaProductos(datos)
@@ -30,6 +31,7 @@ function reiniciarInterfaz() {
     mostrar_grupo_productos('1');
     miniResumenOrden();
     ResumenOrden();
+    obtener_lista_meseros();
 }
 
 function personalizar_producto_ingredientes_y_adicionales(str_producto)
@@ -89,6 +91,16 @@ function mostrar_producto_ingredientes_y_adicionales(str_producto)
 function mostrar_grupo_productos(ID_grupo)
 {
     rsv_solicitar('producto_buscar', {grupo: ID_grupo}, MostrarRejillaProductos, true);
+}
+
+function obtener_lista_meseros()
+{
+    rsv_solicitar('extra_meseros', {}, function(datos){
+        for (x in datos.aux)
+        {
+            _meseros[datos.aux[x].ID_usuarios] = datos.aux[x];
+        }        
+    }, true);
 }
  
 function intentarProductoEnPedido(str_producto, str_detalle, str_precio)
@@ -277,7 +289,15 @@ $(function(){
             
             var ID_mesero = 0;
             while ( ID_mesero == 0 ) {
-                ID_mesero = window.prompt('2. Número de MESERO', ID_mesero_busqueda );
+                var meseros = '';
+                
+                for (x in _meseros)
+                {
+                    meseros += " * " + _meseros[x].ID_usuarios + ". " + _meseros[x].usuario + "\n"; 
+                    
+                }
+                
+                ID_mesero = window.prompt('2. Número de MESERO.' + "\n" + meseros, ID_mesero_busqueda );
                 
                 if (!ID_mesero) {
                     alert ('Cancelando envío');
@@ -523,5 +543,6 @@ $(function(){
     });
     
     mostrar_grupo_productos(1);
+    obtener_lista_meseros();
 
 });

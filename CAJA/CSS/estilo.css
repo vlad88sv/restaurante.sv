@@ -123,7 +123,7 @@ div#pedidos {
 }
 
 .contenedor_mesa_mesero {
-    width: 150px;
+    width: 200px;
 }
 
 .cambio_mesa {
@@ -173,22 +173,18 @@ table.encabezado_orden {
     width: 100%;
     margin-bottom: 2px;
     border: 1px solid black;
+    border-collapse: collapse;
 }
 
 table.encabezado_orden td {
-    border: 1px solid white;
+    border: 1px solid black;
     vertical-align:middle;
 }
 
-table.encabezado_orden .botones {
-    width: 195px;
+.contenedor_botones button {
+    min-width: 100px;
     text-align: center;
 }
-
-table.encabezado_orden button {
- height: 38px;   
-}
-
 .cuenta {
     background-color: gainsboro;
     color: black;

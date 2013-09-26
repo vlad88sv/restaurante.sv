@@ -22,7 +22,7 @@ function cuenta_agregarOrden(objetivo, grupo, modo)
     var orden = $('<div class="orden" />');
     var total = 0.00;
     var html = '';
-    var controles = '<button class="imp_tiquete">Tiquete</button><button class="cerrar_cuenta">Cerrar</button><button class="anular_cuenta">Anular</button>';
+    var controles = '<button class="imp_factura">Factura</button><button class="imp_cf">CF</button><button class="imp_tiquete">Tiquete</button><button class="cerrar_cuenta">Cerrar</button><button class="anular_cuenta">Anular</button>';
 
     if ( modo == 0 && _ordenes[grupo][0].flag_tiquetado == '1')
     {
@@ -63,11 +63,11 @@ function cuenta_agregarOrden(objetivo, grupo, modo)
     html += '<table class="encabezado_orden">';
     html += '<tr>';
     html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa">'+_ordenes[grupo][0].ID_mesa+'</button> → <strong>'+_ordenes[grupo][0].nombre_mesero+'</strong></td>';
-    html += '<td class="botones">' + controles + '</td>';
     html += '<td class="precio_precalculo"></td>';
     html += '<td class="precio"></td>';
     html += '</tr>';
     html += '</table>';
+    html += '<div class="cuenta contenedor_botones">' + controles + '</div>';
     
     if ( modo == 0) {
         html += '<div class="cuenta controles_seleccion">';

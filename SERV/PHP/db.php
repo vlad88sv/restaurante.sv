@@ -11,7 +11,6 @@ $memcache -> addServer('127.0.0.1', 11211);
 function db_conectar(){
     global $db_link;
     $db_link = @mysqli_connect(db__host, db__usuario, db__clave, db__db) or die("Fue imposible conectarse a la base de datos.<br /><hr />Detalles del error:<pre>" . @mysqli_error($db_link) . "</pre>");
-    mysqli_query($db_link,'SET NAMES utf8');
 }
 
 function db_consultar($consulta){

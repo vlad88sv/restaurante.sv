@@ -47,7 +47,7 @@ function actualizarCuentas() {
        for(x in datos.aux.pendientes)
        {
         _ordenes[x] = datos.aux.pendientes[x];                  
-        agregarPedido($("#contenedor_cuentas"), x, 1);
+        cuenta_agregarOrden($("#contenedor_cuentas"), x, 1);
        }
     
     });

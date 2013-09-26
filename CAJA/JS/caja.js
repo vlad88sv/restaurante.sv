@@ -40,10 +40,10 @@ function actualizar() {
 }
 
 function cuadrarCorte() {
-    var total_a_cuadrar = parseFloat($("#total_a_cuadrar").val());
-    var total_efectivo = parseFloat($("#total_efectivo").val());
-    var total_pos = parseFloat($("#total_pos").val());
-    var total_compras = parseFloat($("#total_compras").val());
+    var total_a_cuadrar = parseFloat($.trim($("#total_a_cuadrar").val()));
+    var total_efectivo = parseFloat($.trim($("#total_efectivo").val()));
+    var total_pos = parseFloat($.trim($("#total_pos").val()));
+    var total_compras = parseFloat($.trim($("#total_compras").val()));
     var total_diferencia = total_a_cuadrar - (total_efectivo + total_pos + total_compras);
     
     $("#total_diferencia").val(total_diferencia.toFixed(2));

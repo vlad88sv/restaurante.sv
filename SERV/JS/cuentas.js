@@ -12,7 +12,7 @@ function rsv_solicitar(peticion, data, funcion) {
     return ret_json;
 }
 
-function cuenta_agregarOrden(objetivo, grupo, modo)
+function cuenta_obtenerVisual(objetivo, grupo, modo)
 {
     // Modo = 0 : normal
     // Modo = 1 : historial
@@ -163,7 +163,7 @@ function cuenta_agregarOrden(objetivo, grupo, modo)
 
     objetivo.append(orden);
     
-} // agregarPedido()
+} // cuenta_obtenerVisual()
 
 function crearTiquete(_datos)
 {

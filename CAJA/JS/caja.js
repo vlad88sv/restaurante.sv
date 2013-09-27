@@ -33,7 +33,7 @@ function actualizar() {
        for(x in datos.aux.pendientes)
        {
         _ordenes[x] = datos.aux.pendientes[x];                  
-        cuenta_agregarOrden($("#pedidos"), x, 0);
+        cuenta_obtenerVisual($("#pedidos"), x, 0);
        }
     
     });
@@ -193,7 +193,7 @@ $(function(){
            for(x in datos.aux.pendientes)
            {
             _ordenes[x] = datos.aux.pendientes[x];                  
-            cuenta_agregarOrden($("#destino_historial"), x, 1);
+            cuenta_obtenerVisual($("#destino_historial"), x, 1);
            }
 
         });

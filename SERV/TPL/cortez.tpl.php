@@ -68,8 +68,8 @@ if (empty($_POST['fecha']))
 }
 
 $c_adicionales = '( SELECT COALESCE(SUM(precio_grabado),0 ) FROM `pedidos_adicionales` AS t3 WHERE t3.tipo="poner" AND t3.ID_pedido=t2.ID_pedido )';
-$c_total_bruto = '(COALESCE(t2.precio_grabado,0) + '.$c_adicionales.')';
-$c_total = 'SUM( ('.$c_total_bruto.' / IF(flag_exento = 0, 1, 1.13)) * IF(flag_nopropina = 0, 1.10, 1) ) AS total';
+$c_total_bruto = '( ( (COALESCE(t2.precio_grabado,0) + '.$c_adicionales.') / IF(flag_exento = 0, 1, 1.13) ) * IF(flag_nopropina = 0, 1.10, 1) )';
+$c_total = 'SUM( ROUND('.$c_total_bruto.',2) ) AS total';
 
 $c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0';
 $r = db_consultar($c);

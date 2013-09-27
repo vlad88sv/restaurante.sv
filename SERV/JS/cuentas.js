@@ -169,7 +169,7 @@ function crearTiquete(_datos)
 {
     var orden = $('<div class="orden" />');
     orden.append('<p style="font-weight:bold;text-align:center;">7G, S.A. de C.V.</p>');
-    orden.append('<p style="text-align:center;">Plaza volcán, Km. 16.5,<br />Calle al boquerón<br />Santa Tecla, La Libertad</p>');
+    orden.append('<p style="text-align:center;">Plaza Los Castaños,<br />Av. Masferrer Nte.<br />San Salvador, San Salvador</p>');
     orden.append('<p style="text-align:center;">Tel. Oficinas administrativas:<br />(503) 2243-6017</p>');
     
     var total = 0.00;
@@ -218,8 +218,7 @@ function crearTiquete(_datos)
         orden.find('table.totales').append('<tr><td>Propina (10%):</td><td>' + '$' + parseFloat(propina).toFixed(2) + '</td></tr>' );
 
     orden.find('table.totales').append('<tr><td>Total:</td><td>' + '$' + total.toFixed(2) + '</td></tr>' );
-    orden.append('<br /><br /><br /><br /><p style="text-align:center;">La pizzería - Plaza Volcán<br />¡Gracias por su compra!<br /><br />' + date + '</p>');
-    orden.append('<br /><p style="text-align:center;">'+_datos[0].cuenta+'</p>');
+    orden.append('<br /><br /><br /><br /><p style="text-align:center;">La pizzería - Plaza Los Castaños<br />¡Gracias por su compra!<br /><br />' + date + '</p>');
     
     return orden.html();
 } // crearTiquete()

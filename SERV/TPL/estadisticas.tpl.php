@@ -41,7 +41,7 @@ foreach ($dsn as $ID_mesero => $bdsn)
 
 /***********************************************/
 // Tiempo Promedio de Servicio (TPS)
-$c = 'SELECT (STDDEV(TIME_TO_SEC(TIMEDIFF(`fechahora_entregado`, `fechahora_pedido`))) / 60) AS stddev_tps, (AVG(TIME_TO_SEC(TIMEDIFF(`fechahora_entregado`, `fechahora_pedido`))) / 60) AS tps FROM `ordenes` WHERE  `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_despachado=1 AND fechahora_entregado <> "0000-00-00 00:00:00"';
+$c = 'SELECT (STDDEV(TIME_TO_SEC(TIMEDIFF(`fechahora_entregado`, `fechahora_pedido`))) / 60) AS stddev_tps, (AVG(TIME_TO_SEC(TIMEDIFF(`fechahora_entregado`, `fechahora_pedido`))) / 60) AS tps FROM `ordenes` WHERE  `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_despachado=1 AND nodo IN ("pizzas1", "pizzas2", "pastas", "ensaladas", "entradas_horno") AND fechahora_entregado <> "0000-00-00 00:00:00"';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
@@ -145,7 +145,7 @@ while ($f = db_fetch($r))
 
 /************************************************/
 // Mesas mas utilizadas
-$c = 'SELECT ID_mesa, COUNT(*) as cantidad  FROM `ordenes` LEFT JOIN `pedidos` USING(ID_orden) WHERE ID_producto IS NOT NULL AND `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_anulado = 0 AND flag_cancelado = 0 GROUP BY ID_mesa, cuenta ORDER BY  cantidad DESC';
+$c = 'SELECT ID_mesa, COUNT(DISTINCT `cuenta`) as cantidad  FROM `ordenes` LEFT JOIN `pedidos` USING(ID_orden) WHERE ID_producto IS NOT NULL AND `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_anulado = 0 AND flag_cancelado = 0 GROUP BY ID_mesa ORDER BY cantidad DESC';
 $r = db_consultar($c);
 while ($f = db_fetch($r))
 {

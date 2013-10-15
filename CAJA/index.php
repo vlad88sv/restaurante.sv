@@ -35,7 +35,7 @@ $_html['contenido'] = ob_get_clean();
 	    
             $.ajaxSetup({
                 cache: false,
-		timeout: 5000,
+		timeout: 3000,
 		complete: function (jqXHR, textStatus) {
 		    if (textStatus == "success") {
 			$("#ajax_error").hide();

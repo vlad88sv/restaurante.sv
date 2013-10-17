@@ -292,6 +292,34 @@ $(function(){
        });
     });
     
+    $(document).on('click','.imp_fiscal', function(){        
+        var orden = $(this).parents('.orden');
+        
+        rsv_solicitar('cuenta',{ cuenta: orden.attr('cuenta'), facturacion: '1'},function(datos){
+            for(x in datos.aux.pendientes)
+            {
+                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], true);
+                
+                
+                $.post('http://localhost:40001', {xml:xml}, function(data){alert(data)}, 'text');
+            }
+       });
+    });
+    
+    $(document).on('click','.imp_fiscal_d', function(){        
+        var orden = $(this).parents('.orden');
+        
+        rsv_solicitar('cuenta',{ cuenta: orden.attr('cuenta'), facturacion: '1'},function(datos){
+            for(x in datos.aux.pendientes)
+            {
+                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], false);
+                
+                
+                $.post('http://localhost:40001', {xml:xml}, function(data){alert(data)}, 'text');
+            }
+       });
+    });
+    
     $(document).on('click','.quitar_propina', function(){
         if (!confirm('¿Realmente desea quitarle el sustento a los empleados?'))
             return;
@@ -378,17 +406,6 @@ $(function(){
             // VOID
         });
     });    
-    
-
-    $('#pedidos').on('click','.imp_factura', function(){
-        if (!confirm('¿Realmente desea imprimir esta factura?'))
-            return;
-    });
-    
-    $('#pedidos').on('click','.imp_ccf', function(){
-        if (!confirm('¿Realmente desea imprimir este credito fiscal?'))
-            return;
-    });
 
     $('#inventario').click(function(){
         

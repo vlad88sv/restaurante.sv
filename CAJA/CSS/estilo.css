@@ -92,7 +92,7 @@ input[type=checkbox]
 }
 
 .producto:hover {
-    border-bottom: 1px solid white;
+    border-bottom: 1px dashed white;
 }
 
 .mesa {
@@ -127,20 +127,22 @@ div#pedidos {
 }
 
 .cambio_mesa {
-    font-weight: bold;
-    font-size: 18px;
-    color: red;
-    
+    font-family: monospace !important;
+    font-weight: bold !important;
+    font-size: 22px !important;
+    color: red !important;
+    width: 75px !important;
 }
 
 div.orden {
     background-color: grey;
     border: 2px solid whitesmoke;
+    border-radius: 10px;
     margin: 10px 0;
     padding: 5px;
     position: relative;
     vertical-align: top;
-    overflow: auto;
+    overflow: auto;  
 }
 
 div.orden.ghost {
@@ -154,31 +156,33 @@ div.orden.ghost {
     font-size: 10px;
 }
 
-div.orden_compacta {
-    height: 42px;
-    overflow: hidden;
-}
-
 div.pago_pendiente {
     background: url('../IMG/dinero.gif') grey bottom right no-repeat;
 }
+
 
 span.grupo {
     font-size: 1.2em;
     color: yellow;
 }
 
+div.contenedor_encabezado_orden
+{
+    background-color: #ADFF2F;
+    margin-bottom: 2px;
+    border-radius:5px;
+    border: 3px solid #000000;
+    padding: 2px;
+}
+
 table.encabezado_orden {
-    background-color: gainsboro;
+    background: none;
     color: black;
     width: 100%;
-    margin-bottom: 2px;
-    border: 1px solid black;
     border-collapse: collapse;
 }
 
 table.encabezado_orden td {
-    border: 1px solid black;
     vertical-align:middle;
 }
 
@@ -187,11 +191,12 @@ table.encabezado_orden td {
     text-align: center;
 }
 .cuenta {
-    background-color: gainsboro;
-    color: black;
+    background-color: #A3A3A3;
+    color: #FFFFF0;
     font-family: courier;
     padding: 3px;
-    border: 1px solid black;
+    margin: 2px 0px;
+    border-radius: 5px;
 }
 
 .controles_seleccion {
@@ -214,12 +219,14 @@ table.encabezado_orden td {
     font-size: 18px;
     font-weight: bold;
     color: blue;
-    text-align: center;
+    text-align: right;
+    padding-right: 5px;
 }
 
 .precio_precalculo {
-    font-size: 0.9em;
+    font-size: 13px;
     text-align: center;
+    font-family: monospace;
 }
 
 div.pedido {
@@ -307,4 +314,51 @@ div.pedido {
 
 #cocina div.mucho_tiempo {
     border: 1px solid red !important;
+}
+
+.btn {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background-color:#ededed;
+	-webkit-border-top-left-radius:6px;
+	-moz-border-radius-topleft:6px;
+	border-top-left-radius:6px;
+	-webkit-border-top-right-radius:6px;
+	-moz-border-radius-topright:6px;
+	border-top-right-radius:6px;
+	-webkit-border-bottom-right-radius:6px;
+	-moz-border-radius-bottomright:6px;
+	border-bottom-right-radius:6px;
+	-webkit-border-bottom-left-radius:6px;
+	-moz-border-radius-bottomleft:6px;
+	border-bottom-left-radius:6px;
+	text-indent:0;
+	border:1px solid #000000;
+	display:inline-block;
+	color:#2b2a2b;
+	font-family:arial;
+	font-size:12px;
+	font-weight:bold;
+	font-style:normal;
+	height:24px;
+	line-height:24px;
+	width:100px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #ffffff;
+        margin: 1px;
+}
+.btn:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+	background-color:#dfdfdf;
+}
+.btn:active {
+	position:relative;
+	top:1px;
 }

@@ -22,7 +22,7 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     var orden = $('<div class="orden" />');
     var total = 0.00;
     var html = '';
-    var controles = '<button class="imp_factura">Factura</button><button class="imp_cf">CF</button><button class="imp_tiquete">Tiquete</button><button class="cerrar_cuenta">Cerrar</button><button class="anular_cuenta">Anular</button>';
+    var controles = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button><button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>';
 
     if ( modo == 0 && _ordenes[grupo][0].flag_tiquetado == '1')
     {
@@ -31,7 +31,7 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
 
     if (modo == 1)
     {
-        controles = '<button class="imp_tiquete">Tiquete</button><button class="abrir_cuenta">Abrir</button><button class="anular_cuenta">Anular</button>';
+        controles = '<button class="imp_tiquete btn">Tiquete</button><button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
         html += '<div class="cuenta">Cerrado: ' + _ordenes[grupo][0].fechahora_pagado+ ' | Cuenta: '+_ordenes[grupo][0].cuenta+'</div>';
        
         if (_ordenes[grupo][0].flag_anulado == '1')
@@ -41,6 +41,17 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
         
     }
 
+    html += '<div class="contenedor_encabezado_orden">';
+    html += '<table class="encabezado_orden">';
+    html += '<tr>';
+    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa btn">'+_ordenes[grupo][0].ID_mesa+'</button> → <strong>'+_ordenes[grupo][0].nombre_mesero+'</strong></td>';
+    html += '<td class="precio_precalculo"></td>';
+    html += '<td class="precio"></td>';
+    html += '</tr>';
+    html += '</table>';
+    html += '</div>';
+    html += '<div class="cuenta contenedor_botones" style="text-align:center;">' + controles + '</div>';
+    html += '<hr />';
     if (_ordenes[grupo][0].flag_nopropina == '1')
     {
         html += '<div class="cuenta" style="background-color:pink;color:red;text-align:center;font-size:14px;font-weight:bold;">sin propina</div>';
@@ -51,28 +62,21 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
         html += '<div class="cuenta" style="background-color:yellow;color:black;text-align:center;font-size:14px;font-weight:bold;">sin IVA</div>';
     }
     
-    if (_ordenes[grupo][0].historial != null)
-    {
-        for (historia in _ordenes[grupo][0].historial) {
-            html += '<div class="cuenta" style="background-color:yellow;color:black;text-align:center;font-size:14px;font-weight:bold;">';
-            html += _ordenes[grupo][0].historial[historia].hora + ' :: ' + _ordenes[grupo][0].historial[historia].accion + ' :: ' + _ordenes[grupo][0].historial[historia].nota;
-            html += '</div>';
-        }
-    }
-
-    html += '<table class="encabezado_orden">';
-    html += '<tr>';
-    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa">'+_ordenes[grupo][0].ID_mesa+'</button> → <strong>'+_ordenes[grupo][0].nombre_mesero+'</strong></td>';
-    html += '<td class="precio_precalculo"></td>';
-    html += '<td class="precio"></td>';
-    html += '</tr>';
-    html += '</table>';
-    html += '<div class="cuenta contenedor_botones">' + controles + '</div>';
     
     if ( modo == 0) {
         html += '<div class="cuenta controles_seleccion">';
-        html += 'SELECCIONADOS: <button class="btn_separar_cuenta">separar cuenta</button>&nbsp;<button class="btn_cambiar_mesa">cambiar mesa</button>';
+        html += 'SELECCIONADOS: <button class="btn_separar_cuenta btn">separar cuenta</button>&nbsp;<button class="btn_cambiar_mesa btn">cambiar mesa</button>';
         html += '</div>';
+    }
+
+    if (_ordenes[grupo][0].historial != null && _ordenes[grupo][0].historial.length > 0)
+    {	
+        for (historia in _ordenes[grupo][0].historial) {
+            html += '<div class="cuenta" style="background-color:#FFFFA2;color:#676767;text-align:center;">';
+            html += _ordenes[grupo][0].historial[historia].hora + ' :: ' + _ordenes[grupo][0].historial[historia].accion + ' :: ' + _ordenes[grupo][0].historial[historia].nota;
+            html += '</div>';
+        }
+	html += '<hr />';
     }
     
     orden.append(html);
@@ -151,12 +155,12 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
         
 	if ( ! $("#cuentas_compactas").is(':checked') )
 	    orden.append(pedido);   
-    }    
-   
+    }
+    
     var precio_sin_iva = (total / 1.13).toFixed(2);
     var iva = (_ordenes[grupo][0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
     var propina = ( _ordenes[grupo][0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
-    orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
+    orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;color:red;font-weight:bold;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
     
     total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
     orden.find('.precio').html( '<span title="Total con IVA y con propina">$' + total.toFixed(2) + '</span>' );
@@ -222,6 +226,45 @@ function crearTiquete(_datos)
     
     return orden.html();
 } // crearTiquete()
+
+function crearXmlParaFacturin(_datos, simple)
+{
+    var xml = $('<root><trabajo><general></general><productos></productos></trabajo></root>');
+    var general = xml.find('general');
+    var productos = xml.find('productos');
+    
+    var total = 0;
+    
+    for (x in _datos)
+    {        
+	var totalProducto = ( _datos[x].precio_grabado );
+	
+        if ('adicionales' in _datos[x] && _datos[x].adicionales.length > 0)
+        {
+	    for (adicional in _datos[x].adicionales)
+            {
+		totalProducto = parseFloat(totalProducto) + parseFloat(_datos[x].adicionales[adicional].precio_grabado);
+	    }
+        }
+	total = parseFloat(total) + parseFloat(totalProducto);
+	
+	if (!simple) {
+	    var producto = $('<producto cantidad="1" nosujeta="0" precio="' + parseFloat(totalProducto).toFixed(2) + '">'+_datos[x].nombre_producto.substring(0,23)+'</producto>');
+    
+	    productos.append(producto);
+	}
+    }
+
+    if (simple) {
+	productos.append('<producto cantidad="1" nosujeta="0" precio="' + parseFloat(total).toFixed(2) + '">Consumo</producto>');
+    }
+    var propina = ( _datos[0].flag_nopropina == '0' ? ((parseFloat(total) * 1.10) - parseFloat(total) ) : 0 );
+    productos.append('<producto cantidad="1" nosujeta="1" precio="' + parseFloat(propina).toFixed(2) + '">Propina</producto>');
+
+    general.append('<impuestos>'+( _datos[0].flag_exento == '0' ? "iva" : "exento" )+'</impuestos>');
+    
+    return xml.html();
+} // crearXmlParaFacturin()
 
 $(function(){
     

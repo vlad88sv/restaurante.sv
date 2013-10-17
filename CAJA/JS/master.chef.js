@@ -38,6 +38,8 @@ function timeSince(date) {
     if (interval > 1) {
         return interval + " m";
     }
+    
+    seconds = max(seconds, 0);
     return Math.floor(seconds) + " s";
 }
 

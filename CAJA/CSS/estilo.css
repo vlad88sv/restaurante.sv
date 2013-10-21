@@ -69,6 +69,10 @@ table.zebra tr:nth-child(odd) td
   background-color:#FFE4C6;
 }
 
+table.resalte tr:hover {
+    color: blue;
+    background-color: whitesmoke;
+}
 
 input, button {
     text-align: center;
@@ -136,8 +140,8 @@ div#pedidos {
 
 div.orden {
     background-color: grey;
-    border: 2px solid whitesmoke;
-    border-radius: 10px;
+    border: 5px solid whitesmoke;
+    border-radius: 5px;
     margin: 10px 0;
     padding: 5px;
     position: relative;
@@ -193,7 +197,8 @@ table.encabezado_orden td {
 .cuenta {
     background-color: #A3A3A3;
     color: #FFFFF0;
-    font-family: courier;
+    font-family: "Courier New";
+    font-size: 11px;
     padding: 3px;
     margin: 2px 0px;
     border-radius: 5px;
@@ -346,7 +351,7 @@ div.pedido {
 	font-style:normal;
 	height:24px;
 	line-height:24px;
-	width:100px;
+	min-width:100px;
 	text-decoration:none;
 	text-align:center;
 	text-shadow:1px 1px 0px #ffffff;

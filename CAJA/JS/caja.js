@@ -600,7 +600,7 @@ $(function(){
 
     $('#historial_cortez').click(function(){
         rsv_solicitar('cortez',{historial: true},function(datos){
-            var buffer = '<table class="estandar ancha bordes">';
+            var buffer = '<table class="estandar ancha bordes resalte">';
             buffer += '<tr><th>Fecha</th><th>Total</th><th>Diferencia</th><th>Efectivo</th><th>POS</th><th>Compras</th><th>Caja</th><th>Estado</th></tr>';
             for(y in datos.aux.historial)
             {

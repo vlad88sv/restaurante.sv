@@ -39,7 +39,7 @@ function timeSince(date) {
         return interval + " m";
     }
     
-    Math.max(seconds, 0);
+    seconds = Math.max(seconds, 0);
     return Math.floor(seconds) + " s";
 }
 

@@ -38,7 +38,7 @@ $CRITERIO_BASE = 't0.`flag_despachado` = 0';
 
 if (isset($_POST['ghost']))
 {
-    $CRITERIO_BASE = '(t0.`flag_despachado` = 0 OR fechahora_entregado > (NOW() - INTERVAL 15 MINUTE))';
+    $CRITERIO_BASE = '(t0.`flag_despachado` = 0 OR fechahora_entregado > (NOW() - INTERVAL 5 MINUTE))';
 }
 
 if (isset($_POST['nodo']))

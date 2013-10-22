@@ -110,7 +110,7 @@ function intentarProductoEnPedido(str_producto, str_detalle, str_precio)
     var buffer = '';
         
     buffer += '<div style="clear:both;height:45px;text-align:center;border-bottom: 4px solid black;margin-bottom:4px;" class="botones_grandes">';
-    buffer += '<button id="agregar_producto_aceptar" class="key" key="65" style="float:left;">[Ctrl+Alt+a] Aceptar</button>';
+    buffer += '<div style="float:left;"><button id="agregar_producto_aceptar" class="key" key="65">[Ctrl+Alt+a] Aceptar</button> x <input id="agregar_producto_cantidad" style="width:1em" type="text" value="1" /></div>';
     buffer += '<span style="font-size:1.3em;font-weight:bold;margin:0;padding:0;">' + str_detalle + '</span>';
     buffer += '<button style="float:right;" class="facebox_cerrar key" key="67">[Ctrl+Alt+c] Cerrar</button>';
     buffer += '</div>';
@@ -135,9 +135,12 @@ function intentarProductoEnPedido(str_producto, str_detalle, str_precio)
     
 }
 
-function convertirProductoEnPedido(buffer_de_orden)
+function convertirProductoEnPedido(buffer_de_orden, cantidad)
 {
-    _orden.push(buffer_de_orden);
+    cantidad = cantidad || 1;
+    for (var i=0; i < cantidad; i++) {
+        _orden.push(buffer_de_orden);
+    }
     miniResumenOrden();
     $("#buscar_producto").focus();
 }
@@ -323,15 +326,24 @@ $(function(){
     $(".agregar_producto").live('keydown', function(event){
         event.preventDefault();
         var keyCode = event.keyCode || event.which;
+
+        var ID_producto = $(this).attr('producto');
+        var _b_orden = {ID: ID_producto, precio: $(this).attr('precio'), detalle: $(this).attr('nombre'), adicionales: [], ingredientes: []};
+
+        if (keyCode > 48 && keyCode < 58) {
+            convertirProductoEnPedido(_b_orden, parseInt(keyCode) - 48);
+        }
+
+        
+        if (keyCode > 96 && keyCode < 106) {
+            convertirProductoEnPedido(_b_orden, parseInt(keyCode) - 96);
+        }
         
         if (keyCode == 13) {
-            var ID_producto = $(this).attr('producto');
-            var _b_orden = {ID: ID_producto, precio: $(this).attr('precio'), detalle: $(this).attr('nombre'), adicionales: [], ingredientes: []};
             convertirProductoEnPedido(_b_orden);
         }
         
         if (keyCode == 32) {
-            var ID_producto = $(this).attr('producto');
             intentarProductoEnPedido(ID_producto, $(this).attr('nombre'), $(this).attr('precio'));
         }
         
@@ -349,9 +361,11 @@ $(function(){
     });
     
     function agregar_producto_accion_directa(objeto){
+        
         var ID_producto = $(objeto).attr('producto');
         var _b_orden = {ID: ID_producto, precio: $(objeto).attr('precio'), detalle: $(objeto).attr('nombre'), adicionales: [], ingredientes: []};
         convertirProductoEnPedido(_b_orden);
+        
     }
     
     function agregar_producto_accion_indirecta(objeto){
@@ -401,7 +415,7 @@ $(function(){
             _b_orden.ingredientes.push($(this).val());
         });
 
-        convertirProductoEnPedido(_b_orden);
+        convertirProductoEnPedido(_b_orden, $("#agregar_producto_cantidad").val());
         $.modal.close();
     });
     
@@ -532,7 +546,7 @@ $(function(){
         }
         event.stopPropagation();
     });
-    
+        
     $("#vaciar_cache").click(function () {
        if (confirm("Esto vaciará el cache y borrará el pedido actual.\nEsto es útil si desea cargar nuevos cambios del sistema o nuevos productos/adicionables.") == false)
         return;

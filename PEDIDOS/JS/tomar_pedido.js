@@ -265,6 +265,33 @@ $(function(){
         }, event);
     });
     
+    $(document).on('mouseover', '#busqueda_adicionales', function(event) {
+        $(this).qtip({
+            overwrite: true,
+            content: 'Presione [ENTER] o flecha [ABAJO] para pasar a los resultados.',
+            show: {
+                solo: true,
+                event: event.type,
+                ready: true 
+            }
+        }, event);
+    });
+
+    $(document).on('focus mouseover', '.ppia_adicional', function(event) {
+        $(this).qtip({
+            overwrite: true,
+            content: '[TAB] para cambiar entre Agregar, Doble y Quitar.<br />[ESPACIO] para chequear esta opción.',
+            show: {
+                solo: true,
+                event: event.type,
+                ready: true 
+            },
+            hide: {
+                event: 'unfocus'
+            }
+        }, event);
+    });    
+    
     $("#borrar_orden").click(function(){
         if (confirm('¿Desea borrar por completo esta orden?')) {
             reiniciarInterfaz();

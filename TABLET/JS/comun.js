@@ -9,5 +9,5 @@ function rsv_solicitar(peticion, data, funcion) {
 
 
 $(function(){
-    $('.facebox_cerrar').live('click',function(){$.modal.close();});
+    $('document').on('click', '.facebox_cerrar', function(){$.modal.close();});
 });

@@ -298,7 +298,7 @@ $(function(){
         }
     });
     
-    $('.ppia_adicional').live('click',function(){
+    $('document').on('click','.ppia_adicional',function(){
         $("#busqueda_adicionales").val('').focus().trigger('keyup');
     });
     
@@ -377,7 +377,7 @@ $(function(){
     });
     
     
-    $(".agregar_producto").live('keydown', function(event){
+    $(document).on('keydown', '.agregar_producto', function(event){
         event.preventDefault();
         var keyCode = event.keyCode || event.which;
 
@@ -427,7 +427,7 @@ $(function(){
         intentarProductoEnPedido(ID_producto, $(objeto).attr('nombre'), $(objeto).attr('precio'));
     }
     
-    $('.agregar_producto').live('click', function(){
+    $('document').on('click', '.agregar_producto', function(){
         if ($("#modo_tactil").is(':checked')) {
             agregar_producto_accion_directa(this);
         } else {
@@ -436,7 +436,7 @@ $(function(){
         
     });
         
-    $('.agregar_producto').live('contextmenu', function(event){
+    $('document').on('contextmenu', '.agregar_producto', function(event){
         event.preventDefault();
         if ($("#modo_tactil").is(':checked')) {
             agregar_producto_accion_indirecta(this);
@@ -445,7 +445,7 @@ $(function(){
         }
     });
     
-    $('#agregar_producto_aceptar').live('click', function(){
+    $('document').on('click', '#agregar_producto_aceptar', function(){
 
         _b_orden.ingredientes = [];
         
@@ -472,17 +472,13 @@ $(function(){
         convertirProductoEnPedido(_b_orden, $("#agregar_producto_cantidad").val());
         $.modal.close();
     });
-    
-    $('.btn_detalles_pedido').live('click',function(){
         
-    });
-    
     $(document).on('click','#cpep_adicionables input[type="checkbox"]', function(){
         var grupo = $(this).attr('grupo');
         $('#cpep_adicionables input[type="checkbox"][grupo="'+grupo+'"]:checked').not(this).removeAttr('checked');
     });
     
-    $('.btn_eliminar_pedido').live('click', function(){
+    $('document').on('click', '.btn_eliminar_pedido', function(){
         
         if (!confirm('¿Desea eliminar este producto?')) return;
         
@@ -495,7 +491,7 @@ $(function(){
         ResumenOrden();
     });
     
-    $(".agregar_producto").live('click', function(event){
+    $(document).on('click', '.agregar_producto', function(event){
         event.preventDefault();            
     });
     
@@ -504,7 +500,7 @@ $(function(){
         mostrar_grupo_productos($(this).attr('rel'));
     });
     
-    $(".filtro_adicionales").live('click', function (event){
+    $(document).on('click', '.filtro_adicionales', function (event){
        event.preventDefault();
        var afinidad = $(this).attr('rel');
        if (afinidad == '') {
@@ -516,13 +512,13 @@ $(function(){
        $('.contenedor_adicionales tbody tr[rel="'+afinidad+'"]').show();
     });
     
-    $("#busqueda_adicionales").live('keydown', function(event){
+    $(document).on('keydown', '#busqueda_adicionales', function(event){
         //Keydown es antes de keyup
         //event.stopPropagation();
     });
     
 
-    $("#buscar_producto").live('keydown', function(event){
+    $(document).on('keydown', '#buscar_producto', function(event){
         var keyCode = event.keyCode || event.which;
         
         if (keyCode == 13 || keyCode == 40) {
@@ -532,7 +528,7 @@ $(function(){
         
     });    
     
-    $("#buscar_producto").live('keyup', function(event){
+    $(document).on('keyup', '#buscar_producto', function(event){
         var keyCode = event.keyCode || event.which;
         if ( event.altKey == true  || event.ctrlKey == true || keyCode == 18){
             return false;
@@ -554,7 +550,7 @@ $(function(){
         return true;
     });    
 
-    $("#busqueda_adicionales").live('keydown', function(event){
+    $(document).on('keydown', '#busqueda_adicionales', function(event){
         var keyCode = event.keyCode || event.which;
         
         if (keyCode == 13 || keyCode == 40) {
@@ -564,7 +560,7 @@ $(function(){
         
     });    
     
-    $("#busqueda_adicionales").live('keyup', function(event){
+    $(document).on('keyup', '#busqueda_adicionales', function(event){
        event.stopPropagation();
        
         var keyCode = event.keyCode || event.which;

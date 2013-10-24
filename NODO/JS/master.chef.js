@@ -148,7 +148,7 @@ function actualizar() {
 
 $(function(){
     
-    $('div.orden').live('click', function(){
+     $('document').on('click', 'div.orden', function(){
         
         $(this).addClass('orden_despachando');
         

@@ -291,11 +291,25 @@ function crearXmlParaFacturin(_datos, tipo, simple, directa)
 } // crearXmlParaFacturin()
 
 function cargarEstado() {
-    if(typeof(Storage) != "undefined"){
-        $(".auto_guardar[id!='']").each(function(){
-            console.log(this.nodeName + this.id);
-        });
-    }
+    if(typeof(Storage) == "undefined") return;        
+    
+    $(".auto_guardar[id!='']").each(function(){
+        var resultado = localStorage.getItem("CE_" + this.id);
+        
+        if (resultado)
+        {
+            switch (this.nodeName + "-" + this.type)
+            {
+                case "INPUT-checkbox":
+                    $(this).prop('checked', (resultado == '1'));
+                    break;
+                case "SELECT-select-one":
+                    $(this).val(resultado);
+                    break;
+            }
+        }
+        //console.log(this.id + " :: " + resultado);
+    });
 }
 
 $(document).ready(function(){
@@ -313,8 +327,17 @@ $(document).ready(function(){
 $(function(){
     
     $(".auto_guardar").change(function(){
-        console.log("Ha cambiado: " + this.nodeName);
-        console.log(this);
+        switch (this.nodeName + "-" + this.type)
+        {
+            case "INPUT-checkbox":
+                localStorage.setItem("CE_" + this.id, ($(this).is(':checked') ? '1' : '0'));
+                break;
+            case "SELECT-select-one":
+                localStorage.setItem("CE_" + this.id, $(this).val());
+                break;
+        }
+        
+        //console.log("Ha cambiado: " + this.nodeName + "-" + this.type);
     });
    
     $.expr[':'].icontains = function (n, i, m) {

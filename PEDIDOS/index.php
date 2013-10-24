@@ -19,45 +19,17 @@ $_html['contenido'] = ob_get_clean();
     <meta name="viewport" content="width=480, height=800, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="CSS/estilo.css" />
-    <script type="text/javascript" src="JS/jquery.js"></script>
-    <script type="text/javascript" src="JS/jquery.simplemodal.js"></script>
-    <script type="text/javascript">
-        $(function(){
-            $.extend($.modal.defaults, {
-                minHeight: '90%',
-        	minWidth: '90%'
-            });
-            
-            $.ajax({
-                cache: false,
-		timeout : 2000,
-                beforeSend: function(){
-                    $("#ajax_cargando").show();
-                },
-                complete: function(){
-                    $("#ajax_cargando").hide();
-                },
-		error: function(jqXHR, textStatus, errorThrown) {
-		    alert('La comunicación ha fallado, posiblemente sus datos no se enviaron');
-		}
-            });
-        });
-    </script>
-    <script type="text/javascript" src="JS/comun.js"></script>
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.min.css" />
+    <script type="text/javascript" src="/SERV/JS/jquery.js"></script>
+    <script type="text/javascript" src="/SERV/JS/jquery.simplemodal.js"></script>
+    <script type="text/javascript" src="/SERV/JS/comun.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/qtip2/2.1.1/jquery.qtip.min.js"></script>
 </head> 
-<body>
-    
-<audio id="beep">
-    <source src="./SND/beep.wav">
-    <source src="./SND/beep.mp3">
-</audio>
-    
+<body>    
 <div id="page" >
     <div id="content">
         <?php echo $_html['contenido']; ?>
     </div>
 </div>
-
-<img id="ajax_cargando" src="IMG/cargando.gif" style="position:fixed;top:50%;left:50%;z-index:20;display: none;" />
 </body>
 </html>

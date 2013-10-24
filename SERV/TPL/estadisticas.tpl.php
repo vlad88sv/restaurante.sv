@@ -91,7 +91,7 @@ $c_adicionales = '( SELECT COALESCE(SUM(precio_grabado),0 ) FROM `pedidos_adicio
 $c_total_bruto = '(COALESCE(t2.precio_grabado,0) + '.$c_adicionales.')';
 $c_total = 'ROUND(SUM( ('.$c_total_bruto.' / IF(flag_exento = 0, 1, 1.13)) * IF(flag_nopropina = 0, 1.10, 1) ),2) AS total';
 
-$c = 'SELECT  DATE(fechahora_pedido) AS dia, '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0 GROUP BY DATE(fechahora_pedido) ORDER BY total DESC LIMIT 20';
+$c = 'SELECT  DATE(fechahora_pedido) AS dia, '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0 GROUP BY DATE(fechahora_pedido) ORDER BY DATE(fechahora_pedido) DESC';
 $r = db_consultar($c);
 while ($f = db_fetch($r))
 {
@@ -105,7 +105,7 @@ $c_adicionales = '( SELECT COALESCE(SUM(precio_grabado),0 ) FROM `pedidos_adicio
 $c_total_bruto = '(COALESCE(t2.precio_grabado,0) + '.$c_adicionales.')';
 $c_total = 'ROUND(SUM( ('.$c_total_bruto.' / IF(flag_exento = 0, 1, 1.13)) * IF(flag_nopropina = 0, 1.10, 1) ),2) AS total';
 
-$c = 'SELECT DATE_FORMAT(fechahora_pedido, "%Y-%M") AS mes, '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0 GROUP BY DATE_FORMAT(fechahora_pedido, "%Y%m") ORDER BY total DESC LIMIT 20';
+$c = 'SELECT DATE_FORMAT(fechahora_pedido, "%Y-%M") AS mes, '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0 GROUP BY DATE_FORMAT(fechahora_pedido, "%Y%m") ORDER BY DATE_FORMAT(fechahora_pedido, "%Y%m") DESC';
 $r = db_consultar($c);
 while ($f = db_fetch($r))
 {
@@ -125,7 +125,7 @@ while ($f = db_fetch($r))
 
 /************************************************/
 // Pizzas por dia
-$c = 'SELECT DATE(fechahora_pedido) AS dia, COUNT(*) as cantidad FROM `ordenes` LEFT JOIN `pedidos` USING(ID_orden) LEFT JOIN `productos` AS t3  USING(ID_producto) LEFT JOIN `productos_grupos` AS t4 USING(ID_grupo) WHERE `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_anulado = 0 AND flag_cancelado = 0 AND ID_grupo = 1 GROUP BY DATE(fechahora_pedido) ORDER BY cantidad DESC LIMIT 20';
+$c = 'SELECT DATE(fechahora_pedido) AS dia, COUNT(*) as cantidad FROM `ordenes` LEFT JOIN `pedidos` USING(ID_orden) LEFT JOIN `productos` AS t3  USING(ID_producto) LEFT JOIN `productos_grupos` AS t4 USING(ID_grupo) WHERE `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_anulado = 0 AND flag_cancelado = 0 AND ID_grupo = 1 GROUP BY DATE(fechahora_pedido) ORDER BY cantidad DESC';
 $r = db_consultar($c);
 while ($f = db_fetch($r))
 {

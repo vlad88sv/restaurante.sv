@@ -20,5 +20,13 @@ if (empty($_POST['TPL']) || !file_exists($TPL)) {
 
 header ('Content-type: text/html; charset=utf-8');
 header ('Content-type: application/json');
-echo json_encode($json);
+
+
+$salida = json_encode($json);
+
+if (isset($_POST['filtro_salida__ut8_decode']) )
+    $salida = utf8_decode($salida);
+
+echo $salida;
+
 ?>

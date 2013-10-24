@@ -15,16 +15,16 @@ $_html['titulo'] = '';
     <link rel="stylesheet" media="screen" href="CSS/estilo.css" />
     <link rel="stylesheet" media="print" href="CSS/estilo.impresion.css" />
     
-    <script type="text/javascript" src="JS/jquery.js"></script>
-    <script type="text/javascript" src="JS/jquery-jqprint.js"></script>
-    <script type="text/javascript" src="JS/date.js"></script>
-    <script type="text/javascript" src="JS/comun.js"></script>
+    <script type="text/javascript" src="/SERV/JS/jquery.js"></script>
+    <script type="text/javascript" src="/SERV/JS/jquery-jqprint.js"></script>
+    <script type="text/javascript" src="/SERV/JS/date.js"></script>
+    <script type="text/javascript" src="/SERV/JS/comun.js"></script>
     <script type="text/javascript" src="JS/impresion.js"></script>
 </head> 
 <body>
 <h1>Impresiones</h1>
 <div style="position: fixed; top:0; right:0; left:0; bottom:0; overflow-y: auto; margin:5px;padding:5px;border:1px solid black;" id="ajaxi" >
-<select style="position: fixed; bottom:0; right:0;z-index:99;" id="estacion" >
+<select style="position: fixed; bottom:0; right:0;z-index:99;" id="estacion" class="auto_guardar">
     <option value="tiquetes">Tiquetes y Facturas</option>
     <option value="comandas">Comandas</option>
     <option value="todo">Todo</option>

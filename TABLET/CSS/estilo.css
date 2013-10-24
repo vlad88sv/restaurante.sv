@@ -52,7 +52,7 @@ table.estandar {
     border-collapse: collapse;
     vertical-align: middle;                                                                             
 }
-table.estandar td, table.estandar th, {
+table.estandar td, table.estandar th {
     margin:0;
     border: none;
     padding: 0;

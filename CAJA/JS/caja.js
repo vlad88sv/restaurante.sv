@@ -1,14 +1,12 @@
 _t_id_pedido = 0; // Variable donde se almacena temporalmente el ID de pedido en edición
 keys = {};
 menu_visible = false;
-cmp_cache = {} // objeto donde almacenamos la última actualización real
+cmp_cache = {}; // objeto donde almacenamos la última actualización real
 
 
 function actualizar() {
-    
-    var fecha = $('#fecha_caja').val();
 
-    rsv_solicitar('cuenta',{mesa:$("#id_mesa").val(), pendientes: 1},function(datos){
+    rsv_solicitar('cuenta',{pendientes: 1},function(datos){
         
        _ordenes = {};
        
@@ -18,7 +16,7 @@ function actualizar() {
         return;
        }
        
-       if (JSON.stringify(cmp_cache) == JSON.stringify(datos.aux.pendientes)) {
+       if (cmp_cache == JSON.stringify(datos.aux.pendientes)) {
         // No redendizar nada, con el beneficio de:
         // * No alterar el DOM y hacer mas facil Firedebuggear
         // * No procesar innecesariamente
@@ -27,7 +25,7 @@ function actualizar() {
         return;
        }
        
-       cmp_cache = datos.aux.pendientes;
+       cmp_cache = JSON.stringify(datos.aux.pendientes);
     
        $("#pedidos").empty();
        for(x in datos.aux.pendientes)
@@ -209,7 +207,7 @@ $(function(){
 
     $("#mostrar_opciones").click(function(){
         menu_visible = !menu_visible;
-        $("#menu").toggle(menu_visible);
+        $("#menu, #menu2").toggle(menu_visible);
     });
 
 
@@ -217,6 +215,34 @@ $(function(){
         $("#pestana_cocina").remove();
     }
 
+    $("#btn_rapido_cuenta_cerrar, #btn_rapido_cuenta_tiquete").click(function(){
+        var mesa = $('#id_mesa').val();
+        
+        if ( mesa == "" || mesa == "0" ) {
+           alert('El número de mesa no puede ser "' + mesa + '"');
+           $('#id_mesa').val('').focus();
+	   return;
+	}
+        
+        // Busquemos si tenemos esa cuenta:
+        var orden = $('.orden[id_mesa="' + mesa + '"]');
+        
+        if (orden.length == 0)
+        {
+           alert('El número de mesa "' + mesa + '" no tiene cuenta abierta');
+           $('#id_mesa').val('').focus();
+	   return;
+        }
+        
+        if ($(this).attr('id') == 'btn_rapido_cuenta_cerrar') {
+            orden.find('.cerrar_cuenta').click();
+        } else if ($(this).attr('id') == 'btn_rapido_cuenta_tiquete') {
+            orden.find('.imp_tiquete').click();
+        }
+        
+        $('#id_mesa').val('').focus();
+    });
+    
     $(document).on('click','.abrir_cuenta', function(){
         if (!confirm('¿Realmente desea abrir nuevamente esta cuenta?'))
             return;
@@ -273,10 +299,19 @@ $(function(){
             return;
    
         var orden = $(this).parents('.orden');
+        var cuenta = orden.attr('cuenta');
            
-        rsv_solicitar('cuenta_cerrar',{mesa: orden.attr('id_mesa'), cuenta: orden.attr('cuenta')},function(datos){
-    
-         });     
+        rsv_solicitar('cuenta_cerrar',{mesa: orden.attr('id_mesa'), cuenta: orden.attr('cuenta')},function(datos){});
+         
+         if ($("#habilitar_facturin").is(":checked")) {
+            rsv_solicitar('cuenta',{ cuenta: cuenta, facturacion: '1'},function(datos){
+                for(x in datos.aux.pendientes) {
+                    var xml = crearXmlParaFacturin(datos.aux.pendientes[x], 0, true, true);
+
+                    $.post('http://localhost:40001', {xml:xml}, function(data){alert(data);}, 'text');
+                }
+           });
+         }
         
     });
 
@@ -292,36 +327,42 @@ $(function(){
        });
     });
     
-    $(document).on('click','.imp_fiscal', function(){        
+    $(document).on('contextmenu','.imp_fiscal, .imp_factura', function(event){
+        event.preventDefault();
+        return false;
+    });
+    
+    $(document).on('mousedown','.imp_factura', function(event){        
+        event.preventDefault();
         var orden = $(this).parents('.orden');
         
         rsv_solicitar('cuenta',{ cuenta: orden.attr('cuenta'), facturacion: '1'},function(datos){
             for(x in datos.aux.pendientes)
             {
-                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], true);
-                
+                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], 0, (event.which == 1), (event.which == 1));
                 
                 $.post('http://localhost:40001', {xml:xml}, function(data){alert(data)}, 'text');
             }
        });
+       return false;
     });
     
-    $(document).on('click','.imp_fiscal_d', function(){        
+    $(document).on('mousedown','.imp_fiscal', function(event){        
+        event.preventDefault();
         var orden = $(this).parents('.orden');
         
         rsv_solicitar('cuenta',{ cuenta: orden.attr('cuenta'), facturacion: '1'},function(datos){
-            for(x in datos.aux.pendientes)
+            for(var x in datos.aux.pendientes)
             {
-                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], false);
-                
-                
-                $.post('http://localhost:40001', {xml:xml}, function(data){alert(data)}, 'text');
+                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], 1, (event.which == 1), false);
+                $.post('http://localhost:40001', {xml:xml}, function(data){alert(data);}, 'text');
             }
        });
+       return false;
     });
-    
+
     $(document).on('click','.quitar_propina', function(){
-        if (!confirm('¿Realmente desea quitarle el sustento a los empleados?'))
+        if (!confirm('¿Realmente desea quitarle los sueños y esperanzas a los empleados?'))
             return;
         
         var motivo = '';
@@ -615,4 +656,29 @@ $(function(){
     $('#cortes').click(function(){
         window.location = '/CAJA?TPL=cortes';
     });
+    
+    $(document).on('mouseover', '.imp_factura', function(event) {
+        $(this).qtip({
+            overwrite: true,
+            content: '[CLIC_IZQ] para impresión rápida de factura "Clientes varios" con Consumo/Propina.<br />[CLIC_DER] para enviar detalles a Facturin Plus.',
+            show: {
+                solo: true,
+                event: event.type,
+                ready: true 
+            }
+        }, event);
+    });
+
+    $(document).on('mouseover', '.imp_fiscal', function(event) {
+        $(this).qtip({
+            overwrite: true,
+            content: '[CLIC_IZQ] para crear credito fiscal en Facturin Plus con consumo/propina.<br />[CLIC_DER] para crear credito fiscal en Facturin Plus con detalle de consumo.',
+            show: {
+                solo: true,
+                event: event.type,
+                ready: true 
+            }
+        }, event);
+    });
+    
 });

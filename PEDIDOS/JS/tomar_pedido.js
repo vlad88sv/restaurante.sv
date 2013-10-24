@@ -1,3 +1,5 @@
+_productos = {};
+_adicionales = {};
 _orden = [];
 _b_orden = [];
 _meseros = [];
@@ -237,6 +239,31 @@ $(window).load(function(){
 });
 
 $(function(){  
+    rsv_solicitar('producto_ingredientes_y_adicionales',{}, function(datos){
+        for (x in datos.aux.adicionables)
+        {
+            _adicionales[datos.aux.adicionables[x].ID_adicional] = datos.aux.adicionables[x];
+        }
+    }, true);
+
+
+    $('#buscar_producto').qtip({
+        content: {
+            text: 'Presione [ENTER] o flecha [ABAJO] para pasar a los resultados.'
+        }
+    });
+
+    $(document).on('focus mouseover', '.agregar_producto', function(event) {
+        $(this).qtip({
+            overwrite: true,
+            content: '[ENTER] para agregar el producto.<br />[ESPACIO] para personalizar<br />[1] a [9] para agregar x cantidad de veces',
+            show: {
+                solo: true,
+                event: event.type,
+                ready: true 
+            }
+        }, event);
+    });
     
     $("#borrar_orden").click(function(){
         if (confirm('¿Desea borrar por completo esta orden?')) {

@@ -1,7 +1,7 @@
 <script type="text/javascript" src="JS/master.chef.js"></script>
 <audio id="beep">
-    <source src="./SND/beep.wav">
-    <source src="./SND/beep.mp3">
+    <source src="/SERV/SND/beep.wav">
+    <source src="/SERV/SND/beep.mp3">
 </audio>
 <div id="pedidos">
     

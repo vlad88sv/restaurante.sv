@@ -1,15 +1,35 @@
 _ordenes = {}; // Objeto donde mantenemos las ordenes en presentación
 _productos = {};
 
-function rsv_solicitar(peticion, data, funcion) {
-    var ret_json;
+function rsv_solicitar(peticion, data, funcion, cache) {
     var objetivo = {TPL: peticion};
-        
-    $.post('/SERV/?ref='+peticion, $.extend(objetivo,data), function(retorno){
-        if ( typeof retorno.error != 'undefined' && retorno.error !== '' ) console.log(retorno.error);
+    var llave = window.btoa(peticion + JSON.stringify(data));
+    
+    cache = typeof cache !== 'undefined' ? cache : false;
+    
+    //cache = false;
+    if(typeof(Storage)!=="undefined" && cache == true){
+
+        retorno = localStorage.getItem(llave);
+        if (retorno !== null){
+            //console.log ('Cache hit! ' + peticion);
+            var objeto = JSON.parse(retorno);
+            //console.log(objeto);
+            funcion(objeto);
+            return true;
+        } else {
+            console.log ('No hit!: ' + peticion);
+        }
+    }    
+    
+    $.post('/SERV/', $.extend(objetivo,data), function(retorno){
+        if(typeof(Storage)!=="undefined" && cache == true){
+            localStorage.setItem(llave, JSON.stringify(retorno));
+        }
         funcion(retorno);
     }, 'json');
-    return ret_json;
+    
+    return true;
 }
 
 function cuenta_obtenerVisual(objetivo, grupo, modo)
@@ -22,7 +42,8 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     var orden = $('<div class="orden" />');
     var total = 0.00;
     var html = '';
-    var controles = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button><button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>';
+    var controles_fiscales = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>';
+    var controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>';
 
     if ( modo == 0 && _ordenes[grupo][0].flag_tiquetado == '1')
     {
@@ -31,7 +52,7 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
 
     if (modo == 1)
     {
-        controles = '<button class="imp_tiquete btn">Tiquete</button><button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
+        controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
         html += '<div class="cuenta">Cerrado: ' + _ordenes[grupo][0].fechahora_pagado+ ' | Cuenta: '+_ordenes[grupo][0].cuenta+'</div>';
        
         if (_ordenes[grupo][0].flag_anulado == '1')
@@ -227,7 +248,7 @@ function crearTiquete(_datos)
     return orden.html();
 } // crearTiquete()
 
-function crearXmlParaFacturin(_datos, simple)
+function crearXmlParaFacturin(_datos, tipo, simple, directa)
 {
     var xml = $('<root><trabajo><general></general><productos></productos></trabajo></root>');
     var general = xml.find('general');
@@ -250,9 +271,8 @@ function crearXmlParaFacturin(_datos, simple)
 	
 	if (!simple) {
 	    var producto = $('<producto cantidad="1" nosujeta="0" precio="' + parseFloat(totalProducto).toFixed(2) + '">'+_datos[x].nombre_producto.substring(0,23)+'</producto>');
-    
 	    productos.append(producto);
-	}
+	}   
     }
 
     if (simple) {
@@ -263,11 +283,86 @@ function crearXmlParaFacturin(_datos, simple)
 
     general.append('<impuestos>'+( _datos[0].flag_exento == '0' ? "iva" : "exento" )+'</impuestos>');
     
+    general.append('<directa>' + (directa ? 'si' : 'no') + '</directa>');
+    
+    general.append('<tipo>' + ((tipo == 0) ? 'factura' : 'fiscal') + '</tipo>');
+    
     return xml.html();
 } // crearXmlParaFacturin()
 
+function cargarEstado() {
+    if(typeof(Storage) != "undefined"){
+        $(".auto_guardar[id!='']").each(function(){
+            console.log(this.nodeName + this.id);
+        });
+    }
+}
+
+$(document).ready(function(){
+    $('body').append('<img id="ajax_cargando" src="/SERV/IMG/cargando.gif" style="position:fixed;top:50%;left:50%;z-index:20;display: none;" />\n');
+    $('body').append('\
+    <div id="ajax_error" style="position:fixed;top:25%;left:25%;z-index:90;display: none;text-align: center;">\
+        <img src="/SERV/IMG/error.png" />\
+        <p id="ajax_error_texto" style="color:greenyellow;background: black;font-weight:bold;font-size: 18px;padding:6px;"></p>\
+    </div>\
+    ');
+    
+    cargarEstado();
+});
+
 $(function(){
     
-    $('.facebox_cerrar').live('click',function(){$.modal.close();});    
-    
+    $(".auto_guardar").change(function(){
+        console.log("Ha cambiado: " + this.nodeName);
+        console.log(this);
+    });
+   
+    $.expr[':'].icontains = function (n, i, m) {
+        return jQuery(n).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
+    };
+   
+    $(document).ajaxStart(function(){$("#ajax_cargando").show();});
+    $(document).ajaxStop(function(){$("#ajax_cargando").hide();});
+
+    $.ajaxSetup({
+        cache: false,
+        timeout: 3000,
+        complete: function (jqXHR, textStatus) {
+            if (textStatus == "success") {
+                $("#ajax_error").hide();
+            }
+        },
+        error: function(jqXHR, exception) {
+            $("#ajax_error").show();
+            var textoError = '';
+            if (jqXHR.status === 0) {
+                textoError = 'No hay conexión.\nVerificar red.';
+            } else if (jqXHR.status == 404) {
+                textoError = 'Página no encontrada [404]';
+            } else if (jqXHR.status == 500) {
+                textoError = 'Error interno de servidor [500].';
+            } else if (exception === 'timeout') {
+                textoError = 'Error: su conexión esta muy lenta.';
+            } else if (exception === 'abort') {
+                textoError = 'Error: petición AJAX abortada.';
+            } else {
+                textoError = 'Error desconocido.\nError: ' + jqXHR.responseText;
+            }
+
+            $("#ajax_error_texto").html(textoError);
+        }
+    });
+
+    if ( typeof $.modal != 'undefined' )
+    {
+        $.extend($.modal.defaults, {
+            autoResize: true,
+            minHeight: '95%',
+            minWidth: '95%'
+        }); 
+
+        $('.facebox_cerrar').live('click',function(){
+            $.modal.close();
+        });
+    }
 });

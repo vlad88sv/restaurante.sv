@@ -5,7 +5,7 @@
 </audio>
 <div id="pedidos"></div>
 <div id="cont_nodo">
-    <select id="nodo">
+    <select class="auto_guardar" id="nodo">
         <option value="todos">Todas las ordenes</option>
         <option value="pizzas">Pizzas y entradas horneadas</option>
         <option value="pizzas1">Pizzas 1 + entradas horneadas</option>

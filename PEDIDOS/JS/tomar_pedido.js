@@ -298,7 +298,7 @@ $(function(){
         }
     });
     
-    $('document').on('click','.ppia_adicional',function(){
+    $(document).on('click','.ppia_adicional',function(){
         $("#busqueda_adicionales").val('').focus().trigger('keyup');
     });
     
@@ -427,7 +427,7 @@ $(function(){
         intentarProductoEnPedido(ID_producto, $(objeto).attr('nombre'), $(objeto).attr('precio'));
     }
     
-    $('document').on('click', '.agregar_producto', function(){
+    $(document).on('click', '.agregar_producto', function(){
         if ($("#modo_tactil").is(':checked')) {
             agregar_producto_accion_directa(this);
         } else {
@@ -436,7 +436,7 @@ $(function(){
         
     });
         
-    $('document').on('contextmenu', '.agregar_producto', function(event){
+    $(document).on('contextmenu', '.agregar_producto', function(event){
         event.preventDefault();
         if ($("#modo_tactil").is(':checked')) {
             agregar_producto_accion_indirecta(this);
@@ -445,7 +445,7 @@ $(function(){
         }
     });
     
-    $('document').on('click', '#agregar_producto_aceptar', function(){
+    $(document).on('click', '#agregar_producto_aceptar', function(){
 
         _b_orden.ingredientes = [];
         
@@ -478,7 +478,7 @@ $(function(){
         $('#cpep_adicionables input[type="checkbox"][grupo="'+grupo+'"]:checked').not(this).removeAttr('checked');
     });
     
-    $('document').on('click', '.btn_eliminar_pedido', function(){
+    $(document).on('click', '.btn_eliminar_pedido', function(){
         
         if (!confirm('¿Desea eliminar este producto?')) return;
         

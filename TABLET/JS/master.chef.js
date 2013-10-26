@@ -113,7 +113,7 @@ setInterval(actualizar,1000);
 
 $(function(){
     
-    $('document').on('click', '.despachar', function(){
+    $(document).on('click', '.despachar', function(){
         
         var ID_orden = $(this).parents('.orden').attr('id_orden');
         if (!confirm('Desea despachar esta orden?'))

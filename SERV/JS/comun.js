@@ -384,7 +384,7 @@ $(function(){
             minWidth: '95%'
         }); 
 
-        $('document').on('click', '.facebox_cerrar', function(){
+        $(document).on('click', '.facebox_cerrar', function(){
             $.modal.close();
         });
     }

@@ -1,18 +1,22 @@
 <?php
 $where = '';
 
-if ( isset($_POST['mesa']) && is_numeric($_POST['mesa']) && $_POST['mesa'] > 0 )
+if (isset($_POST['mesa']) && is_numeric($_POST['mesa']) && $_POST['mesa'] > 0) {
     $where .= ' AND ID_mesa = ' . $_POST['mesa'];
+}
 
-if ( isset($_POST['cuenta']) )
+if (isset($_POST['cuenta'])) {
     $where .= ' AND cuenta = "' . db_codex($_POST['cuenta']) . '"';
-    
-if ( isset($_POST['pendientes']) )
-    $where .= ' AND t0.`flag_pagado` = 0 AND t0.`flag_anulado` = 0';
+}
 
-if ( isset($_POST['facturacion']) )
+if (isset($_POST['pendientes'])) {
+    $where .= ' AND t0.`flag_pagado` = 0 AND t0.`flag_anulado` = 0';
+}
+
+if (isset($_POST['facturacion'])) {
     $where .= ' AND t1.`flag_cancelado` = 0';
-    
+}
+
 $fecha = ( empty($_POST['fecha']) ?  mysql_date() : db_codex($_POST['fecha']) );
 
 if ( isset($_POST['modificados']) ) 
@@ -36,7 +40,6 @@ WHERE 1 AND t1.`ID_producto` IS NOT NULL '.$where.'
 ORDER BY t0.ID_mesa ASC, t0.`fechahora_pedido`, t1.`ID_producto`';
 
 $llaveCache = $c;
-
 $cache = CacheObtener($llaveCache);
 if ($cache !== false)
 {
@@ -44,7 +47,6 @@ if ($cache !== false)
     $json['cachado'] = true;
     return;
 }
-
 
 $r = db_consultar($c);
 

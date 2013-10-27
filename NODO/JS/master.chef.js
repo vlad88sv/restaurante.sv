@@ -103,11 +103,13 @@ function actualizarTiempoTranscurrido()
 function actualizar() {
     nodo = $("#nodo :selected").val();
     
-    rsv_solicitar('orden_pendientes',{grupo:nodo, nodo: true},function(datos){
+    rsv_solicitar('orden_pendientes',{grupo:nodo, nodo: true},function(datos, slam){
+        
+        if (slam === true) return;
 	
 	var max_x = 0;
     
-	if ( typeof datos.aux.pendientes === "undefined" )
+	if ( typeof datos.aux.pendientes === "undefined" || datos.aux.pendientes == "")
 	{
 	 $('#pedidos').html('<div id="nada_pendiente" style="color:red;font-size:8em;text-align:center;">Nada pendiente!</div>')
 	 return;
@@ -143,7 +145,7 @@ function actualizar() {
 	}
 	
     
-    });
+    }, false, true);
 }
 
 $(function(){
@@ -161,8 +163,6 @@ $(function(){
             return;
         }
         
-        var datos_imprimir = $(this).html();
-        
         rsv_solicitar('despachar_orden',{orden: ID_orden, elaborado: true},function(){});
         
         $(this).animate({width: 'hide'}, function() { $(this).remove(); } );        
@@ -171,4 +171,4 @@ $(function(){
 });
 
 setInterval(actualizarTiempoTranscurrido,1000);
-setInterval(actualizar,2000);
+setInterval(actualizar,500);

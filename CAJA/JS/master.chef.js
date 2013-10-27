@@ -114,9 +114,9 @@ function cocina_actualizarTiempoTranscurrido()
 }
 
 function cocina_actualizar() {
-    rsv_solicitar('orden_pendientes',{grupo: 'todos', ghost: true},function(datos){
+    rsv_solicitar('orden_pendientes',{grupo: 'todos', ghost: true},function(datos, slam){
 	
-        if (datos === false) return;
+        if (slam === true) return;
         
         $("#t_pendientes").html(datos.benchmark + "μs");
         

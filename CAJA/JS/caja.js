@@ -6,9 +6,9 @@ cmp_cache = {}; // objeto donde almacenamos la última actualización real
 
 function actualizar() {
 
-    rsv_solicitar('cuenta',{pendientes: 1},function(datos){
+    rsv_solicitar('cuenta',{pendientes: 1},function(datos, slam){
         
-        if (datos === false) return;
+        if (slam === true) return;
         
         $("#t_cuentas").html(datos.benchmark + "μs");
         

@@ -13,7 +13,7 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
     if (slam_defense && slam && _ajax[llave] === true)
     {
         console.log ("Diferido: " + peticion + " :: " + _ajax[llave]);
-        funcion(false);
+        funcion(false,true);
         return false;
     }
     

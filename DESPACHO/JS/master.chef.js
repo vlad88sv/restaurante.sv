@@ -47,7 +47,7 @@ function despacho_agregarOrden(grupo)
     orden.attr('id_orden',_ordenes[grupo][0].ID_orden);
     orden.attr('id_mesa',_ordenes[grupo][0].ID_mesa);
     orden.attr('tiempo', (_ordenes[grupo][0].fechahora_pedido_uts*1000));
-    orden.find('.tiempo').html('*NUEVO*');
+    orden.find('.tiempo').html('');
     
     var pedidos = orden.find('.pedidos');
     
@@ -106,17 +106,19 @@ function actualizarTiempoTranscurrido()
 }
 
 function actualizarOrdenesPendientes() {
-    rsv_solicitar('orden_pendientes',{grupo:'todos'},function(datos){
+    rsv_solicitar('orden_pendientes',{grupo:'todos'},function(datos, slam){
 	
+        if (slam === true) return;
+        
 	var max_x = 0;
     
-	if ( typeof datos.aux.pendientes === "undefined" )
+	if ( typeof datos.aux.pendientes === "undefined" || datos.aux.pendientes == "")
 	{
 	 $('#pedidos').html('<div id="nada_pendiente" style="color:red;font-size:8em;text-align:center;">Nada pendiente!</div>')
 	 return;
 	}
 	
-	if (JSON.stringify(cmp_cache) == JSON.stringify(datos.aux.pendientes)) {
+	if (cmp_cache == JSON.stringify(datos.aux.pendientes)) {
         // No redendizar nada, con el beneficio de:
         // * No alterar el DOM y hacer mas facil Firedebuggear
         // * No procesar innecesariamente
@@ -125,7 +127,7 @@ function actualizarOrdenesPendientes() {
 	return;
 	}
 
-	cmp_cache = datos.aux.pendientes;
+	cmp_cache = JSON.stringify(datos.aux.pendientes);
 	
 	$('#pedidos').empty();
 	_ordenes = {};
@@ -145,7 +147,7 @@ function actualizarOrdenesPendientes() {
 	    max_id = max_x;
 	}
 	
-    });
+    }, false, true);
 }
 
 function forzarFoco() {
@@ -202,5 +204,5 @@ $(function(){
 });
 
 setInterval(actualizarTiempoTranscurrido,2000);
-setInterval(actualizarOrdenesPendientes,1000);
+setInterval(actualizarOrdenesPendientes,500);
 setInterval(forzarFoco,500);

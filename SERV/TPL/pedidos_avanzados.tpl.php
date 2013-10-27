@@ -20,5 +20,6 @@ if ( isset($_POST['mesero']) && is_numeric($_POST['mesero']) ) {
 
 $FORZAR_CUENTA_NUEVA = ( isset($_POST['FORZAR_CUENTA_NUEVA']) ? true : false );
 
+// ingresar_orden destruye el cache, asi que no hay necesidad de hacerlo aquí.
 ingresar_orden($PEDIDOS, $_POST['mesa'], $ID_MESERO, 1, $FORZAR_CUENTA_NUEVA);
 ?>

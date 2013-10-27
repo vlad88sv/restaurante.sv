@@ -28,4 +28,5 @@ $DATOS['ID_mesa'] = $mesa_nueva;
 
 db_actualizar_datos('ordenes', $DATOS, 'cuenta="'.$cuenta.'"');
 
+CacheDestruir();
 ?>

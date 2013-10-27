@@ -31,6 +31,8 @@ if (isset($_POST['imprimir']))
             }
             
         /****** HISTORIAL *******/
+        
+        CacheDestruir();
     }
     
     db_agregar_datos('comandas', array('data' => $_POST['imprimir'], 'impreso' => '0', 'estacion' => $_POST['estacion']));

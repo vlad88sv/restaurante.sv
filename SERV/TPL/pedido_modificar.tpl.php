@@ -42,10 +42,6 @@ db_consultar($c);
 // Triggers
 switch ($campo) {
     case 'flag_cancelado':
-        // si lo cancelo tenemos que devolver al stock los ingredientes que usó
-        $ID_producto = db_obtener('pedidos', 'ID_producto', 'ID_pedido="'.$pedido.'"');
-        $cDevolverIngredientes = 'INSERT INTO stock (ID_pedido, ID_ingrediente, existencia, cambio, fechahora,  operacion) SELECT "'.$pedido.'", `ID_ingrediente`, (COALESCE((SELECT COALESCE(existencia,0) FROM stock AS tt0 WHERE tt0.ID_ingrediente=t1.ID_ingrediente ORDER BY tt0.ID_stock DESC LIMIT 1),0)+t1.cantidad), `cantidad`, NOW(), "cancelacion" FROM `productos_ingredientes` AS t1 WHERE ID_producto="'.$ID_producto.'"';
-        db_consultar($cDescontarIngredientes);    
         break;
 }
 
@@ -61,4 +57,6 @@ if (!empty($_POST['nota']))
     
     db_agregar_datos('historial',$DATOS);
 }
+
+CacheDestruir();
 ?>

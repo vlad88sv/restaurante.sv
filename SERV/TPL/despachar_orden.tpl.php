@@ -21,5 +21,7 @@ if ( empty($_POST['orden']) || !is_numeric($_POST['orden']) ) {
         
         db_agregar_datos('comandas', array('data' => $_POST['imprimir'], 'impreso' => '0', 'estacion' => 'comandas'));
     }
+    
+    CacheDestruir();
 }
 ?>

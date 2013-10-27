@@ -34,4 +34,6 @@ if (!empty($_POST['motivo']))
     
     db_agregar_datos('historial',$DATOS);
 }
+
+CacheDestruir();
 ?>

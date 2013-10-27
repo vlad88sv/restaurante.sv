@@ -64,7 +64,17 @@ $order_by = 'ORDER BY t0.flag_despachado ASC, t0.fechahora_entregado DESC, t0.fe
 
 $c = $campos.' '.$where.' '.$order_by;
 
-$json['sql'] = $c;
+$llaveCache = $c;
+
+$cache = CacheObtener($llaveCache);
+if ($cache !== false)
+{
+    $json['aux']['pendientes'] = $cache;
+    $json['cachado'] = true;
+    return;
+}
+
+//$json['sql'] = $c;
 //error_log($c);
 
 $r = db_consultar($c);
@@ -92,4 +102,9 @@ while ($r && $f = db_fetch($r))
     
     $json['aux']['pendientes'][$grupo][] = $f;
 }
+
+$json['cache'] = (serialize(@$json['aux']['pendientes']) == serialize($cache));
+
+if (!$cache)
+    CacheCrear($llaveCache, @$json['aux']['pendientes'], false);
 ?>

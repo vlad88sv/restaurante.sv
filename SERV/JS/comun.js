@@ -22,7 +22,7 @@ function rsv_solicitar(peticion, data, funcion, cache) {
         }
     }    
     
-    $.post('/SERV/', $.extend(objetivo,data), function(retorno){
+    $.post('/SERV/?REFERENCIA='+peticion, $.extend(objetivo,data), function(retorno){
         if(typeof(Storage)!=="undefined" && cache == true){
             localStorage.setItem(llave, JSON.stringify(retorno));
         }

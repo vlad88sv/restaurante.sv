@@ -1,6 +1,6 @@
 <?php
 
-/* Migración a uso de cuentas completa. */
+/* Migraciï¿½n a uso de cuentas completa. */
 
 if ( empty($_POST['cuenta']) )
     return;
@@ -22,4 +22,6 @@ if (!empty($_POST['motivo']))
     
     db_agregar_datos('historial',$DATOS);
 }
+
+CacheDestruir();
 ?>

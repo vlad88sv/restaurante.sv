@@ -232,11 +232,7 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
             $BUFFER_DB_DATOS['ID_orden'] = $ID_esta_orden;
             
             $ID_pedido = db_agregar_datos('pedidos', $BUFFER_DB_DATOS);
-            
-            // Obtengamos los ingredientes de este producto y grabremolos en cuenta stock
-            $cDescontarIngredientes = 'INSERT INTO stock (ID_pedido, ID_ingrediente, existencia, cambio, fechahora,  operacion) SELECT "'.$ID_pedido.'", `ID_ingrediente`, (COALESCE((SELECT existencia FROM stock AS tt0 WHERE tt0.ID_ingrediente=t1.ID_ingrediente ORDER BY tt0.ID_stock DESC LIMIT 1),0)-t1.cantidad), (`cantidad` * -1), NOW(), "venta" FROM `productos_ingredientes` AS t1 WHERE ID_producto="'.db_codex($pedido['ID']).'"';
-            db_consultar($cDescontarIngredientes);    
-            
+                        
             if (isset($pedido['adicionales']) && is_array($pedido['adicionales']) && count($pedido['adicionales']) > 0 )
             {
                 foreach ($pedido['adicionales'] as $adicional)
@@ -261,5 +257,29 @@ function ingresar_orden($PEDIDOS, $MESA, $MESERO, $MODO = 0, $FORZAR_CUENTA_NUEV
             db_actualizar_datos('pedidos', $BUFFER_DB_DATOS, 'ID_pedido="'.$pedido['ID_pedido'].'"');
         }
     } // foreach($PEDIDOS as $tmpID => $pedido)
+    
+    CacheDestruir();
+}
+
+
+function CacheDestruir()
+{
+    $toDelete = new APCIterator('user', '/^RSV_SQL_/', APC_ITER_VALUE);
+    apc_delete($toDelete); 
+}
+
+function CacheCrear($llave, $valor, $destructivo = false)
+{
+    if ($destructivo)
+        CacheDestruir ();
+
+    $llave = "RSV_SQL_".sha1($llave);
+    apc_store($llave, $valor, 3600);
+}
+
+function CacheObtener($llave)
+{
+    $cache = apc_fetch("RSV_SQL_".sha1($llave));
+    return $cache;
 }
 ?>

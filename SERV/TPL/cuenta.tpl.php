@@ -35,6 +35,17 @@ ON t0.ID_mesero = t4.ID_usuarios
 WHERE 1 AND t1.`ID_producto` IS NOT NULL '.$where.'
 ORDER BY t0.ID_mesa ASC, t0.`fechahora_pedido`, t1.`ID_producto`';
 
+$llaveCache = $c;
+
+$cache = CacheObtener($llaveCache);
+if ($cache !== false)
+{
+    $json['aux']['pendientes'] = $cache;
+    $json['cachado'] = true;
+    return;
+}
+
+
 $r = db_consultar($c);
 
 while ($r && $f = db_fetch($r))
@@ -70,4 +81,9 @@ while ($r && $f = db_fetch($r))
     
     $json['aux']['pendientes'][$grupo][] = $f;
 }
+
+$json['cache'] = (serialize(@$json['aux']['pendientes']) == serialize($cache));
+
+if (!$cache)
+    CacheCrear($llaveCache, @$json['aux']['pendientes'], false);
 ?>

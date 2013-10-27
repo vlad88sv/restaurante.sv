@@ -1,4 +1,6 @@
 <?php
+$rsv_benchmark = microtime(true);
+
 define('__BASE__', str_replace('//','/',dirname(__FILE__).'/'));
 require_once('configuracion.php');
 require_once('PHP/vital.php');
@@ -21,6 +23,7 @@ if (empty($_POST['TPL']) || !file_exists($TPL)) {
 header ('Content-type: text/html; charset=utf-8');
 header ('Content-type: application/json');
 
+$json['benchmark'] = round(((microtime(true) - $rsv_benchmark) * 1000),5);
 
 $salida = json_encode($json);
 

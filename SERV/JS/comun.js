@@ -1,9 +1,21 @@
 _ordenes = {}; // Objeto donde mantenemos las ordenes en presentación
 _productos = {};
+_ajax = {};
+slam_defense = true;
 
-function rsv_solicitar(peticion, data, funcion, cache) {
+function rsv_solicitar(peticion, data, funcion, cache, slam) {
+    
     var objetivo = {TPL: peticion};
-    var llave = window.btoa(peticion + JSON.stringify(data));
+    var llave = window.btoa(peticion + JSON.stringify(data));    
+
+    slam = typeof slam !== 'undefined' ? true : false;
+    
+    if (slam_defense && slam && _ajax[llave] === true)
+    {
+        console.log ("Diferido: " + peticion + " :: " + _ajax[llave]);
+        funcion(false);
+        return false;
+    }
     
     cache = typeof cache !== 'undefined' ? cache : false;
     
@@ -18,16 +30,22 @@ function rsv_solicitar(peticion, data, funcion, cache) {
             funcion(objeto);
             return true;
         } else {
-            console.log ('No hit!: ' + peticion);
+            //console.log ('No hit!: ' + peticion);
         }
     }    
+    
+    _ajax[llave] = true;
+    //console.log( "Iniciado :: " + peticion + " :: " + _ajax[llave]);
     
     $.post('/SERV/?REFERENCIA='+peticion, $.extend(objetivo,data), function(retorno){
         if(typeof(Storage)!=="undefined" && cache == true){
             localStorage.setItem(llave, JSON.stringify(retorno));
         }
         funcion(retorno);
-    }, 'json');
+    }, 'json').always(function(){
+        //console.log( "Completado :: " + peticion + " :: " + _ajax[llave]);
+        delete _ajax[llave];
+    });
     
     return true;
 }

@@ -116,6 +116,10 @@ function cocina_actualizarTiempoTranscurrido()
 function cocina_actualizar() {
     rsv_solicitar('orden_pendientes',{grupo: 'todos', ghost: true},function(datos){
 	
+        if (datos === false) return;
+        
+        $("#t_pendientes").html(datos.benchmark + "μs");
+        
 	if ( typeof datos.aux.pendientes === "undefined" )
 	{
 	 $('#cocina').html('<div id="nada_pendiente" style="color:red;text-align:center;">Nada pendiente!</div>')
@@ -130,7 +134,7 @@ function cocina_actualizar() {
 	    cocina_agregarPedido(index);
 	});	
     
-    });
+    },false, true);
 }
 
 $(function(){
@@ -138,4 +142,4 @@ $(function(){
 });
 
 setInterval(cocina_actualizarTiempoTranscurrido,2000);
-setInterval(cocina_actualizar,5000);
+setInterval(cocina_actualizar,500);

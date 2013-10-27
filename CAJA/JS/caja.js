@@ -8,6 +8,10 @@ function actualizar() {
 
     rsv_solicitar('cuenta',{pendientes: 1},function(datos){
         
+        if (datos === false) return;
+        
+        $("#t_cuentas").html(datos.benchmark + "μs");
+        
        _ordenes = {};
        
        if ( typeof datos.aux.pendientes === "undefined" )
@@ -34,7 +38,7 @@ function actualizar() {
         cuenta_obtenerVisual($("#pedidos"), x, 0);
        }
     
-    });
+    }, false, true);
 }
 
 function cuadrarCorte() {
@@ -71,7 +75,7 @@ function estadisticas() {
      });
 }
 
-setInterval(actualizar,1000);
+setInterval(actualizar,500);
 setInterval(estadisticas,10000);
 
 function activarAdm()

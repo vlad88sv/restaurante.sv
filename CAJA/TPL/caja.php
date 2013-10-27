@@ -41,7 +41,9 @@
     <b>[</b> <input type="checkbox" style="vertical-align: middle;" class="vaciar_cache_caja auto_guardar" id="ocultar_fechas" value="1" /><label for="ocultar_fechas">Ocultar horas</label> <b>]</b>&nbsp;
     <b>[</b> <input type="checkbox" style="vertical-align: middle;" class="vaciar_cache_caja auto_guardar" id="cuentas_compactas" value="1" /><label for="cuentas_compactas">Cuentas compactas</label> <b>]</b>&nbsp;
     <b>[</b> <input type="checkbox" style="vertical-align: middle;" class="auto_guardar" id="habilitar_facturin" value="1" /><label for="habilitar_facturin">Facturin Plus</label> <b>]</b>
-    <hr />
+    &nbsp;|&nbsp;C<span id="t_cuentas"></span>
+    &nbsp;|&nbsp;P<span id="t_pendientes"></span>
+    <br />
     <span title="Distrubición de Servicio Normalizado" style="font-weight:bold;">DSN</span>: <span id="dsn"></span>
     <br />
     <span title="Tiempo Promedio de Servicio" style="font-weight:bold;">TPS</span>: <span id="tps"></span>

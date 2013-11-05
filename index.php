@@ -26,5 +26,5 @@ table td {
     <li><a href="/CAJA/" target="_blank">Caja - cuentas por pagar, historial, cortes</a></li>
     <li><a href="/PEDIDOS/" target="_blank">Pedidos - ingreso de ordenes</a></li>
     <li><a href="/IMPRESION/" target="_blank">Impresiones - servidor de impresiones de tiquetes y comandas</a></li>
-    <li><a href="/STAT/" target="_blank">Estadísticas</a></li>
+    <li><a href="/STAT/" target="_blank">EstadÃ­sticas</a></li>
 </ul>

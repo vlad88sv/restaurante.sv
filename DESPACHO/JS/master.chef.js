@@ -183,6 +183,12 @@ $(function(){
     });
     
     $(document).on('click', 'div.orden', function(){
+     
+        if ( ! $(this).hasClass('orden_tiene_productos_elaborados'))
+        {
+            alert ('No se pueden despachar productos no elaborados.');
+            return;
+        }
         
         $(this).addClass('orden_despachando');
         

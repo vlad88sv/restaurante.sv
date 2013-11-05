@@ -10,16 +10,8 @@ function actualizar() {
         
         if (slam === true) return;
         
-        $("#t_cuentas").html(datos.benchmark + "μs");
+        $("#t_cuentas").html(datos.benchmark + "ms");
         
-       _ordenes = {};
-       
-       if ( typeof datos.aux.pendientes === "undefined" )
-       {
-        $("#pedidos").html('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
-        return;
-       }
-       
        if (cmp_cache == JSON.stringify(datos.aux.pendientes)) {
         // No redendizar nada, con el beneficio de:
         // * No alterar el DOM y hacer mas facil Firedebuggear
@@ -30,13 +22,21 @@ function actualizar() {
        }
        
        cmp_cache = JSON.stringify(datos.aux.pendientes);
-    
+               
+       if ( typeof datos.aux.pendientes === "undefined" )
+       {
+        $("#pedidos").html('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
+        return;
+       }
+       
+       var buffer_visual = '';
        $("#pedidos").empty();
        for(x in datos.aux.pendientes)
        {
-        _ordenes[x] = datos.aux.pendientes[x];                  
-        cuenta_obtenerVisual($("#pedidos"), x, 0);
+        buffer_visual += cuenta_obtenerVisual(datos.aux.pendientes[x], 0);
        }
+       
+       $("#pedidos").html(buffer_visual);
     
     }, false, true);
 }
@@ -75,7 +75,7 @@ function estadisticas() {
      });
 }
 
-setInterval(actualizar,500);
+setInterval(actualizar,1000);
 setInterval(estadisticas,10000);
 
 function activarAdm()
@@ -180,11 +180,9 @@ $(function(){
     $("#ver_historial").click(function(){
         var fecha = $('#fecha_caja').val();
         
-        $.modal('<h1>Historial de '+fecha+'</h1><br /><div style="height:500px;overflow-y:auto;"><div id="destino_historial"></div></div>');
+        $.modal('<h1>Historial de '+fecha+'</h1><br /><div style="position:absolute;top:30px;bottom:0;left:0;right:0;overflow-y:auto;"><div id="destino_historial"></div></div>');
 
         rsv_solicitar('cuenta',{mesa:$("#id_mesa").val(), historial: 1, fecha: fecha},function(datos){
-
-           _ordenes = {};
            
            if ( typeof datos.aux.pendientes === "undefined" )
            {
@@ -192,11 +190,12 @@ $(function(){
             return;
            }
 
+           var buffer_visual = '';
            for(x in datos.aux.pendientes)
            {
-            _ordenes[x] = datos.aux.pendientes[x];                  
-            cuenta_obtenerVisual($("#destino_historial"), x, 1);
+            buffer_visual += cuenta_obtenerVisual(datos.aux.pendientes[x], 1);
            }
+           $("#destino_historial").html(buffer_visual);
 
         });
     });
@@ -422,6 +421,34 @@ $(function(){
         buffer += '<h1>Cambio de precio</h1><p>Nuevo precio: <input type="text" style="width:75px;" value="0.00" id="pedido_valor_nuevo_precio" /> Razón: <input type="text" style="width:450px;font-size:0.9em;" value="" id="pedido_valor_nuevo_precio_razon" /><button id="pedido_cambiar_precio">Cambiar</button></p>';
         buffer += '</div>';
         $.modal(buffer);    
+    });    
+
+
+    $(document).on('click','.adicionales_precio', function(){
+        var precio = prompt('Nuevo precio', '0.00');
+        
+        var motivo = '';
+        var intentos = 0;
+        
+        while (motivo.length < 3 && intentos < 3) {
+            motivo = prompt('Ingrese el motivo del cambio de precio de este adicional.');
+            motivo = $.trim(motivo);
+            intentos++;
+        }
+        
+        if (motivo == '') {
+            alert('Debe ingresar un motivo para el cambio de precio de este adicional');
+            return;
+        }
+        
+        var id_adicional = $(this).parents('.li').attr('id_adicional');
+        
+        alert(id_adicional);
+        
+        rsv_solicitar('adicional_modificar',{pedido: id_pedido, campo: 'precio_grabado', valor: precio, nota: motivo },function(datos){
+            // VOID
+        });
+        
     });    
 
     

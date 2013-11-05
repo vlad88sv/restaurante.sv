@@ -1,6 +1,6 @@
 <?php
 
-/* Migración a uso de cuentas completa - no usa cuenta - no USAR cuenta. */
+/* Migración a uso de cuentas completa */
 
 if (isset($_POST['imprimir']))
 {
@@ -14,43 +14,28 @@ if (isset($_POST['imprimir']))
         
         /****** HISTORIAL *******/
             
-            if (empty($_POST['no_historial']))
-            {
-                $DATOS['grupo'] = 'ORDENES';
-                $DATOS['accion'] = 'TIQUETE';
-                
-                if (empty($_POST['nota']))
-                    $DATOS['nota'] = 'impresión de tiquete';
-                else
-                    $DATOS['nota'] = $_POST['nota'];
-                
-                $DATOS['fechahora'] = mysql_datetime();
-                $DATOS['cuenta'] = $cuenta;
-                
-                db_agregar_datos('historial',$DATOS);
-            }
+        if (empty($_POST['no_historial']))
+        {
+            $DATOS['grupo'] = 'ORDENES';
+            $DATOS['accion'] = 'TIQUETE';
+
+            if (empty($_POST['nota']))
+                $DATOS['nota'] = 'impresión de tiquete';
+            else
+                $DATOS['nota'] = $_POST['nota'];
+
+            $DATOS['fechahora'] = mysql_datetime();
+            $DATOS['cuenta'] = $cuenta;
+
+            db_agregar_datos('historial',$DATOS);            
+        }
             
         /****** HISTORIAL *******/
         
+        db_agregar_datos('comandas', array('data' => $_POST['imprimir'], 'impreso' => '0', 'estacion' => $_POST['estacion']));
         CacheDestruir();
-    }
-    
-    db_agregar_datos('comandas', array('data' => $_POST['imprimir'], 'impreso' => '0', 'estacion' => $_POST['estacion']));
+    }    
         
     return;
-}
-
-if (!empty($_POST['impreso']) && is_numeric($_POST['impreso']))
-{
-    $c = 'UPDATE `tiquetes` SET `impreso`= 1 WHERE `ID_tiquete`="'.db_codex($_POST['impreso']).'" LIMIT 1';
-    $r = db_consultar($c);
-    return;
-}
-
-$c = 'SELECT `ID_tiquete`, `ID_mesa`, `cuenta`, `fechahora`, `impreso` FROM `tiquetes` WHERE impreso=0 LIMIT 1';
-$r = db_consultar($c);
-
-if (mysqli_num_rows($r) > 0 && $f = db_fetch($r)) {
-    $json['aux']['tiquetes'] = $f;
 }
 ?>

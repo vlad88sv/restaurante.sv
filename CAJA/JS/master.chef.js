@@ -1,5 +1,5 @@
-_ordenes = {}; // Objeto donde mantenemos las ordenes en presentación
 bool_mucho_tiempo = true;
+cmp_cache_master_chef = {}; // objeto donde almacenamos la última actualización real
 
 function Beep() {
     
@@ -47,57 +47,57 @@ function cocina_agregarPedido(grupo)
 {
     var orden = $('<div class="orden" />');
     
-    orden.append('<div style="height:1.5em;"><span class="grupo"><span class="mesa">#'+_ordenes[grupo][0].ID_mesa+'</span>:<span class="mesero">' + _ordenes[grupo][0].nombre_mesero + '</span></span><span class="tiempo" /></div>');
+    orden.append('<div style="height:1.5em;"><span class="grupo"><span class="mesa">#'+_orden[0].ID_mesa+'</span>:<span class="mesero">' + _orden[0].nombre_mesero + '</span></span><span class="tiempo" /></div>');
     orden.append('<hr />');
     orden.append('<div class="pedidos"></div>');
     orden.attr('id','o_'+grupo);
-    orden.attr('id_orden',_ordenes[grupo][0].ID_orden);
+    orden.attr('id_orden',_orden[0].ID_orden);
     
     // Ghost in the shell
     
-    if (_ordenes[grupo][0].flag_despachado == 1)
+    if (_orden[0].flag_despachado == 1)
     {
 	orden.addClass('ghost');
-	orden.find('.tiempo').html('Entregada hace ' + timeSince(new Date(_ordenes[grupo][0].fechahora_entregado_uts*1000)));
+	orden.find('.tiempo').html('Entregada hace ' + timeSince(new Date(_orden[0].fechahora_entregado_uts*1000)));
     } else {
-	orden.find('.tiempo').html(timeSince(new Date(_ordenes[grupo][0].fechahora_pedido_uts*1000)));
+	orden.find('.tiempo').html(timeSince(new Date(_orden[0].fechahora_pedido_uts*1000)));
     }
     
     
     var pedidos = orden.find('.pedidos');
     
     // Si lleva más de 15m esperando
-    if (_ordenes[grupo][0].flag_despachado == 0 && Math.floor((new Date() - new Date(_ordenes[grupo][0].fechahora_pedido_uts*1000)) / 1000) > 900)
+    if (_orden[0].flag_despachado == 0 && Math.floor((new Date() - new Date(_orden[0].fechahora_pedido_uts*1000)) / 1000) > 900)
     {
 	orden.toggleClass('mucho_tiempo', bool_mucho_tiempo);
     }
     
 
-    for (x in _ordenes[grupo])
+    for (x in _orden)
     {
         var pedido = $('<div class="pedido" />');
-        pedido.attr('id','p_'+grupo+_ordenes[grupo][x].ID_pedido);
+        pedido.attr('id','p_'+grupo+_orden[x].ID_pedido);
         pedido.append('<div class="producto" />');
         
-        pedido.find('.producto').html(_ordenes[grupo][x].nombre_producto);
+        pedido.find('.producto').html(_orden[x].nombre_producto);
         
-        if ('adicionales' in _ordenes[grupo][x] && _ordenes[grupo][x].adicionales.length > 0)
+        if ('adicionales' in _orden[x] && _orden[x].adicionales.length > 0)
         {
 	    pedido.append('<p style="color:lightskyblue;">Adicionar</p>');
             pedido.append('<div class="adicionales" ><ul></ul></div>');
-            for (adicional in _ordenes[grupo][x].adicionales)
+            for (adicional in _orden[x].adicionales)
             {
-                pedido.find('.adicionales ul').append('<li>' + _ordenes[grupo][x].adicionales[adicional].nombre + '</li>');
+                pedido.find('.adicionales ul').append('<li>' + _orden[x].adicionales[adicional].nombre + '</li>');
             }
         }
 
-        if ('ingredientes' in _ordenes[grupo][x] && _ordenes[grupo][x].ingredientes.length > 0)
+        if ('ingredientes' in _orden[x] && _orden[x].ingredientes.length > 0)
         {
 	    pedido.append('<p style="color:lightcoral;">Quitar</p>');
             pedido.append('<div class="ingredientes" ><ul></ul></div>');
-            for (adicional in _ordenes[grupo][x].ingredientes)
+            for (adicional in _orden[x].ingredientes)
             {
-                pedido.find('.ingredientes ul').append('<li>' + _ordenes[grupo][x].ingredientes[adicional].nombre + '</li>');
+                pedido.find('.ingredientes ul').append('<li>' + _orden[x].ingredientes[adicional].nombre + '</li>');
             }
         }
 
@@ -105,7 +105,7 @@ function cocina_agregarPedido(grupo)
     }
     orden.append(pedidos);
     
-    $("#cocina").append(orden);
+    orden[0].outerHTML;
 }
 
 function cocina_actualizarTiempoTranscurrido()
@@ -118,21 +118,32 @@ function cocina_actualizar() {
 	
         if (slam === true) return;
         
-        $("#t_pendientes").html(datos.benchmark + "μs");
+        $("#t_pendientes").html(datos.benchmark + "ms");
+        
+        if (cmp_cache_master_chef == JSON.stringify(datos.aux.pendientes)) {
+        // No redendizar nada, con el beneficio de:
+        // * No alterar el DOM y hacer mas facil Firedebuggear
+        // * No procesar innecesariamente
+        // * Facilitar el click en los botones
+        // * Hacer posible mantener estado en los cheques
+        return;
+        }
+       
+        cmp_cache_master_chef = JSON.stringify(datos.aux.pendientes);
         
 	if ( typeof datos.aux.pendientes === "undefined" )
 	{
-	 $('#cocina').html('<div id="nada_pendiente" style="color:red;text-align:center;">Nada pendiente!</div>')
+	 $('#cocina').html('<div id="nada_pendiente" style="color:red;text-align:center;">Nada pendiente!</div>');
 	 return;
 	}
+        
 	
 	$('#cocina').empty();
-	_ordenes = {};
-	 
-	$.each(datos.aux.pendientes, function(index, value) {
-	    _ordenes[index] = value;	    
-	    cocina_agregarPedido(index);
-	});	
+        var buffer_visual = '';
+	for(x in datos.aux.pendientes)
+        {
+	    buffer_visual += cocina_agregarPedido(datos.aux.pendientes[x]);
+	};	
     
     },false, true);
 }
@@ -142,4 +153,4 @@ $(function(){
 });
 
 setInterval(cocina_actualizarTiempoTranscurrido,2000);
-setInterval(cocina_actualizar,500);
+setInterval(cocina_actualizar,1000);

@@ -23,7 +23,7 @@ if (empty($_POST['TPL']) || !file_exists($TPL)) {
 header ('Content-type: text/html; charset=utf-8');
 header ('Content-type: application/json');
 
-$json['benchmark'] = round(((microtime(true) - $rsv_benchmark) * 1000),5);
+$json['benchmark'] = round(((microtime(true) - $rsv_benchmark) * 1000),0);
 
 $salida = json_encode($json);
 

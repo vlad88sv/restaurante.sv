@@ -121,6 +121,10 @@ div#pedidos {
     cursor: pointer;
 }
 
+.adicionales_precio {
+    cursor: pointer;
+}
+
 .cancelar_pedido {
     font-weight: bold;
     cursor: pointer;

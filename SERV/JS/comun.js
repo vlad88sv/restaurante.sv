@@ -1,5 +1,3 @@
-_ordenes = {}; // Objeto donde mantenemos las ordenes en presentación
-_productos = {};
 _ajax = {};
 slam_defense = true;
 
@@ -50,7 +48,7 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
     return true;
 }
 
-function cuenta_obtenerVisual(objetivo, grupo, modo)
+function cuenta_obtenerVisual(_orden, modo)
 {
     // Modo = 0 : normal
     // Modo = 1 : historial
@@ -63,7 +61,7 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     var controles_fiscales = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>';
     var controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>';
 
-    if ( modo == 0 && _ordenes[grupo][0].flag_tiquetado == '1')
+    if ( modo == 0 && _orden[0].flag_tiquetado == '1')
     {
        orden.addClass('pago_pendiente');
     }
@@ -71,9 +69,9 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     if (modo == 1)
     {
         controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
-        html += '<div class="cuenta">Cerrado: ' + _ordenes[grupo][0].fechahora_pagado+ ' | Cuenta: '+_ordenes[grupo][0].cuenta+'</div>';
+        html += '<div class="cuenta">Cerrado: ' + _orden[0].fechahora_pagado+ ' | Cuenta: '+_orden[0].cuenta+'</div>';
        
-        if (_ordenes[grupo][0].flag_anulado == '1')
+        if (_orden[0].flag_anulado == '1')
         {
             html += '<div class="cuenta" style="background-color:white;color:red;text-align:center;font-size:14px;font-weight:bold;">¡esta cuenta fue anulada!</div>';
         }
@@ -83,7 +81,7 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     html += '<div class="contenedor_encabezado_orden">';
     html += '<table class="encabezado_orden">';
     html += '<tr>';
-    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa btn">'+_ordenes[grupo][0].ID_mesa+'</button> → <strong>'+_ordenes[grupo][0].nombre_mesero+'</strong></td>';
+    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa btn">'+_orden[0].ID_mesa+'</button> → <strong>'+_orden[0].nombre_mesero+'</strong></td>';
     html += '<td class="precio_precalculo"></td>';
     html += '<td class="precio"></td>';
     html += '</tr>';
@@ -91,12 +89,12 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     html += '</div>';
     html += '<div class="cuenta contenedor_botones" style="text-align:center;">' + controles + '</div>';
     html += '<hr />';
-    if (_ordenes[grupo][0].flag_nopropina == '1')
+    if (_orden[0].flag_nopropina == '1')
     {
         html += '<div class="cuenta" style="background-color:pink;color:red;text-align:center;font-size:14px;font-weight:bold;">sin propina</div>';
     }
     
-    if (_ordenes[grupo][0].flag_exento == '1')
+    if (_orden[0].flag_exento == '1')
     {
         html += '<div class="cuenta" style="background-color:yellow;color:black;text-align:center;font-size:14px;font-weight:bold;">sin IVA</div>';
     }
@@ -108,11 +106,11 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
         html += '</div>';
     }
 
-    if (_ordenes[grupo][0].historial != null && _ordenes[grupo][0].historial.length > 0)
+    if (_orden[0].historial != null && _orden[0].historial.length > 0)
     {	
-        for (historia in _ordenes[grupo][0].historial) {
+        for (historia in _orden[0].historial) {
             html += '<div class="cuenta" style="background-color:#FFFFA2;color:#676767;text-align:center;">';
-            html += _ordenes[grupo][0].historial[historia].hora + ' :: ' + _ordenes[grupo][0].historial[historia].accion + ' :: ' + _ordenes[grupo][0].historial[historia].nota;
+            html += _orden[0].historial[historia].hora + ' :: ' + _orden[0].historial[historia].accion + ' :: ' + _orden[0].historial[historia].nota;
             html += '</div>';
         }
 	html += '<hr />';
@@ -120,76 +118,81 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     
     orden.append(html);
     
-    orden.attr('id','o_'+grupo);
-    orden.attr('id_mesa',_ordenes[grupo][0].ID_mesa);
-    orden.attr('cuenta',_ordenes[grupo][0].cuenta);
+    orden.attr('id','o_'+_orden[0].cuenta);
+    orden.attr('id_mesa',_orden[0].ID_mesa);
+    orden.attr('cuenta',_orden[0].cuenta);
     
-    for (x in _ordenes[grupo])
+    for (x in _orden)
     {
         var pedido = $('<div class="pedido" />');
-        pedido.attr('id','p_'+grupo+_ordenes[grupo][x].ID_pedido);
-        pedido.attr('id_pedido',_ordenes[grupo][x].ID_pedido);
+        pedido.attr('id','p_'+_orden[x].ID_pedido);
+        pedido.attr('id_pedido',_orden[x].ID_pedido);
         
         pedido.append('<div class="producto" />');
         
         var hora_entregado = '';
 	/*
-	if (_ordenes[grupo][x].fechahora_elaborado !== '0000-00-00 00:00:00') {
-            hora_entregado += '→' + Date.parse(_ordenes[grupo][x].fechahora_elaborado).toString('HH:mm');
+	if (_orden[x].fechahora_elaborado !== '0000-00-00 00:00:00') {
+            hora_entregado += '→' + Date.parse(_orden[x].fechahora_elaborado).toString('HH:mm');
         }
         */
-        if (_ordenes[grupo][x].fechahora_entregado !== '0000-00-00 00:00:00') {
-            hora_entregado += '→' + Date.parse(_ordenes[grupo][x].fechahora_entregado).toString('HH:mm');
+        if (_orden[x].fechahora_entregado !== '0000-00-00 00:00:00') {
+            hora_entregado += '→' + Date.parse(_orden[x].fechahora_entregado).toString('HH:mm');
         }
         
         var eliminado = '';
-        if ( _ordenes[grupo][x].flag_cancelado == '1' ) {
+        if ( _orden[x].flag_cancelado == '1' ) {
             eliminado = ' - <span style="background-color:black;color:red;">ELIMINADO</span>';
         }
         
         var historial = '';
-        if ( _ordenes[grupo][x].historia != null ) {
-            historial = ' - <span class="historia">' + _ordenes[grupo][x].historia + '</span>';
+        if ( _orden[x].historia != null ) {
+            historial = ' - <span class="historia">' + _orden[x].historia + '</span>';
         }
         
         var buffer = '';
         if ( modo == '0' ) {
-            buffer += '<input class="chk_separar_pedido" type="checkbox" value="'+_ordenes[grupo][x].ID_pedido+'" />&nbsp;';
+            buffer += '<input class="chk_separar_pedido" type="checkbox" value="'+_orden[x].ID_pedido+'" />&nbsp;';
         }
-        buffer += '<span class="estado_despacho" title="P = pendiente | D = despachado">' + (_ordenes[grupo][x].flag_despachado === '0' ? 'P' : 'D') + '</span>&nbsp;';
+        
+        var estado_despacho = "P";
+        if (_orden[x].flag_elaborado === '1') estado_despacho = 'E';
+        if (_orden[x].flag_despachado === '1') estado_despacho = 'D';
+        
+        buffer += '<span class="estado_despacho" title="P = pendiente | E = elaborado | D = despachado">' + estado_despacho + '</span>&nbsp;';
         buffer += botones;
-        buffer += '<span style="color:yellow;" title="' + _ordenes[grupo][x].ID_orden + ':' + _ordenes[grupo][x].ID_pedido + '">' + _ordenes[grupo][x].nombre_producto + '</span>&nbsp;';
-        buffer += '<span class="editar_pedido">$' + _ordenes[grupo][x].precio_grabado + "</span>";
+        buffer += '<span style="color:yellow;" title="' + _orden[x].ID_orden + ':' + _orden[x].ID_pedido + '">' + _orden[x].nombre_producto + '</span>&nbsp;';
+        buffer += '<span class="editar_pedido">$' + _orden[x].precio_grabado + "</span>";
         if (!$("#ocultar_fechas").is(':checked'))
-            buffer += '&nbsp;<span class="detalle_hora">[' + Date.parse(_ordenes[grupo][x].fechahora_pedido).toString('HH:mm') + hora_entregado  + ']</span>&nbsp;';
+            buffer += '&nbsp;<span class="detalle_hora">[' + Date.parse(_orden[x].fechahora_pedido).toString('HH:mm') + hora_entregado  + ']</span>&nbsp;';
         buffer += eliminado;
         buffer += historial;
 
         pedido.find('.producto').html(buffer);
                 
-        if ('adicionales' in _ordenes[grupo][x] && _ordenes[grupo][x].adicionales.length > 0)
+        if ('adicionales' in _orden[x] && _orden[x].adicionales.length > 0)
         {
             pedido.append('<div class="adicionales" ><ul></ul></div>');
-            for (adicional in _ordenes[grupo][x].adicionales)
+            for (adicional in _orden[x].adicionales)
             {
-                pedido.find('.adicionales ul').append('<li>' + _ordenes[grupo][x].adicionales[adicional].nombre  + ' $' + _ordenes[grupo][x].adicionales[adicional].precio_grabado + '</li>');
-                if (_ordenes[grupo][x].flag_cancelado === '0') {
-                    total += parseFloat(_ordenes[grupo][x].adicionales[adicional].precio_grabado);
+                pedido.find('.adicionales ul').append('<li id_adicional="'+_orden[x].adicionales[adicional].ID_pedido_adicional+'">' + _orden[x].adicionales[adicional].nombre  + ' <span class="adicionales_precio">$' + _orden[x].adicionales[adicional].precio_grabado + '</span></li>');
+                if (_orden[x].flag_cancelado === '0') {
+                    total += parseFloat(_orden[x].adicionales[adicional].precio_grabado);
                 }
             }
         }
 
-        if ('remociones' in _ordenes[grupo][x] && _ordenes[grupo][x].remociones.length > 0)
+        if ('remociones' in _orden[x] && _orden[x].remociones.length > 0)
         {
             pedido.append('<div class="remociones" ><ul></ul></div>');
-            for (remocion in _ordenes[grupo][x].remociones)
+            for (remocion in _orden[x].remociones)
             {
-                pedido.find('.remociones ul').append('<li>' + _ordenes[grupo][x].remociones[remocion].nombre + '</li>');
+                pedido.find('.remociones ul').append('<li>' + _orden[x].remociones[remocion].nombre + '</li>');
             }
         }
 
-        if (_ordenes[grupo][x].flag_cancelado === '0') {
-            total += parseFloat(_ordenes[grupo][x].precio_grabado);
+        if (_orden[x].flag_cancelado === '0') {
+            total += parseFloat(_orden[x].precio_grabado);
         }
         
 	if ( ! $("#cuentas_compactas").is(':checked') )
@@ -197,14 +200,14 @@ function cuenta_obtenerVisual(objetivo, grupo, modo)
     }
     
     var precio_sin_iva = (total / 1.13).toFixed(2);
-    var iva = (_ordenes[grupo][0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
-    var propina = ( _ordenes[grupo][0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
+    var iva = (_orden[0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
+    var propina = ( _orden[0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
     orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;color:red;font-weight:bold;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
     
     total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
     orden.find('.precio').html( '<span title="Total con IVA y con propina">$' + total.toFixed(2) + '</span>' );
-
-    objetivo.append(orden);
+    
+    return orden[0].outerHTML;
     
 } // cuenta_obtenerVisual()
 
@@ -309,7 +312,7 @@ function crearXmlParaFacturin(_datos, tipo, simple, directa)
 } // crearXmlParaFacturin()
 
 function cargarEstado() {
-    if(typeof(Storage) == "undefined") return;        
+    if(typeof(Storage) === "undefined") return;        
     
     $(".auto_guardar[id!='']").each(function(){
         var resultado = localStorage.getItem("CE_" + this.id);
@@ -362,8 +365,8 @@ $(function(){
         return jQuery(n).text().toUpperCase().indexOf(m[3].toUpperCase()) >= 0;
     };
    
-    $(document).ajaxStart(function(){$("#ajax_cargando").show();});
-    $(document).ajaxStop(function(){$("#ajax_cargando").hide();});
+    $(document).ajaxStart(function(){});
+    $(document).ajaxStop(function(){});
 
     $.ajaxSetup({
         cache: false,

@@ -274,7 +274,7 @@ function CacheCrear($llave, $valor, $destructivo = false)
         CacheDestruir ();
 
     $llave = "RSV_SQL_".sha1($llave);
-    apc_store($llave, $valor, 3600);
+    apc_store($llave, $valor, 30);
 }
 
 function CacheObtener($llave)

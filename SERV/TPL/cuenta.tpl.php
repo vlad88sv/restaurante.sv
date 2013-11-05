@@ -52,7 +52,7 @@ $r = db_consultar($c);
 
 while ($r && $f = db_fetch($r))
 {
-    $c = 'SELECT t2.nombre, t1.precio_grabado, t1.tipo FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido='.$f['ID_pedido'].' AND tipo="poner"';
+    $c = 'SELECT t1.ID_pedido_adicional, t2.nombre, t1.precio_grabado, t1.tipo FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido='.$f['ID_pedido'].' AND tipo="poner"';
     $rAdicionales = db_consultar($c);
 
     while ($rAdicionales && $fAdicionales = db_fetch($rAdicionales))

@@ -109,13 +109,7 @@ function actualizar() {
 	
 	var max_x = 0;
     
-	if ( typeof datos.aux.pendientes === "undefined" || datos.aux.pendientes == "")
-	{
-	 $('#pedidos').html('<div id="nada_pendiente" style="color:red;font-size:8em;text-align:center;">Nada pendiente!</div>')
-	 return;
-	}
-	
-	if (JSON.stringify(cmp_cache) == JSON.stringify(datos.aux.pendientes)) {
+    	if (cmp_cache == JSON.stringify(datos.aux.pendientes)) {
         // No redendizar nada, con el beneficio de:
         // * No alterar el DOM y hacer mas facil Firedebuggear
         // * No procesar innecesariamente
@@ -123,9 +117,15 @@ function actualizar() {
         // * Hacer posible mantener estado en los cheques
 	return;
 	}
+    
+	cmp_cache = JSON.stringify(datos.aux.pendientes);
 
-	cmp_cache = datos.aux.pendientes;
-	
+	if ( typeof datos.aux.pendientes === "undefined" || datos.aux.pendientes == "")
+	{
+            $('#pedidos').html('<div id="nada_pendiente" style="color:red;font-size:8em;text-align:center;">Nada pendiente!</div>')
+            return;
+	}
+        
 	$('#pedidos').empty();
 	_ordenes = {};
 	 

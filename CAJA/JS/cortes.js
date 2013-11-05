@@ -36,20 +36,21 @@ function actualizarCuentas() {
     
     rsv_solicitar('cuenta',{modificados: 1, fecha: fecha.toString('yyyy-MM-dd')},function(datos){
         $("#contenedor_cuentas").html('');    
-       _ordenes = {};
-       
+        
        if ( typeof datos.aux.pendientes === "undefined" )
        {
         $("#contenedor_cuentas").html('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
         return;
        }
     
+       var buffer_visual = '';
+       $("#pedidos").empty();
        for(x in datos.aux.pendientes)
        {
-        _ordenes[x] = datos.aux.pendientes[x];                  
-        cuenta_obtenerVisual($("#contenedor_cuentas"), x, 1);
+        buffer_visual += cuenta_obtenerVisual(datos.aux.pendientes[x], 0);
        }
-    
+       
+       $("#contenedor_cuentas").html(buffer_visual);
     });
 }
 

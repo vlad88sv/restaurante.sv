@@ -4,11 +4,10 @@
     <tr>
         <td style="text-align:left;">Búscar: <input class="key enfocar" key="88" type="text" id="buscar_producto" value="" /></td>
         <td style="text-align: right;vertical-align: middle;">
-            [ <input type="checkbox" id="modo_tactil" value="1" /> <label for="modo_tactil">modo táctil</label> ]&nbsp; 
-            <button id="vaciar_cache">Vaciar cache</button>&nbsp;
-            <button class="key" key="66" id="borrar_orden">[Ctrl+Alt+b] Borrar</button>&nbsp;
-            <button class="key" key="82" id="ver_resumen">[Ctrl+Alt+r] Resumen</button>
-            <button class="key" key="69" id="enviar_orden_a_cocina">[Ctrl+Alt+e] Enviar</button>
+            [ <input type="checkbox" id="modo_tactil" value="1" /> <label style="font-size:10pt" for="modo_tactil">táctil</label> ]&nbsp; 
+            <button class="key" key="66" id="borrar_orden"><b>B</b>orrar</button>&nbsp;
+            <button class="key" key="82" id="ver_resumen"><b>R</b>esumen</button>
+            <button class="key" key="69" id="enviar_orden_a_cocina"><b>E</b>nviar</button>
         </td>
     </tr>
 </table>

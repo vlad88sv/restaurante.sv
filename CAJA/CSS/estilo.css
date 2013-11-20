@@ -74,6 +74,9 @@ table.resalte tr:hover {
     background-color: whitesmoke;
 }
 
+table.centrada td {
+    text-align: center;
+}
 input, button {
     text-align: center;
 }
@@ -195,7 +198,7 @@ table.encabezado_orden td {
 }
 
 .contenedor_botones button {
-    min-width: 100px;
+    min-width: 70px;
     text-align: center;
 }
 .cuenta {
@@ -354,7 +357,7 @@ div.pedido {
 	font-weight:bold;
 	font-style:normal;
 	height:24px;
-	line-height:24px;
+	line-height:20px;
 	min-width:100px;
 	text-decoration:none;
 	text-align:center;

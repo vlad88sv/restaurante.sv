@@ -5,8 +5,6 @@ _b_orden = [];
 _meseros = [];
 ID_mesero_busqueda = '';
 
-localStorage.clear();
-
 function MostrarRejillaProductos(datos)
 {
     
@@ -32,7 +30,7 @@ function MostrarRejillaProductos(datos)
 function reiniciarInterfaz() {
     _orden = [];
     _b_orden = [];
-    mostrar_grupo_productos('1');
+    mostrar_grupo_productos();
     miniResumenOrden();
     ResumenOrden();
     obtener_lista_meseros();
@@ -145,6 +143,7 @@ function convertirProductoEnPedido(buffer_de_orden, cantidad)
     for (var i=0; i < cantidad; i++) {
         _orden.push(buffer_de_orden);
     }
+    ResumenOrden();
     miniResumenOrden();
     $("#buscar_producto").focus();
 }
@@ -153,13 +152,15 @@ function ResumenOrden()
 {
     var buffer = '';
     
+    buffer += '<h1>Editar orden</h1>';
+    
     if (_orden.length == 0)
     {
-        $("#scroller").html('<p>No hay ningún pedido agregado</p>');
+        buffer += '<p>No hay ningún pedido agregado</p>';
+        $("#resumen_completo").html(buffer);
         return;
     }
     
-    buffer += '<h1>Resumen de la orden</h1>';
     
     buffer += '<table class="estandar ancha bordes zebra" id="seleccion_producto">';
     for (x in _orden)
@@ -201,16 +202,25 @@ function ResumenOrden()
     
     _orden[x].precio
     
-    $("#scroller").html(buffer);
+    $("#resumen_completo").html(buffer);
 }
 
 function miniResumenOrden()
 {
     var ordenador = {};
-    var buffer = '';
+    var buffer = '<h1>Resumen de la orden</h1>';
+    
+    buffer += '<p><b>Teléfono:</b><br />' + $("#cliente_telefono").val() + '</p>';
+    buffer += '<p><b>Cliente:</b><br />' + $("#cliente_nombre").val() + '</p>';
+    buffer += '<p><b>Dirección:</b><br />' + $("#cliente_direccion").val() + '</p>';
+    buffer += '<p><b>Método de pago:</b><br />' + $('label[for="'+$('[name="domicilio_metodo_pago"]:checked').attr('id')+'"]').html() + '</p>';
+    buffer += '<p><b>Documento físcal:</b><br />' + $('label[for="'+$('[name="domicilio_documento_fiscal"]:checked').attr('id')+'"]').html() + '</p>';
+    
+    buffer += '<hr />';
     
     if (_orden.length == 0)
     {
+        buffer += '<p>No hay ningún pedido agregado</p>';
         $('#info_principal').html(buffer);
         return;
     }
@@ -238,6 +248,8 @@ function miniResumenOrden()
 
 $(window).load(function(){
     $("#buscar_producto").focus();
+    localStorage.clear();
+    reiniciarInterfaz();
 });
 
 $(function(){  
@@ -312,69 +324,28 @@ $(function(){
             return;
         }
         
-        ResumenOrden();
+        var datos_domicilio = {};
         
-        var ID_mesa = 0;
+        datos_domicilio['telefono'] = $("#cliente_telefono").val();
+        datos_domicilio['nombre'] = $("#cliente_nombre").val();
+        datos_domicilio['direccion'] = $("#cliente_direccion").val();
+        datos_domicilio['tarjeta'] = $("#cliente_tarjeta").val();
+        datos_domicilio['expiracion'] = $("#cliente_tarjeta_expiracion").val();
+        datos_domicilio['vuelto'] = $("#cliente_vuelto").val();
+        datos_domicilio['metodo_pago'] = $('[name="domicilio_metodo_pago"]:checked').val();
+        datos_domicilio['documento_fiscal'] = $('[name="domicilio_documento_fiscal"]:checked').val();
+        datos_domicilio['detalle_facturacion'] = $('[name="domicilio_detalle_facturacion"]').val();
+        datos_domicilio['facturacion_nombre'] = $("#datos_facturacion__nombre").val();
+        datos_domicilio['facturacion__dui'] = $("#datos_facturacion__dui").val();
+        datos_domicilio['facturacion_nit'] = $("#datos_facturacion__nit").val();
+        datos_domicilio['facturacion_nrc'] = $("#datos_facturacion__nrc").val();
+        datos_domicilio['facturacion_giro'] = $("#datos_facturacion__giro").val();
+        datos_domicilio['facturacion_direccion'] = $("#datos_facturacion__direccion").val();
         
-        while ( ID_mesa == 0 ) {
-            ID_mesa = window.prompt('1. Número de MESA','0');
-            
-            if (!ID_mesa) {
-                alert ('Cancelando envío');
-                return;
-            }
-
-            if (/^[0-9]+$/.test(ID_mesa) == false)
-            {
-                alert('Número de mesa incorrecto.');
-                ID_mesa = 0;
-            }
-        }
-        
-        
-        var ID_mesero_busqueda = "";
-        
-        rsv_solicitar('cuenta',{mesa: ID_mesa, pendientes: true}, function(datos){
-            if ( typeof datos.aux.pendientes != "undefined" )
-            {
-                ID_mesero_busqueda = datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].ID_mesero;
-                
-                alert('¡Mesa con cuenta abierta!');
-
-                if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
-                    alert('¡parece que la va a meter donde no debe!');
-                }
-            }
-            
-            var ID_mesero = 0;
-            while ( ID_mesero == 0 ) {
-                var meseros = '';
-                
-                for (x in _meseros)
-                {
-                    meseros += " * " + _meseros[x].ID_usuarios + ". " + _meseros[x].usuario + "\n"; 
-                    
-                }
-                
-                ID_mesero = window.prompt('2. Número de MESERO.' + "\n" + meseros, ID_mesero_busqueda );
-                
-                if (!ID_mesero) {
-                    alert ('Cancelando envío');
-                    return;
-                }
-    
-                if (/^[0-9]+$/.test(ID_mesero) == false)
-                {
-                    alert('Número de mesero incorrecto.');
-                    ID_mesero = 0;
-                }
-            }
-            
-            rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: ID_mesero, orden: _orden}, function(){
-                reiniciarInterfaz();
-                $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
-            }); 
-        });
+        rsv_solicitar('ingresar_orden',{mesa: datos_domicilio['telefono'], mesero: ID_usuario, orden: _orden, domicilio: datos_domicilio}, function(){
+            reiniciarInterfaz();
+            $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
+        }); 
         
     });
     
@@ -598,8 +569,8 @@ $(function(){
         }
         event.stopPropagation();
     });
-            
-    mostrar_grupo_productos(1);
+        
+    mostrar_grupo_productos();
     obtener_lista_meseros();
 
 });

@@ -33,8 +33,8 @@ if (isset($_POST['ver']))
 
 if (isset($_POST['impreso']))
 {
-    $datos['impreso'] = '1';
-    db_actualizar_datos('comandas', $datos, 'ID_comanda="'.db_codex($_POST['impreso']).'"');
+    $c = 'DELETE FROM comandas WHERE ID_comanda="'.db_codex($_POST['impreso']).'" LIMIT 1';
+    db_consultar($c);
     return;
 }
 ?>

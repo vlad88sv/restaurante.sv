@@ -1,8 +1,8 @@
 _ajax = {};
 slam_defense = true;
+if (typeof URI_SERVIDOR == "undefined") URI_SERVIDOR = "/SERV";
 
-function rsv_solicitar(peticion, data, funcion, cache, slam) {
-    
+function rsv_solicitar(peticion, data, funcion, cache, slam) {    
     var objetivo = {TPL: peticion};
     var llave = window.btoa(peticion + JSON.stringify(data));    
 
@@ -35,7 +35,7 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
     _ajax[llave] = true;
     //console.log( "Iniciado :: " + peticion + " :: " + _ajax[llave]);
     
-    $.post('/SERV/?REFERENCIA='+peticion, $.extend(objetivo,data), function(retorno){
+    $.post(URI_SERVIDOR + '/?REFERENCIA='+peticion, $.extend(objetivo,data), function(retorno){
         if(typeof(Storage)!=="undefined" && cache == true){
             localStorage.setItem(llave, JSON.stringify(retorno));
         }
@@ -58,8 +58,8 @@ function cuenta_obtenerVisual(_orden, modo)
     var orden = $('<div class="orden" />');
     var total = 0.00;
     var html = '';
-    var controles_fiscales = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>';
-    var controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>';
+    var controles_fiscales = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>&nbsp;';
+    var controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button>';
 
     if ( modo == 0 && _orden[0].flag_tiquetado == '1')
     {
@@ -88,7 +88,8 @@ function cuenta_obtenerVisual(_orden, modo)
     html += '</table>';
     html += '</div>';
     html += '<div class="cuenta contenedor_botones" style="text-align:center;">' + controles + '</div>';
-    html += '<hr />';
+    if ( ! $("#cuentas_compactas").is(':checked') ) html += '<hr />';
+    
     if (_orden[0].flag_nopropina == '1')
     {
         html += '<div class="cuenta" style="background-color:pink;color:red;text-align:center;font-size:14px;font-weight:bold;">sin propina</div>';
@@ -131,11 +132,11 @@ function cuenta_obtenerVisual(_orden, modo)
         pedido.append('<div class="producto" />');
         
         var hora_entregado = '';
-	/*
+	
 	if (_orden[x].fechahora_elaborado !== '0000-00-00 00:00:00') {
             hora_entregado += '→' + Date.parse(_orden[x].fechahora_elaborado).toString('HH:mm');
         }
-        */
+        
         if (_orden[x].fechahora_entregado !== '0000-00-00 00:00:00') {
             hora_entregado += '→' + Date.parse(_orden[x].fechahora_entregado).toString('HH:mm');
         }
@@ -334,10 +335,10 @@ function cargarEstado() {
 }
 
 $(document).ready(function(){
-    $('body').append('<img id="ajax_cargando" src="/SERV/IMG/cargando.gif" style="position:fixed;top:50%;left:50%;z-index:20;display: none;" />\n');
+    $('body').append('<img id="ajax_cargando" src="' + URI_SERVIDOR + '/IMG/cargando.gif" style="position:fixed;top:50%;left:50%;z-index:20;display: none;" />\n');
     $('body').append('\
     <div id="ajax_error" style="position:fixed;top:25%;left:25%;z-index:90;display: none;text-align: center;">\
-        <img src="/SERV/IMG/error.png" />\
+        <img src="' + URI_SERVIDOR + '/IMG/error.png" />\
         <p id="ajax_error_texto" style="color:greenyellow;background: black;font-weight:bold;font-size: 18px;padding:6px;"></p>\
     </div>\
     ');
@@ -410,3 +411,14 @@ $(function(){
         });
     }
 });
+
+function luhn(b, y, t, e, s, u) {
+    b = b.replace(/[^0-9]/g, '');     
+    s = 0; u = y ? 1 : 2;
+    for (t = ( b = b + '').length; t--;) {
+        e = b[t] * (u^=3);
+        s += e-(e>9?9:0);
+    }
+    t = 10 - (s % 10 || 10);
+    return y ? b + t : !t;
+}

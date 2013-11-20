@@ -4,6 +4,10 @@ $GRUPO = (empty($_POST['grupo']) ? '' : $_POST['grupo']);
 
 switch ($GRUPO)
 {       
+    case 'horno':
+        $GRUPO = 'AND t0.nodo IN ("pizzas1","pizzas2","entradas_horno","pastas")';
+        break;
+    
     case 'pizzas':
         $GRUPO = 'AND t0.nodo IN ("pizzas1","pizzas2","entradas_horno")';
         break;
@@ -91,19 +95,17 @@ while ($r && $f = db_fetch($r))
     }
 
     $c = 'SELECT t2.nombre FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido='.$f['ID_pedido'] . ' AND tipo="quitar"';
-    $rAdicionales = db_consultar($c);
+    $rEliminados = db_consultar($c);
 
-    while ($rAdicionales && $fAdicionales = db_fetch($rAdicionales))
+    while ($rEliminados && $fEliminados= db_fetch($rEliminados))
     {
-        $f['ingredientes'][] = $fAdicionales;
+        $f['ingredientes'][] = $fEliminados;
     }    
     
     $grupo = 'id_'.sha1($f['ID_orden']);
     
     $json['aux']['pendientes'][$grupo][] = $f;
 }
-
-$json['cache'] = (serialize(@$json['aux']['pendientes']) == serialize($cache));
 
 if (!$cache)
     CacheCrear($llaveCache, @$json['aux']['pendientes'], false);

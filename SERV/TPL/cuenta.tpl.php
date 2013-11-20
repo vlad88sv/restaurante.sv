@@ -24,9 +24,9 @@ if ( isset($_POST['modificados']) )
 LEFT JOIN `pedidos` AS x1 USING(ID_orden) WHERE (x0.flag_nopropina = 1 OR x1.`flag_cancelado` = 1 OR x0.`flag_anulado` = 1) AND DATE(x0.fechahora_pedido) = "'.$fecha.'" ) OR t0.cuenta IN (SELECT x4.cuenta FROM historial AS x2 LEFT JOIN pedidos AS x3 USING (ID_pedido) LEFT JOIN ordenes AS x4 USING (ID_orden) WHERE DATE(x2.fechahora) = "'.$fecha.'") )';
 
 if ( isset($_POST['historial']) && $_POST['historial'] == '1' )
-    $where = ' AND DATE(fechahora_pedido) = "'.$fecha.'" AND t0.`flag_pagado` = 1';
+    $where = ' AND DATE(fechahora_pedido) = "'.$fecha.'" AND (t0.`flag_pagado` = 1 OR t0.`flag_anulado` = 1)';
     
-$c = 'SELECT (SELECT nota FROM historial st0 WHERE grupo="PEDIDOS" AND st0.ID_pedido = t1.ID_pedido ORDER BY ID_historial DESC LIMIT 1) AS "historia", t0.ID_mesero, t4.usuario AS "nombre_mesero", t0.cuenta, t0.`fechahora_elaborado`, t0.`fechahora_pedido` , unix_timestamp(t0.`fechahora_pedido`) AS "fechahora_pedido_uts" , t0.`fechahora_entregado` , t0.`fechahora_pagado` , t0.`flag_nopropina` , t0.`flag_exento` , t0.`flag_pagado`, t0.`flag_elaborado` , t0.`flag_despachado` ,  t0.`flag_anulado`, t0.`flag_tiquetado`, t1.`flag_cancelado`, t0.`metodo_pago` , t1.`ID_orden` , t0.`ID_mesa` , t0.`ID_usuario` , t1.`ID_pedido` , `ID_producto` , `precio_grabado` , t2.`nombre` AS "nombre_producto", `tmpID`, `flag_cancelado`, t2.ID_grupo, t3.descripcion AS "grupo_desc"
+$c = 'SELECT (SELECT nota FROM historial st0 WHERE ID_pedido>0 AND st0.ID_pedido = t1.ID_pedido ORDER BY ID_historial DESC LIMIT 1) AS "historia", t0.ID_mesero, t4.usuario AS "nombre_mesero", t0.cuenta, t0.`fechahora_elaborado`, t0.`fechahora_pedido` , unix_timestamp(t0.`fechahora_pedido`) AS "fechahora_pedido_uts" , t0.`fechahora_entregado` , t0.`fechahora_pagado` , t0.`flag_nopropina` , t0.`flag_exento` , t0.`flag_pagado`, t0.`flag_elaborado` , t0.`flag_despachado` ,  t0.`flag_anulado`, t0.`flag_tiquetado`, t1.`flag_cancelado`, t0.`metodo_pago` , t1.`ID_orden` , t0.`ID_mesa` , t0.`ID_usuario` , t1.`ID_pedido` , `ID_producto` , `precio_grabado` , t2.`nombre` AS "nombre_producto", `tmpID`, `flag_cancelado`, t2.ID_grupo, t3.descripcion AS "grupo_desc"
 FROM `ordenes` AS t0
 LEFT JOIN `pedidos` AS t1
 USING ( ID_orden )
@@ -36,7 +36,7 @@ LEFT JOIN productos_grupos AS t3
 USING ( ID_grupo )
 LEFT JOIN usuarios AS t4
 ON t0.ID_mesero = t4.ID_usuarios
-WHERE 1 AND t1.`ID_producto` IS NOT NULL '.$where.'
+WHERE 1 '.$where.'
 ORDER BY t0.ID_mesa ASC, t0.`fechahora_pedido`, t1.`ID_producto`';
 
 $llaveCache = $c;
@@ -84,7 +84,14 @@ while ($r && $f = db_fetch($r))
     $json['aux']['pendientes'][$grupo][] = $f;
 }
 
-$json['cache'] = (serialize(@$json['aux']['pendientes']) == serialize($cache));
+// Calcular totales
+if (0){
+    $json['aux']['totales'][$grupo]['total_sin_iva'] = 0;
+    $json['aux']['totales'][$grupo]['total_con_iva'] = 0;
+    $json['aux']['totales'][$grupo]['iva'] = 0;
+    $json['aux']['totales'][$grupo]['propina'] = 0;
+    $json['aux']['totales'][$grupo]['total_con_iva_y_propina'] = 0;
+}
 
 if (!$cache)
     CacheCrear($llaveCache, @$json['aux']['pendientes'], false);

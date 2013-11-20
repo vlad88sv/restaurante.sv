@@ -5,13 +5,15 @@
 </audio>
 <div id="pedidos"></div>
 <div id="cont_nodo">
+    <label for="opcion_despacho_completo">Despacho completo</label>
+    <input class="auto_guardar" id="opcion_despacho" type="checkbox" value="1" />
+    &nbsp;
     <select class="auto_guardar" id="nodo">
-        <option value="todos">Todas las ordenes</option>
-        <option value="pizzas">Pizzas y entradas horneadas</option>
-        <option value="pizzas1">Pizzas 1 + entradas horneadas</option>
-        <option value="pizzas2">Pizzas 2</option>
-        <option value="pastas">Pastas</option>
-        <option value="bebidas_ensaladas_postres_entradas">Bebidas, Ensaladas, Postres y Entradas</option>
-        <option value="nada">Desactivar este nodo</option>
+<?php
+    foreach($__listado_nodos as $valor => $nodo)
+    {
+        echo sprintf("\t\t".'<option value="%s">%s</option>', $valor, $nodo)."\n";
+    }
+?>
     </select>
 </div>

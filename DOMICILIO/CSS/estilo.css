@@ -1,0 +1,412 @@
+html, body
+{
+    font-family: Arial;
+    font-size: 1.0em;
+    margin:0;
+    padding: 0;
+}
+
+hr {
+    margin: 0;
+}
+h1
+{
+    font-size: 1em;
+    text-align: center;
+    margin: 2px;
+}
+
+h2
+{
+    font-size: 0.8em;
+    text-align: left;
+    margin: 0px;
+}
+
+a {
+    font-style: normal;
+    text-decoration: none;
+    display: block;
+    background-color: black;
+    padding:15px 3px;
+    border-radius: 5px;
+    margin:3px;
+    color:white;
+}
+
+
+table.ancha {
+    width: 100%;
+}
+
+table.bordes td, table.bordes th {
+    border: 1px solid #DDD;
+}
+
+table.estandar {
+    border-collapse: collapse;
+    vertical-align: middle;                                                                             
+}
+table.estandar td, table.estandar th {
+    margin:0;
+    border: none;
+    padding: 0;
+}
+
+table.amplia td, table.amplia th {
+    padding: 10px 0;
+}
+
+table.delgada td, table.delgada th {
+    padding: 0;
+}
+
+
+table.zebra tr:nth-child(odd) td
+{
+  background-color:#FFE4C6;
+}
+
+
+input[type="text"], input[type="number"], input[type="password"], button {
+    font-size: 0.8em;
+    text-align: center;
+}
+
+input[type="text"], input[type="number"], input[type="password"], textarea {
+    font-size: 1.1em;
+    padding: 0;
+    font-weight: bold;
+    color: blue;
+    background-color: #FFFFD1;
+    border: 1px solid black;
+}
+
+input[type=checkbox]
+{
+  padding: 0px;
+}
+
+input[type=checkbox]:focus
+{
+    border: 1px solid red;
+    outline:5px solid red;
+}
+
+ul {
+    padding-left:20px;
+}
+/* ayudantes */
+
+.container {
+    overflow: hidden;
+    clear: both;
+}
+.right {
+    float: right;
+    width: 100px;
+    height: 100%;
+    max-height: 100%;
+}
+.left {
+    float: left;
+    width: 100px;
+    height: 100%;
+    max-height: 100%;
+}
+.middle {
+    margin: 0 100px;
+    height: 100%;
+    max-height: 100%;
+}
+
+/* especificos */
+#seleccion_producto td {
+    vertical-align: top;
+}
+
+#menu {
+    margin-bottom: 4px;
+    width: 100%;
+}
+
+#menu td {
+    text-align: center;
+}
+
+#menu td a {
+    text-align: center;
+    display: block;
+}
+
+#menu_productos  {
+    position: fixed;
+    bottom: 1px;
+    width: 100%;
+    z-index: 999;
+}
+
+#menu_productos td {
+    padding: 0 5px;
+}
+
+#menu_productos td a {
+    display: block;
+    height: 20px;
+    line-height: 20px;
+    width: 100%;
+    text-align: center;
+    font-size:0.6em;
+}
+
+#content {
+    position: relative;
+}
+
+#scroller {
+    height: 130px;
+    overflow-y: auto;
+    margin:5px 15px;
+    padding:5px;
+    border:1px solid pink;
+    border-radius: 10px;
+}
+
+#info_principal {
+    background-color: cornsilk;
+    position:fixed;
+    right:0;
+    top:0px;
+    bottom: 0;
+    width:20%;
+    overflow-y: auto;
+    border-left:1px solid grey;
+    font-size:0.8em;
+}
+
+#info_principal p {
+    padding-left:2px;
+}
+
+#info_extendida {
+    font-size: 1.5em;
+    font-family: monospace;
+}
+
+#pedido .producto {
+    background-color: #EEE;
+    border: 1px #CCC dashed;
+    border-radius: 10px;
+    padding: 10px;
+    height:40px;
+    position: relative;
+    margin-bottom: 10px;
+}
+
+#pedido .foto_producto {
+    width: 128px;
+    height: 128px;
+}
+
+#pedido .fragmento_asiento {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.agregar_producto {
+    display: inline-block;
+    background-color: dimgray;
+    color: snow;
+    font-size: 1.0em;
+    border: 1px solid black;
+    margin: 3px;
+    border-radius: 5px;
+    width: auto;
+    position: relative;
+    padding: 3px;
+    cursor: pointer;
+}
+
+.agregar_producto:hover, .agregar_producto:focus {
+    color: yellow;
+}
+
+.agregar_producto div {
+    text-wrap: none;
+    white-space: nowrap;
+    position: relative;
+    float:left;
+    cursor: pointer;
+}
+
+.agregar_producto .nombre {
+    min-width:140px;
+    text-align:left;
+    margin-right:2px;
+}
+
+.agregar_producto .precio {
+    width:65px;
+    padding-right:1px;
+    text-align:right;
+}
+
+#simplemodal-overlay {background-color:#DDD;z-index:999;}
+#simplemodal-container {background-color:#FFF; border:8px solid #444; padding:12px;}
+#simplemodal-container button {
+    font-size: 1.2em;
+}
+
+div.orden {
+    border: 1px solid #666;
+    border-radius: 10px;
+    margin: 10px;
+    padding: 10px;
+    position: relative;
+    display: inline-block !important;
+    vertical-align: top;
+    min-width: 170px;
+}
+
+span.grupo {
+    font-size: 1.2em;
+    position: absolute;
+    color: #666;
+    left: 10px;
+    top: 5px;
+}
+
+.adicionales ul, .ingredientes ul {
+    margin-top: 1px;
+    padding-left: 20px;
+    color: #A5A5A5;
+}
+    
+span.precio {
+    font-size: 1.2em;
+    position: absolute;
+    color: #666;
+    right: 10px;
+    top: 5px;
+    padding-left: 5px;
+}
+
+
+div.pedido {
+    margin: 4px;
+    padding: 0 4px;
+    position: relative;
+}
+
+div.pedido:before {
+    content: "► ";
+    float: left;
+    margin-right: 2px;
+}
+
+@keyframes pulse {
+  00% { background-color: #FF0; }
+  33% { background-color: #F00; }
+  66% { background-color: #0F0; }
+}
+
+.pulso {
+  animation: pulse 1s ease-out 5;
+}
+
+#botones_principales {
+    background-color: lightyellow;
+    position:absolute;
+    top: 0px;
+    right: 0px;
+    border: 3px solid red;
+    border-radius: 10px;
+    padding:5px;
+    margin:5px;
+    z-index: 99;
+    text-align: center;
+}
+
+#botones_principales button{
+    font-size: 16pt;
+}
+
+#datos_cliente {
+    position: relative;
+}
+
+#datos_cliente label, #datos_pago label {
+    min-width: 70px;
+    display: inline-block;
+    text-align: right;
+    margin-right: 5px;
+}
+
+#cliente_direccion, #datos_facturacion {
+    width: 80%;
+    max-width: 640px;
+    height:100px;
+}
+
+#resumen_completo {
+    margin:5px 15px;
+    padding:5px;
+    border:3px solid black;
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: auto;
+}
+
+#metodo_pago {
+    width:100%;
+    border-collapse: collapse;
+}
+
+#metodo_pago td {
+    border: 1px solid pink;
+}
+
+#info_domicilio {
+    width: 100%;
+}
+
+#info_domicilio td {
+    width: 50%;
+}
+
+#domicilio_nombres {
+    border-right: 1px solid grey;
+}
+
+#domicilio_direcciones li, #domicilio_nombres li {
+    cursor: pointer;
+}
+
+#domicilio_direcciones li:hover, #domicilio_nombres li:hover {
+    color: red;
+}
+
+#contenedor_general {
+    position: relative;
+}
+
+#cambiar_vista {
+    background-color: lightyellow;
+    border:2px solid cornflowerblue;
+    border-radius: 5px;
+    padding:1px;
+    position:fixed;
+    top:0px;
+    left:0px;
+    z-index:999;
+    width:32px;
+    height:32px;
+}
+
+#buscar_telefono {
+    height:22px;
+    border: 1px solid black;
+}

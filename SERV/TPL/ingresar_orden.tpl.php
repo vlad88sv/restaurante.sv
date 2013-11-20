@@ -19,4 +19,6 @@ if (!is_numeric($_POST['mesa']) || !isset($_POST['orden']) || !is_array($_POST['
 
 // ingresar_orden destruye el cache, asi que no hay necesidad de hacerlo aquí.
 ingresar_orden($_POST['orden'], $_POST['mesa'], $_POST['mesero']);
+
+$json['post'] = $_POST;
 ?>

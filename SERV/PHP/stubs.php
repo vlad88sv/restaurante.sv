@@ -273,13 +273,13 @@ function CacheCrear($llave, $valor, $destructivo = false)
     if ($destructivo)
         CacheDestruir ();
 
-    $llave = "RSV_SQL_".sha1($llave);
+    $llave = "RSV_SQL_" .  crc32($llave);
     apc_store($llave, $valor, 30);
 }
 
 function CacheObtener($llave)
 {
-    $cache = apc_fetch("RSV_SQL_".sha1($llave));
+    $cache = apc_fetch("RSV_SQL_" .  crc32($llave));
     return $cache;
 }
 ?>

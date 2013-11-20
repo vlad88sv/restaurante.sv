@@ -1,7 +1,7 @@
 _t_id_pedido = 0; // Variable donde se almacena temporalmente el ID de pedido en edición
 keys = {};
 menu_visible = false;
-cmp_cache = {}; // objeto donde almacenamos la última actualización real
+cmp_cache = {cache:true}; // objeto donde almacenamos la última actualización real
 
 
 function actualizar() {
@@ -11,7 +11,7 @@ function actualizar() {
         if (slam === true) return;
         
         $("#t_cuentas").html(datos.benchmark + "ms");
-        
+
        if (cmp_cache == JSON.stringify(datos.aux.pendientes)) {
         // No redendizar nada, con el beneficio de:
         // * No alterar el DOM y hacer mas facil Firedebuggear
@@ -22,8 +22,8 @@ function actualizar() {
        }
        
        cmp_cache = JSON.stringify(datos.aux.pendientes);
-               
-       if ( typeof datos.aux.pendientes === "undefined" )
+       
+       if ( typeof datos.aux.pendientes === "undefined" || datos.aux.pendientes === '' )
        {
         $("#pedidos").html('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
         return;
@@ -177,8 +177,8 @@ $(function(){
         }
     });
     
-    $("#ver_historial").click(function(){
-        var fecha = $('#fecha_caja').val();
+    $("#ver_historial").click(function(){    
+       var fecha = $('#fecha_caja').val();
         
         $.modal('<h1>Historial de '+fecha+'</h1><br /><div style="position:absolute;top:30px;bottom:0;left:0;right:0;overflow-y:auto;"><div id="destino_historial"></div></div>');
 
@@ -271,7 +271,66 @@ $(function(){
         });
     });
     
+    // Descuento por porcentaje
+    $('#pedidos').on('click','.descuento_p_cuenta', function(){
+        var orden = $(this).parents('.orden');
+        
+        var motivo = '';
+        var valor = 0.00;
+        
+        motivo = prompt('Ingrese el motivo del descuento.');
+        motivo = $.trim(motivo);
+        
+        if (motivo == '') {
+            alert('Debe ingresar un motivo para realizar descuento');
+            return;
+        }
+        
+        valor = prompt('Ingrese el porcentaje a descontar.');
+        valor = $.trim(valor);
+        
+        if (valor == '') {
+            alert('Debe ingresar un porcentaje para realizar descuento');
+            return;
+        }
+        
+        rsv_solicitar('cuenta_descuento',{cuenta: orden.attr('cuenta'), tipo: 'porcentaje', valor: valor, motivo: motivo},function(){
+            cmp_cache = null;
+       });
        
+    });
+        
+    $('#pedidos').on('click','.cupon_cuenta', function(){
+        var orden = $(this).parents('.orden');
+        
+        var cupon = '';
+        
+        cupon = prompt('Ingrese el código del cupon.');
+        cupon = $.trim(cupon);
+
+        if (cupon === '')
+            return;
+        
+        $.post('http://cupon.lapizzeria.com.sv',{cupon:cupon, operacion:'buscar'}, 'json').done(function(data){
+            if (data.cupon.utilizado === '1')
+            {
+                alert('Cupon utilizado');
+                return;
+            }
+            
+            if (confirm('El cupón es válido por '+data.cupon.valor+' ('+data.cupon.tipo+'). ¿aplicar?.'))
+            {
+                rsv_solicitar('cuenta_descuento',{cuenta: orden.attr('cuenta'), tipo: data.cupon.tipo, valor: data.cupon.valor, motivo: 'Cupon utilizado: ' + data.cupon.cupon},function(){
+                    cmp_cache = null;
+                    $.post('http://cupon.lapizzeria.com.sv',{cupon:cupon, operacion:'invalidar'});
+                });
+            }
+        }).fail(function(){
+            alert('ERROR: intente nuevamente');
+        });
+        
+    });
+
     $('#pedidos').on('click','.anular_cuenta', function(){
         if (!confirm('¿Realmente desea anular esta orden?'))
             return;
@@ -310,7 +369,6 @@ $(function(){
             rsv_solicitar('cuenta',{ cuenta: cuenta, facturacion: '1'},function(datos){
                 for(x in datos.aux.pendientes) {
                     var xml = crearXmlParaFacturin(datos.aux.pendientes[x], 0, true, true);
-
                     $.post('http://localhost:40001', {xml:xml}, function(data){alert(data);}, 'text');
                 }
            });
@@ -441,11 +499,9 @@ $(function(){
             return;
         }
         
-        var id_adicional = $(this).parents('.li').attr('id_adicional');
+        var id_adicional = $(this).parents('li').attr('id_adicional');
         
-        alert(id_adicional);
-        
-        rsv_solicitar('adicional_modificar',{pedido: id_pedido, campo: 'precio_grabado', valor: precio, nota: motivo },function(datos){
+        rsv_solicitar('adicional_modificar',{pedido_adicional: id_adicional, campo: 'precio_grabado', valor: precio, nota: motivo },function(datos){
             // VOID
         });
         
@@ -520,41 +576,20 @@ $(function(){
     $("#compras").click(function() {
         rsv_solicitar('producto_ingredientes_y_adicionales',{modo: 'inventario'}, function(datos){
             var buffer = '<h1>Compras</h1>';
-            buffer += '<hr />';
-            buffer += '<h2>General</h2>';
             buffer += '<form id="datos_compra">';
-            buffer += '<table class="ancha">';
+            buffer += '<table class="ancha centrada">';
             buffer += '<tr><th>Comprado a</th><th>Descripción</th><th>Precio</th><th>Pagado via</th></tr>';
-            buffer += '<tr><td><input type="text" name="empresa" value="" /></td><td><input type="text" name="descripcion" value="" /></td><td><input type="text" name="precio" value="0.00" /></td><td><select name="via"><option value="caja">Caja</option><option value="cheque">Cheque</option></select></td></tr>';
+            buffer += '<tr><td><input type="text" name="empresa" value="" /></td><td><input type="text" name="descripcion" value="" /></td><td><input type="text" name="precio" value="0.00" /></td><td><select name="via"><option value="caja">Caja</option><option value="cheque">Cheque</option></select></td><td><button id="guardar_compra">Guardar</button></td></tr>';            
             buffer += '</table>';
             buffer += '</form>';
             
-            buffer += '<hr />';
-            
-            buffer += '<h2>Especifico para inventario</th>';
-        
-            buffer += '<form id="datos_inventario">';
-            buffer += '<table class="estandar bordes">';
-            buffer += '<tr><th>Ingrediente</th><th>Cantidad</th></tr>';
-            for (x in datos.aux.ingredientes)
-            {
-                if (datos.aux.ingredientes[x].disponible === '1') { 
-                    buffer += '<tr><td>' + datos.aux.ingredientes[x].nombre + '</td><td><input name="ingrediente_cantidad['+datos.aux.ingredientes[x].ID_ingrediente+']" type="text" value="" /> '+datos.aux.ingredientes[x].unidad+'</td></tr>';
-                }
-            }
-            
-            buffer += '</table>';
-            buffer += '</form>';
-            
-            buffer += '<hr />';
-        
-            buffer += '<button id="guardar_compra">Guardar</button>';
-            
-            buffer += '<hr />';
-            buffer += '<h1>Tabla de conversiones</h1>';
-            buffer += '<p>De Libras a Onzas: una libra = 16 onzas. Utilizar Onzas como medida base.</p>';
             $.modal(buffer);
         });
+    });
+    
+    $(document).on('submit','#datos_compra', function(event){
+        event.preventDefault();
+        return false;
     });
         
     $(document).on('click','#guardar_compra', function(){
@@ -566,7 +601,7 @@ $(function(){
         
         $("#guardar_compra").attr('disabled','disabled');
         
-        rsv_solicitar('inventario',{ingreso: true, compra: $("#datos_compra").serialize(), inventario: $("#datos_inventario").serialize()},function(datos){
+        rsv_solicitar('inventario',{ingreso: true, compra: $("#datos_compra").serialize()},function(datos){
             alert('Compra y/o ingreso de inventario realizado con exito.');
             $.modal.close();
         });

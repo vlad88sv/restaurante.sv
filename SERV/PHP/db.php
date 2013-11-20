@@ -3,11 +3,6 @@ $db_link = NULL;
 static $db_contador;
 db_conectar(); // Iniciamos la conexión a la base de datos.
 
-/*
-$memcache = new Memcached();
-$memcache -> addServer('127.0.0.1', 11211);
-*/
-
 function db_conectar(){
     global $db_link;
     $db_link = @mysqli_connect(db__host, db__usuario, db__clave, db__db) or die("<div>Fue imposible conectarse a la base de datos.<br />" . mysqli_connect_error() . '<br />'. @mysqli_error($db_link) . "</div>");
@@ -160,51 +155,35 @@ function db_obtener($tabla,$campo,$where,$group='')
     }
 }
 
-function db_obtener_fila($tabla,$where,$group='')
+function db_obtener_fila($tabla,$where)
 {
-    $c ="SELECT * FROM $tabla WHERE $where $group LIMIT 1";
+    $c ="SELECT * FROM $tabla WHERE $where LIMIT 1";
     $r = db_consultar($c);
-    return db_fetch($r);
+    if ($f = db_fetch($r))
+        return $f;
+    else
+        return false;
 }
 
 
-/*
-// Usar solamente en scripts que no procesen post
-function memcache_iniciar($contexto,$discriminador='')
-{
-    global $memcache;
-    
-    if (!MEMCACHE_ACTIVO || isset($_GET['nocache']))
-        return;
-
-    $hash = sha1($contexto.serialize(array($_SERVER['SERVER_PORT'],@$_SERVER["SERVER_NAME"],$discriminador)));
-    $buffer = $memcache->get($hash);
-
-    if ($buffer)
-    {
-        echo $buffer;
-        echo '<!-- memcache.hash :: '.$hash.' !-->';
-        return true;
-    }
-    
-    ob_start(); // Nota: usar memcache_finalizar() o no se veran los datos!
-    
-    return false;
+//Timestamp to MYSQL DATETIME
+function mysql_datetime($tiempo = 'now'){
+    return date( 'Y-m-d H:i:s',strtotime($tiempo) );
 }
 
-function memcache_finalizar($contexto, $discriminador='', $duracion = '+12 hour')
-{
-    global $memcache;
-    
-    if (!MEMCACHE_ACTIVO || isset($_GET['nocache']))
-        return;
-    
-    $contenido = ob_get_clean();
-    
-    $hash = sha1($contexto.serialize(array($_SERVER['SERVER_PORT'],@$_SERVER["SERVER_NAME"],$discriminador)));
-    $memcache -> set($hash, $contenido, strtotime($duracion));
-    
-    return $contenido;
+//Timestamp to MYSQL DATE
+function mysql_date($tiempo = 'now'){
+    return date( 'Y-m-d',strtotime($tiempo) );
 }
-*/
+
+//Timestamp to MYSQL TIME
+function mysql_time($tiempo = 'now'){
+    return date( 'H:i:s',strtotime($tiempo) );
+}
+
+function mysql_uuid() {
+    $f = db_fetch(db_consultar('SELECT UUID() AS UUID'));    
+    return $f['UUID'];
+}
+
 ?>

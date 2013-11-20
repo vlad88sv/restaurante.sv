@@ -43,14 +43,14 @@ function timeSince(date) {
     return Math.floor(seconds) + " s";
 }
 
-function cocina_agregarPedido(grupo)
+function cocina_agregarPedido(_orden)
 {
     var orden = $('<div class="orden" />');
     
     orden.append('<div style="height:1.5em;"><span class="grupo"><span class="mesa">#'+_orden[0].ID_mesa+'</span>:<span class="mesero">' + _orden[0].nombre_mesero + '</span></span><span class="tiempo" /></div>');
     orden.append('<hr />');
     orden.append('<div class="pedidos"></div>');
-    orden.attr('id','o_'+grupo);
+    orden.attr('id','cocina_'+_orden[0].cuenta);
     orden.attr('id_orden',_orden[0].ID_orden);
     
     // Ghost in the shell
@@ -76,7 +76,7 @@ function cocina_agregarPedido(grupo)
     for (x in _orden)
     {
         var pedido = $('<div class="pedido" />');
-        pedido.attr('id','p_'+grupo+_orden[x].ID_pedido);
+        pedido.attr('id','cocp_'+_orden[x].ID_pedido);
         pedido.append('<div class="producto" />');
         
         pedido.find('.producto').html(_orden[x].nombre_producto);
@@ -105,7 +105,7 @@ function cocina_agregarPedido(grupo)
     }
     orden.append(pedidos);
     
-    orden[0].outerHTML;
+    return orden[0].outerHTML;
 }
 
 function cocina_actualizarTiempoTranscurrido()
@@ -131,7 +131,7 @@ function cocina_actualizar() {
        
         cmp_cache_master_chef = JSON.stringify(datos.aux.pendientes);
         
-	if ( typeof datos.aux.pendientes === "undefined" )
+	if ( typeof datos.aux.pendientes === "undefined"  || datos.aux.pendientes === '' )
 	{
 	 $('#cocina').html('<div id="nada_pendiente" style="color:red;text-align:center;">Nada pendiente!</div>');
 	 return;
@@ -144,6 +144,7 @@ function cocina_actualizar() {
         {
 	    buffer_visual += cocina_agregarPedido(datos.aux.pendientes[x]);
 	};	
+        $('#cocina').html(buffer_visual);
     
     },false, true);
 }

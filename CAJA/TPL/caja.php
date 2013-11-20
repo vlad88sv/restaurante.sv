@@ -10,7 +10,6 @@
     <input type="text" style="width:100px;" readonly="readonly" value="<?php echo date('Y-m-d'); ?>" id="fecha_caja" />&nbsp;
     <button class="btn" id="ver_historial">Historial</button>&nbsp;
     <button class="btn" id="ver_total">Corte Z</button>&nbsp;
-    <button class="btn" id="inventario">Inventario</button>&nbsp;
     <button class="btn" id="compras">Compras</button>&nbsp;
     <button class="btn" id="historial_cortez" style="display:none;">H. Cortes</button>&nbsp;
     <button class="btn" id="cortes" style="display:none;">Cortes</button>&nbsp;

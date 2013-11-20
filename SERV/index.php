@@ -1,11 +1,12 @@
 <?php
 $rsv_benchmark = microtime(true);
+header ('Content-type: text/html; charset=utf-8');
+header ('Content-type: application/json');
+header ('Access-Control-Allow-Origin: *');
 
 define('__BASE__', str_replace('//','/',dirname(__FILE__).'/'));
 require_once('configuracion.php');
 require_once('PHP/vital.php');
-
-/* Solo debemos chequear que el token de auth sea válido */
 
 $json['error'] = '';
 $json['html'] = '';
@@ -19,17 +20,8 @@ if (empty($_POST['TPL']) || !file_exists($TPL)) {
     require_once($TPL);
 }
 
+$json['benchmark'] = round(((microtime(true) - $rsv_benchmark) * 1000),1);
 
-header ('Content-type: text/html; charset=utf-8');
-header ('Content-type: application/json');
-
-$json['benchmark'] = round(((microtime(true) - $rsv_benchmark) * 1000),0);
-
-$salida = json_encode($json);
-
-if (isset($_POST['filtro_salida__ut8_decode']) )
-    $salida = utf8_decode($salida);
-
-echo $salida;
+echo json_encode($json);
 
 ?>

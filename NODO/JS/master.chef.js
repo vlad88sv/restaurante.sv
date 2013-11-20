@@ -101,8 +101,7 @@ function actualizarTiempoTranscurrido()
     
 }
 function actualizar() {
-    nodo = $("#nodo :selected").val();
-    
+    var nodo = $("#nodo :selected").val();   
     rsv_solicitar('orden_pendientes',{grupo:nodo, nodo: true},function(datos, slam){
         
         if (slam === true) return;
@@ -163,7 +162,15 @@ $(function(){
             return;
         }
         
-        rsv_solicitar('despachar_orden',{orden: ID_orden, elaborado: true},function(){});
+        var opcion_despacho = ( $("#opcion_despacho").is(':checked') ? 'si' : 'no' );
+        var datos_imprimir = $(this).html();
+        
+        if (opcion_despacho === 'no')
+        {
+            datos_imprimir = '';
+        }
+        
+        rsv_solicitar('despachar_orden',{orden: ID_orden, elaborado: true, despacho_completo:opcion_despacho, imprimir: datos_imprimir},function(){});
         
         $(this).animate({width: 'hide'}, function() { $(this).remove(); } );        
     });

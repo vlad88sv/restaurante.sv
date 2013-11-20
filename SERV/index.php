@@ -5,7 +5,7 @@ header ('Content-type: application/json');
 header ('Access-Control-Allow-Origin: *');
 
 define('__BASE__', str_replace('//','/',dirname(__FILE__).'/'));
-require_once('configuracion.php');
+require_once('../configuracion.php');
 require_once('PHP/vital.php');
 
 $json['error'] = '';
@@ -23,5 +23,4 @@ if (empty($_POST['TPL']) || !file_exists($TPL)) {
 $json['benchmark'] = round(((microtime(true) - $rsv_benchmark) * 1000),1);
 
 echo json_encode($json);
-
 ?>

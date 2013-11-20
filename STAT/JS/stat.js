@@ -1,15 +1,3 @@
-function rsv_solicitar(peticion, data, funcion) {
-    var ret_json;
-    var objetivo = {TPL: peticion};
-    
-    
-    $.post('../SERV/', $.extend(objetivo,data), function(retorno){
-        if (typeof retorno.error != 'undefined') console.log(retorno.error);
-        funcion(retorno);
-    }, 'json');
-    return ret_json;
-}
-
 function agregar_info(texto) {
     $("#estadisticas").append('<div style="padding-top:5px;">' + texto + '</div>');
 }

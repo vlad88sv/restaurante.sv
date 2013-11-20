@@ -19,6 +19,7 @@ $_html['contenido'] = ob_get_clean();
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" media="screen" href="CSS/estilo.css" />
     
+    <script type="text/javascript">URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";</script>
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/jquery.js"></script>
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/comun.js"></script>
 </head> 

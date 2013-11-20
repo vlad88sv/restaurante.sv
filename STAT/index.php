@@ -1,5 +1,5 @@
 <?php
-require_once('configuracion.php');
+require_once('../configuracion.php');
 
 $_html['titulo'] = '';
 if (empty($_GET['TPL'])) $_GET['TPL'] = 'admin';
@@ -13,22 +13,12 @@ $_html['contenido'] = ob_get_clean();
 <head> 
     <title><?php echo NOMBRE_RESTAURANTE . ' - ' . $_html['titulo']; ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Content-Style-type" content="text/css" />
-    <meta http-equiv="Content-Script-type" content="text/javascript" />
     <meta http-equiv="Content-Language" content="es" />
     <link rel="stylesheet" href="CSS/estilo.css" />
+    <script type="text/javascript">URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";</script>
     <script type="text/javascript" src="JS/jquery.js"></script>
-    <script type="text/javascript">
-        $(function(){
-            $.ajax({
-                cache: false,
-		error: function(jqXHR, textStatus, errorThrown) {
-		    alert('La comunicación ha fallado, posiblemente sus datos no se enviaron');
-		}
-            });
-        });
-    </script>
-    <script type="text/javascript" src="JS/comun.js"></script>
+    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>JS/comun.js"></script>
+    <script type="text/javascript" src="JS/stat.js"></script>
 </head> 
 <body> 
 <div id="page" >

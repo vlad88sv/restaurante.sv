@@ -16,8 +16,8 @@ $_html['contenido'] = ob_get_clean();
     <meta http-equiv="Content-Language" content="es" />
     <link rel="stylesheet" href="CSS/estilo.css" />
     <script type="text/javascript">URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";</script>
-    <script type="text/javascript" src="JS/jquery.js"></script>
-    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>JS/comun.js"></script>
+    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/jquery.js"></script>
+    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/comun.js"></script>
     <script type="text/javascript" src="JS/stat.js"></script>
 </head> 
 <body> 

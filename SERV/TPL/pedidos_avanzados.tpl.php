@@ -1,25 +1,34 @@
 <?php
 
-if ( empty($_POST['pedidos']) || !is_array($_POST['pedidos']) || empty($_POST['mesa']) || empty($_POST['cuenta']) )
+if ( empty($_POST['pedidos']) || !is_array($_POST['pedidos']) || count($_POST['pedidos']) === 0 || !is_array($_POST['pedidos']) || empty($_POST['mesa']))
+{
+    $json['error'] = 'ERROR';
     return;
+}  
 
 $PEDIDOS = array();
 
-foreach($_POST['pedidos'] as $ID_PEDIDO) {
-    $PEDIDO = db_obtener_fila('pedidos', 'ID_pedido="'.db_codex($ID_PEDIDO).'"');
-    $PEDIDOS[] = array('ID_pedido' => $ID_PEDIDO, 'ID' => $PEDIDO['ID_producto'], 'ID_orden' => $PEDIDO['ID_orden']);
-}
+$cuenta_destino = rsv::cuenta_de_mesa($_POST['mesa']);
 
-$ORDEN = db_obtener_fila('ordenes', 'cuenta="'.db_codex($_POST['cuenta']).'"');
+unset($DATOS);
 
-if ( isset($_POST['mesero']) && is_numeric($_POST['mesero']) ) {
-    $ID_MESERO = $_POST['mesero'];
+if (isset($_POST['SEPARAR_CUENTA'])) {
+    // Necesita separar los productos en cuentas con mismo número de mesa
+    // pero diferente cuenta.
+    $DATOS['ID_cuenta'] = rsv::cuenta_duplicar_mesa($_POST['mesa']);
+} elseif ($cuenta_destino) {
+    // Si la mesa existe entonces combinamos
+    $DATOS['ID_cuenta'] = $cuenta_destino;
 } else {
-    $ID_MESERO = $ORDEN['ID_mesero'];
+    // No existe ninguna mesa con ese número, creemos la nueva cuenta
+    $DATOS['ID_cuenta'] = rsv::cuenta_nueva($_POST['mesa'], $_POST['mesero']);
 }
 
-$FORZAR_CUENTA_NUEVA = ( isset($_POST['FORZAR_CUENTA_NUEVA']) ? true : false );
+foreach($_POST['pedidos'] as $ID_PEDIDO)
+{
+    db_actualizar_datos('pedidos', $DATOS, 'ID_pedido="'.$ID_PEDIDO.'"');
+}
 
-// ingresar_orden destruye el cache, asi que no hay necesidad de hacerlo aquí.
-ingresar_orden($PEDIDOS, $_POST['mesa'], $ID_MESERO, 1, $FORZAR_CUENTA_NUEVA);
+rsv::integrar();
+
 ?>

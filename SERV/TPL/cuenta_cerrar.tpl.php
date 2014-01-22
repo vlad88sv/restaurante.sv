@@ -7,7 +7,7 @@ if ( empty($_POST['cuenta']) )
 
 $cuenta = db_codex($_POST['cuenta']);
 
-$c = 'UPDATE ordenes SET flag_pagado=1, fechahora_pagado=NOW() WHERE cuenta="'.$cuenta.'"';
+$c = 'UPDATE cuentas SET flag_pagado=1, fechahora_pagado=NOW() WHERE ID_cuenta="'.$cuenta.'"';
 db_consultar($c);
 
 CacheDestruir();

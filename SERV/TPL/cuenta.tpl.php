@@ -1,12 +1,27 @@
 <?php
+$permisos[] = 'cuentas';
+sesion::verificar($permisos);
+
+if ( ! sesion::$autorizado )
+{
+    $json['AUTORIZADO'] = 'no';
+    $json['permisos'] = @$_SESSION['permisos'];
+    if ( ! sesion::$autenticado )
+        $json['AUT_M'] = 'No ha iniciado sesión';
+    else
+        $json['AUT_M'] = 'No cuenta con los permisos necesarios';
+    return;
+}
+
 $where = '';
 
-if (isset($_POST['mesa']) && is_numeric($_POST['mesa']) && $_POST['mesa'] > 0) {
-    $where .= ' AND ID_mesa = ' . $_POST['mesa'];
+if ( isset($_POST['mesa']) )
+{
+    $where .= ' AND t0.`ID_mesa` = "' . db_codex($_POST['mesa']) . '"';
 }
 
 if (isset($_POST['cuenta'])) {
-    $where .= ' AND cuenta = "' . db_codex($_POST['cuenta']) . '"';
+    $where .= ' AND t0.`ID_cuenta` = "' . db_codex($_POST['cuenta']) . '"';
 }
 
 if (isset($_POST['pendientes'])) {
@@ -17,19 +32,27 @@ if (isset($_POST['facturacion'])) {
     $where .= ' AND t1.`flag_cancelado` = 0';
 }
 
-$fecha = ( empty($_POST['fecha']) ?  mysql_date() : db_codex($_POST['fecha']) );
+if ( isset($_POST['fecha']) )
+{
+    $fecha = db_codex($_POST['fecha']);
+} else {
+    $fecha = mysql_date();
+}
 
 if ( isset($_POST['modificados']) ) 
-    $where = ' AND ( t0.cuenta IN ( SELECT cuenta FROM `ordenes` AS x0
-LEFT JOIN `pedidos` AS x1 USING(ID_orden) WHERE (x0.flag_nopropina = 1 OR x1.`flag_cancelado` = 1 OR x0.`flag_anulado` = 1) AND DATE(x0.fechahora_pedido) = "'.$fecha.'" ) OR t0.cuenta IN (SELECT x4.cuenta FROM historial AS x2 LEFT JOIN pedidos AS x3 USING (ID_pedido) LEFT JOIN ordenes AS x4 USING (ID_orden) WHERE DATE(x2.fechahora) = "'.$fecha.'") )';
+{
+    $where = ' AND 0';// AND ID_cuenta IN (SELECT ID_cuenta FROM historial) OR ID_pedido IN (SELECT ID_pedido FROM historial)';
+}
 
 if ( isset($_POST['historial']) && $_POST['historial'] == '1' )
+{
     $where = ' AND DATE(fechahora_pedido) = "'.$fecha.'" AND (t0.`flag_pagado` = 1 OR t0.`flag_anulado` = 1)';
-    
-$c = 'SELECT (SELECT nota FROM historial st0 WHERE ID_pedido>0 AND st0.ID_pedido = t1.ID_pedido ORDER BY ID_historial DESC LIMIT 1) AS "historia", t0.ID_mesero, t4.usuario AS "nombre_mesero", t0.cuenta, t0.`fechahora_elaborado`, t0.`fechahora_pedido` , unix_timestamp(t0.`fechahora_pedido`) AS "fechahora_pedido_uts" , t0.`fechahora_entregado` , t0.`fechahora_pagado` , t0.`flag_nopropina` , t0.`flag_exento` , t0.`flag_pagado`, t0.`flag_elaborado` , t0.`flag_despachado` ,  t0.`flag_anulado`, t0.`flag_tiquetado`, t1.`flag_cancelado`, t0.`metodo_pago` , t1.`ID_orden` , t0.`ID_mesa` , t0.`ID_usuario` , t1.`ID_pedido` , `ID_producto` , `precio_grabado` , t2.`nombre` AS "nombre_producto", `tmpID`, `flag_cancelado`, t2.ID_grupo, t3.descripcion AS "grupo_desc"
-FROM `ordenes` AS t0
-LEFT JOIN `pedidos` AS t1
-USING ( ID_orden )
+}
+
+$c = 'SELECT (SELECT nota FROM historial st0 WHERE ID_pedido>0 AND st0.ID_pedido = t1.ID_pedido ORDER BY ID_historial DESC LIMIT 1) AS "historia", t0.ID_mesero, t4.usuario AS "nombre_mesero", t0.`ID_domicilio`, t1.`ID_cuenta`, t1.`fechahora_despachado`, t1.`fechahora_pedido` , unix_timestamp(t1.`fechahora_pedido`) AS "fechahora_pedido_uts" , t1.`fechahora_despachado` , t0.`fechahora_pagado` , t0.`flag_nopropina` , t0.`flag_exento` , t0.`flag_pagado`, t1.`flag_elaborado` , t1.`flag_despachado` ,  t0.`flag_anulado`, t0.`flag_tiquetado`, t1.`flag_cancelado`, t0.`metodo_pago`, t0.`ID_mesa` , t0.`ID_usuario` , t1.`ID_pedido` , t1.`ID_producto` , t1.`precio_grabado` , t2.`nombre` AS "nombre_producto", t1.`tmpID`, t1.`flag_cancelado`, t2.ID_grupo, t3.descripcion AS "grupo_desc"
+FROM `pedidos` AS t1
+LEFT JOIN `cuentas` AS t0
+USING ( ID_cuenta )
 LEFT JOIN `productos` AS t2
 USING ( ID_producto )
 LEFT JOIN productos_grupos AS t3
@@ -37,22 +60,31 @@ USING ( ID_grupo )
 LEFT JOIN usuarios AS t4
 ON t0.ID_mesero = t4.ID_usuarios
 WHERE 1 '.$where.'
-ORDER BY t0.ID_mesa ASC, t0.`fechahora_pedido`, t1.`ID_producto`';
+ORDER BY ( t0.ID_mesa + 0 ) ASC, t1.`fechahora_pedido` ASC, t1.`tmpID`';
 
 $llaveCache = $c;
 $cache = CacheObtener($llaveCache);
 if ($cache !== false)
 {
-    $json['aux']['pendientes'] = $cache;
+    $json['aux']['cuentas'] = @$cache['cuentas'];
+    $json['aux']['pendientes'] = @$cache['pendientes'];
     $json['cachado'] = true;
     return;
 }
 
 $r = db_consultar($c);
 
+if (db_num_resultados($r) == 0)
+{
+    $json['aux']['cuentas'] = (@$cache['cuentas'] ?: '');
+    $json['aux']['pendientes'] = (@$cache['pendientes'] ?: '');
+    CacheCrear($llaveCache, @$json['aux'], false);
+    return;
+}
+
 while ($r && $f = db_fetch($r))
 {
-    $c = 'SELECT t1.ID_pedido_adicional, t2.nombre, t1.precio_grabado, t1.tipo FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido='.$f['ID_pedido'].' AND tipo="poner"';
+    $c = 'SELECT t1.ID_pedido_adicional, t2.nombre, t1.precio_grabado, t1.tipo FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido="'.$f['ID_pedido'].'" AND tipo="poner"';
     $rAdicionales = db_consultar($c);
 
     while ($rAdicionales && $fAdicionales = db_fetch($rAdicionales))
@@ -60,39 +92,43 @@ while ($r && $f = db_fetch($r))
         $f['adicionales'][] = $fAdicionales;
     }
     
-    $c = 'SELECT t2.nombre, t1.precio_grabado, t1.tipo FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido='.$f['ID_pedido']. ' AND tipo="quitar"';
+    $c = 'SELECT t2.nombre, t1.precio_grabado, t1.tipo FROM `pedidos_adicionales` AS t1 LEFT JOIN `adicionables` AS t2 USING(ID_adicional) WHERE ID_pedido="'.$f['ID_pedido']. '" AND tipo="quitar"';
     $rRemociones = db_consultar($c);
     
     while ($rRemociones && $fRemociones = db_fetch($rRemociones))
     {
         $f['remociones'][] = $fRemociones;
     }
-    
-    // Historial de cuentas
-    $c = 'SELECT `fechahora`, TIME(`fechahora`) AS "hora", `nota`, `grupo`, `accion`, `cuenta` FROM `historial` WHERE `cuenta`="'.$f['cuenta'].'"';
-    $rHistorial = db_consultar($c);
-    
-    $f['historial'] = array();
-    
-    while ($rHistorial && $fHistorial = db_fetch($rHistorial))
-    {
-        $f['historial'][] = $fHistorial;
-    }
-    
-    $grupo = 'x'.$f['ID_mesa'].crc32($f['cuenta']);
+
+    $grupo = 'x'.$f['ID_cuenta'];
     
     $json['aux']['pendientes'][$grupo][] = $f;
 }
 
-// Calcular totales
-if (0){
-    $json['aux']['totales'][$grupo]['total_sin_iva'] = 0;
-    $json['aux']['totales'][$grupo]['total_con_iva'] = 0;
-    $json['aux']['totales'][$grupo]['iva'] = 0;
-    $json['aux']['totales'][$grupo]['propina'] = 0;
-    $json['aux']['totales'][$grupo]['total_con_iva_y_propina'] = 0;
+foreach ( $json['aux']['pendientes'] AS $grupo => $cuenta)
+{
+    // Datos de cuenta
+    $json['aux']['cuentas'][$grupo]['info'] = $cuenta[0];
+        
+    // Historial de cuentas
+    $c = 'SELECT `fechahora`, TIME(`fechahora`) AS "hora", `nota`, `grupo`, `accion` FROM `historial` WHERE `ID_cuenta`="'.$cuenta[0]['ID_cuenta'].'"';
+    $rHistorial = db_consultar($c);
+    
+    while ($rHistorial && $fHistorial = db_fetch($rHistorial))
+    {
+        $json['aux']['cuentas'][$grupo]['historial'][] = $fHistorial;
+    }
+
+    // Domicilio
+    $c = 'SELECT `ID_domicilio`, `telefono`, `direccion`, `nombre`, `tarjeta`, `expiracion`, `vuelto`, `notas`, `metodo_pago`, `documento_fiscal`, `detalle_facturacion`, `facturacion_nombre`, `facturacion__dui`, `facturacion_nit`, `facturacion_nrc`, `facturacion_giro`, `facturacion_direccion`, `flag_en_transito`, `fechahora_transito` FROM `domicilio` WHERE `ID_domicilio`="'.$cuenta[0]['ID_domicilio'].'"';
+    $rDomicilio = db_consultar($c);
+    
+    if ($rDomicilio && $fDomicilio = db_fetch($rDomicilio))
+    {
+        $fDomicilio['notas'] = ($fDomicilio['notas'] == '' ? 'Ninguna ingresada' : $fDomicilio['notas']);
+        $json['aux']['cuentas'][$grupo]['domicilio'] = $fDomicilio;
+    }
 }
 
-if (!$cache)
-    CacheCrear($llaveCache, @$json['aux']['pendientes'], false);
+CacheCrear($llaveCache, @$json['aux'], false);
 ?>

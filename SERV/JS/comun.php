@@ -1,6 +1,25 @@
+<?php
+header('Content-type: text/javascript');
+require_once('../../configuracion.php');
+?> 
+
+URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";
+URI_AUT = "<?php echo URI_AUT; ?>";
+MODO_GLOBAL = "<?php echo MODO_GLOBAL; ?>";
+
+JSOPS = [];
+
+<?php
+foreach ($JSOPS as $opcion)
+{
+    echo 'JSOPS.push("'.$opcion.'");'."\n";
+}
+?>
+
+
 _ajax = {};
 slam_defense = true;
-if (typeof URI_SERVIDOR == "undefined") URI_SERVIDOR = "/SERV";
+ult_AUT_M = '';
 
 function rsv_solicitar(peticion, data, funcion, cache, slam) {    
     var objetivo = {TPL: peticion};
@@ -39,7 +58,17 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
         if(typeof(Storage)!=="undefined" && cache == true){
             localStorage.setItem(llave, JSON.stringify(retorno));
         }
-        funcion(retorno);
+        
+        if ( typeof(retorno.AUT) !== "undefined" )
+        {
+            // DATOS; SLAM; AUT (fallo);
+            $("#ajax_aut_texto").html(retorno.AUT_M);
+            funcion(false,false,true);
+        } else {
+            funcion(retorno);
+        }
+        
+        
     }, 'json').always(function(){
         //console.log( "Completado :: " + peticion + " :: " + _ajax[llave]);
         delete _ajax[llave];
@@ -48,56 +77,81 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
     return true;
 }
 
-function cuenta_obtenerVisual(_orden, modo)
+function aut_solicitar() {
+    
+    var html = '';
+    
+    html += '<h1>AUTORIZACION REQUERIDA</h1>';
+    html += '<div style="text-align:center;">';
+    html += 'Una o mas acciones realizadas fueron detenidas por falta de permisos.<br /><br />';
+    html += '<a class="btn" target="_blank" href="' + URI_AUT + '">Autorización</a>';
+    html += '<br /><p>Una ves realizada la autorización puede cerrar esta ventana</p>.';
+    html += '<a class="btn facebox_cerrar" href="#">Cerrar ventana</a>';
+    html += '</div>';   
+    
+    $.modal(html);
+}
+
+function cuenta_obtenerVisual(_datos, _grupo, modo)
 {
     // Modo = 0 : normal
     // Modo = 1 : historial
     
-    var botones = '';
-    botones += '<span class="cancelar_pedido" title="Cancelar este pedido">X</span>&nbsp;';
+    var _cuenta = _datos['cuentas'][_grupo];
+    var _orden = _datos['pendientes'][_grupo];
+    
+    var cuenta_tiene_domicilio = ( typeof _cuenta.domicilio != 'undefined' )
+    
     var orden = $('<div class="orden" />');
     var total = 0.00;
     var html = '';
-    var controles_fiscales = '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>&nbsp;';
-    var controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button>';
+    var controles_fiscales = ( true ? '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>&nbsp;' : '<button class="imp_fiscalizar btn">Fiscalizar</button>&nbsp;');
+    var control_domicilio = ( cuenta_tiene_domicilio ? '<button class="imp_domicilio btn">Domicilio</button>' : '');
+    var control_tiquete = ( ! cuenta_tiene_domicilio ? '<button class="imp_tiquete btn">Tiquete</button>' : '');
+    var controles = controles_fiscales + control_domicilio + control_tiquete + '<button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button>';
 
-    if ( modo == 0 && _orden[0].flag_tiquetado == '1')
+    if ( modo == 0 && _cuenta.info.flag_tiquetado == '1')
     {
        orden.addClass('pago_pendiente');
     }
 
     if (modo == 1)
     {
-        controles = controles_fiscales + '<button class="imp_tiquete btn">Tiquete</button><button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
-        html += '<div class="cuenta">Cerrado: ' + _orden[0].fechahora_pagado+ ' | Cuenta: '+_orden[0].cuenta+'</div>';
+        controles = controles_fiscales + control_domicilio + control_tiquete +  '<button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
+        html += '<div class="cuenta">Cuenta: '+_cuenta.info.ID_cuenta+' | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
        
-        if (_orden[0].flag_anulado == '1')
+        if (_cuenta.info.flag_anulado == '1')
         {
-            html += '<div class="cuenta" style="background-color:white;color:red;text-align:center;font-size:14px;font-weight:bold;">¡esta cuenta fue anulada!</div>';
+            html += '<div class="vineta" style="background-color:white;color:red;text-align:center;">¡esta cuenta fue anulada!</div>';
         }
         
+    } else {
+        html += '<div class="cuenta">Cuenta <b>#'+_cuenta.info.ID_cuenta+'</b> | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
     }
 
     html += '<div class="contenedor_encabezado_orden">';
     html += '<table class="encabezado_orden">';
     html += '<tr>';
-    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa btn">'+_orden[0].ID_mesa+'</button> → <strong>'+_orden[0].nombre_mesero+'</strong></td>';
+    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa btn">'+_cuenta.info.ID_mesa+'</button></td>';
     html += '<td class="precio_precalculo"></td>';
     html += '<td class="precio"></td>';
     html += '</tr>';
     html += '</table>';
     html += '</div>';
     html += '<div class="cuenta contenedor_botones" style="text-align:center;">' + controles + '</div>';
-    if ( ! $("#cuentas_compactas").is(':checked') ) html += '<hr />';
     
-    if (_orden[0].flag_nopropina == '1')
-    {
-        html += '<div class="cuenta" style="background-color:pink;color:red;text-align:center;font-size:14px;font-weight:bold;">sin propina</div>';
-    }
+    // Información de domicilio
     
-    if (_orden[0].flag_exento == '1')
+    if ( cuenta_tiene_domicilio )
     {
-        html += '<div class="cuenta" style="background-color:yellow;color:black;text-align:center;font-size:14px;font-weight:bold;">sin IVA</div>';
+        var domicilio = '';
+        domicilio += '<div>Entregar a: <b>' + _cuenta.domicilio.nombre + '</b></div>';
+        domicilio += '<div>Entregar en: <b>' + _cuenta.domicilio.direccion + '</b></div>';        
+        domicilio += '<div>Notas: <b>' + _cuenta.domicilio.notas + '</b></div>';
+        domicilio += '<div>Método pago: <b>' + _cuenta.domicilio.metodo_pago + '</b>. ' + (_cuenta.domicilio.metodo_pago == 'efectivo' ? 'Cambio para: <b>$' + _cuenta.domicilio.vuelto + '</b>.': '') + '</div>';
+        domicilio += '<div>Facturación: <b> '+_cuenta.domicilio.documento_fiscal + '</b> elaborar por <b>' + _cuenta.domicilio.detalle_facturacion + '</b></div>';
+        domicilio += '<div>Nombre fiscal: <b>' + _cuenta.domicilio.facturacion_nombre + '</b>. DUI: <b> ' + _cuenta.domicilio.facturacion__dui + '</b>. NIT: <b>' + _cuenta.domicilio.facturacion_nit + '</b>. NRC: <b>' + _cuenta.domicilio.facturacion_nrc + '</b>. Giro: <b>' + _cuenta.domicilio.facturacion_giro  + '</b>. Dirección físcal: <b>' + _cuenta.domicilio.facturacion_direccion  + '</b>.</div>';
+        html += '<div class="info_domicilio">' + domicilio + '</div>';
     }
     
     
@@ -106,22 +160,26 @@ function cuenta_obtenerVisual(_orden, modo)
         html += 'SELECCIONADOS: <button class="btn_separar_cuenta btn">separar cuenta</button>&nbsp;<button class="btn_cambiar_mesa btn">cambiar mesa</button>';
         html += '</div>';
     }
-
-    if (_orden[0].historial != null && _orden[0].historial.length > 0)
+    
+    if (_cuenta.historial != null && _cuenta.historial.length > 0)
     {	
-        for (historia in _orden[0].historial) {
-            html += '<div class="cuenta" style="background-color:#FFFFA2;color:#676767;text-align:center;">';
-            html += _orden[0].historial[historia].hora + ' :: ' + _orden[0].historial[historia].accion + ' :: ' + _orden[0].historial[historia].nota;
+        for (var historia in _cuenta.historial) {
+            html += '<div class="vineta" style="background-color:#FFFFA2;color:#676767;text-align:center;">';
+            html += _cuenta.historial[historia].hora + ' :: ' + _cuenta.historial[historia].accion + ' :: ' + _cuenta.historial[historia].nota;
             html += '</div>';
         }
-	html += '<hr />';
     }
     
-    orden.append(html);
+    orden.append(html);    
+
+    var notificaciones = $('<div class="cuenta_notificaciones" style="text-align:center;" />');
+    orden.append(notificaciones);
     
-    orden.attr('id','o_'+_orden[0].cuenta);
-    orden.attr('id_mesa',_orden[0].ID_mesa);
-    orden.attr('cuenta',_orden[0].cuenta);
+    orden.attr('id','o_'+_cuenta.info.ID_cuenta);
+    orden.attr('id_mesa',_cuenta.info.ID_mesa);
+    orden.attr('cuenta',_cuenta.info.ID_cuenta);
+    
+    orden.append($('<hr />'));
     
     for (x in _orden)
     {
@@ -133,12 +191,20 @@ function cuenta_obtenerVisual(_orden, modo)
         
         var hora_entregado = '';
 	
-	if (_orden[x].fechahora_elaborado !== '0000-00-00 00:00:00') {
-            hora_entregado += '→' + Date.parse(_orden[x].fechahora_elaborado).toString('HH:mm');
+	if (_orden[x].fechahora_despachado !== '0000-00-00 00:00:00') {
+            try {
+                hora_entregado += '→' + Date.parse(_orden[x].fechahora_despachado).toString('HH:mm');
+            } catch(error) {
+                console.log(error);
+            }
         }
         
-        if (_orden[x].fechahora_entregado !== '0000-00-00 00:00:00') {
-            hora_entregado += '→' + Date.parse(_orden[x].fechahora_entregado).toString('HH:mm');
+        if (_orden[x].fechahora_despachado !== '0000-00-00 00:00:00') {
+            try {
+                hora_entregado += '→' + Date.parse(_orden[x].fechahora_despachado).toString('HH:mm');
+            } catch(error) {
+                console.log(error);
+            }
         }
         
         var eliminado = '';
@@ -156,16 +222,30 @@ function cuenta_obtenerVisual(_orden, modo)
             buffer += '<input class="chk_separar_pedido" type="checkbox" value="'+_orden[x].ID_pedido+'" />&nbsp;';
         }
         
+        var todo_despachado = true;
         var estado_despacho = "P";
         if (_orden[x].flag_elaborado === '1') estado_despacho = 'E';
         if (_orden[x].flag_despachado === '1') estado_despacho = 'D';
+        if (_orden[x].flag_cancelado === '1') estado_despacho = '-';
+        
+        if (_orden[x].flag_cancelado === "0" && estado_despacho !== "D") todo_despachado = false;
+        
+        var opcion_cancelar_pedido = '<span class="cancelar_pedido" title="Cancelar este pedido">X</span>&nbsp;';
+        if (_orden[x].flag_cancelado === '1') opcion_cancelar_pedido = "-&nbsp;";
+        
         
         buffer += '<span class="estado_despacho" title="P = pendiente | E = elaborado | D = despachado">' + estado_despacho + '</span>&nbsp;';
-        buffer += botones;
-        buffer += '<span style="color:yellow;" title="' + _orden[x].ID_orden + ':' + _orden[x].ID_pedido + '">' + _orden[x].nombre_producto + '</span>&nbsp;';
+        buffer += opcion_cancelar_pedido;
+        buffer += '<span style="color:yellow;" title="' + _orden[x].ID_pedido + '">' + _orden[x].nombre_producto + '</span>&nbsp;';
         buffer += '<span class="editar_pedido">$' + _orden[x].precio_grabado + "</span>";
         if (!$("#ocultar_fechas").is(':checked'))
-            buffer += '&nbsp;<span class="detalle_hora">[' + Date.parse(_orden[x].fechahora_pedido).toString('HH:mm') + hora_entregado  + ']</span>&nbsp;';
+        {
+            try {
+                buffer += '&nbsp;<span class="detalle_hora">[' + Date.parse(_orden[x].fechahora_pedido).toString('HH:mm') + hora_entregado  + ']</span>&nbsp;';
+            } catch(error){
+                console.log(error);
+            }
+        }
         buffer += eliminado;
         buffer += historial;
 
@@ -200,9 +280,42 @@ function cuenta_obtenerVisual(_orden, modo)
 	    orden.append(pedido);   
     }
     
+    try {
+        if ( _cuenta.info.flag_pagado == '1' )
+        {
+            notificaciones.append('<div class="vineta" style="background-color:#FFFACD;color:black;text-align:center;">cerrada/pagada ['+_cuenta.info.fechahora_pagado+']</div>');
+        }
+    } catch(error) {
+        
+    }   
+    
+    try {
+        if ( _cuenta.domicilio.flag_en_transito == '1' )
+        {
+            notificaciones.append('<div class="vineta" style="background-color:white;color:blue;text-align:center;">en tránsito ['+_cuenta.domicilio.fechahora_transito+']</div>');
+        }
+    } catch(error) {
+        
+    }
+    
+    if ( todo_despachado )
+    {
+        notificaciones.append('<div class="vineta" style="background-color:#BBFFFF;color:black;text-align:center;">nada pendiente</div>');
+    }
+
+    if ( _cuenta.info.flag_nopropina == '1' )
+    {
+        notificaciones.append('<div class="vineta" style="background-color:pink;color:red;text-align:center;">sin propina</div>');
+    }
+    
+    if ( _cuenta.info.flag_exento == '1' )
+    {
+        notificaciones.append('<div class="vineta" style="background-color:yellow;color:black;text-align:center;">sin IVA</div>');
+    }   
+    
     var precio_sin_iva = (total / 1.13).toFixed(2);
-    var iva = (_orden[0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
-    var propina = ( _orden[0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
+    var iva = (_cuenta.info.flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
+    var propina = ( _cuenta.info.flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
     orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;color:red;font-weight:bold;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
     
     total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
@@ -210,7 +323,7 @@ function cuenta_obtenerVisual(_orden, modo)
     
     return orden[0].outerHTML;
     
-} // cuenta_obtenerVisual()
+}
 
 function crearTiquete(_datos)
 {
@@ -264,6 +377,9 @@ function crearTiquete(_datos)
     if ( _datos[0].flag_nopropina == '0' )
         orden.find('table.totales').append('<tr><td>Propina (10%):</td><td>' + '$' + parseFloat(propina).toFixed(2) + '</td></tr>' );
 
+    if ( _datos[0].flag_exento == '1' )
+        orden.find('table.totales').append('<tr><td>IVA</td><td>EXENTO</td></tr>' );
+    
     orden.find('table.totales').append('<tr><td>Total:</td><td>' + '$' + total.toFixed(2) + '</td></tr>' );
     orden.append('<br /><br /><br /><br /><p style="text-align:center;">La pizzería - Plaza Los Castaños<br />¡Gracias por su compra!<br /><br />' + date + '</p>');
     
@@ -303,10 +419,8 @@ function crearXmlParaFacturin(_datos, tipo, simple, directa)
     var propina = ( _datos[0].flag_nopropina == '0' ? ((parseFloat(total) * 1.10) - parseFloat(total) ) : 0 );
     productos.append('<producto cantidad="1" nosujeta="1" precio="' + parseFloat(propina).toFixed(2) + '">Propina</producto>');
 
-    general.append('<impuestos>'+( _datos[0].flag_exento == '0' ? "iva" : "exento" )+'</impuestos>');
-    
+    general.append('<impuestos>' + ( _datos[0].flag_exento == '0' ? "iva" : "exento" ) + '</impuestos>');
     general.append('<directa>' + (directa ? 'si' : 'no') + '</directa>');
-    
     general.append('<tipo>' + ((tipo == 0) ? 'factura' : 'fiscal') + '</tipo>');
     
     return xml.html();
@@ -335,13 +449,15 @@ function cargarEstado() {
 }
 
 $(document).ready(function(){
-    $('body').append('<img id="ajax_cargando" src="' + URI_SERVIDOR + '/IMG/cargando.gif" style="position:fixed;top:50%;left:50%;z-index:20;display: none;" />\n');
+    //$('body').append('<img id="ajax_cargando" src="' + URI_SERVIDOR + '/IMG/cargando.gif" style="position:fixed;top:50%;left:50%;z-index:20;display: none;" />\n');
+    
     $('body').append('\
     <div id="ajax_error" style="position:fixed;top:25%;left:25%;z-index:90;display: none;text-align: center;">\
         <img src="' + URI_SERVIDOR + '/IMG/error.png" />\
-        <p id="ajax_error_texto" style="color:greenyellow;background: black;font-weight:bold;font-size: 18px;padding:6px;"></p>\
+        <p id="ajax_error_texto" style="color:greenyellow;background: black;font-weight:bold;font-size: 1.2em;padding:6px;"></p>\
     </div>\
     ');
+
     
     cargarEstado();
 });
@@ -371,7 +487,7 @@ $(function(){
 
     $.ajaxSetup({
         cache: false,
-        timeout: 3000,
+        timeout: 5000,
         complete: function (jqXHR, textStatus) {
             if (textStatus == "success") {
                 $("#ajax_error").hide();
@@ -401,13 +517,14 @@ $(function(){
     if ( typeof $.modal != 'undefined' )
     {
         $.extend($.modal.defaults, {
-            autoResize: true,
-            minHeight: '95%',
-            minWidth: '95%'
+            minHeight: '90%',
+            minWidth: '90%'
         }); 
 
-        $(document).on('click', '.facebox_cerrar', function(){
+        $(document).on('click', '.facebox_cerrar', function(event){
+            event.preventDefault();
             $.modal.close();
+            return false;
         });
     }
 });

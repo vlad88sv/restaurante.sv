@@ -1,8 +1,6 @@
 <?php
-
-if ( isset($_POST['modificar']) )
-{
-    
+if ( isset($_POST['imprimir'])) {
+    rsv::generar_impresion_cortez($_POST['imprimir']);
 }
 
 if ( isset($_POST['ultimo']))
@@ -71,42 +69,42 @@ $c_adicionales = '( SELECT COALESCE(SUM(precio_grabado),0 ) FROM `pedidos_adicio
 $c_total_bruto = '( ( (COALESCE(t2.precio_grabado,0) + '.$c_adicionales.') / IF(flag_exento = 0, 1, 1.13) ) * IF(flag_nopropina = 0, 1.10, 1) )';
 $c_total = 'SUM( ROUND('.$c_total_bruto.',2) ) AS total';
 
-$c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0';
+$c = 'SELECT '.$c_total.' FROM `cuentas` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_cuenta) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
 $total = ( empty($f['total']) ? '0.00' : $f['total'] );
 $json['aux']['total'] = numero($total);
 
-$c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_pagado=0 AND flag_anulado=0 AND flag_cancelado=0';
+$c = 'SELECT '.$c_total.' FROM `cuentas` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_cuenta) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_pagado=0 AND flag_anulado=0 AND flag_cancelado=0';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
 $total = ( empty($f['total']) ? '0.00' : $f['total'] );
 $json['aux']['total_pendiente'] = numero($total);
 
-$c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_anulado=0 AND flag_cancelado=0';
+$c = 'SELECT '.$c_total.' FROM `cuentas` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_cuenta) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_anulado=0 AND flag_cancelado=0';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
 $total = ( empty($f['total']) ? '0.00' : $f['total'] );
 $json['aux']['total_posible'] = numero($total);
 
-$c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_anulado=1';
+$c = 'SELECT '.$c_total.' FROM `cuentas` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_cuenta) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_anulado=1';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
 $total = ( empty($f['total']) ? '0.00' : $f['total'] );
 $json['aux']['total_anulado'] = numero($total);
 
-$c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_cancelado=1';
+$c = 'SELECT '.$c_total.' FROM `cuentas` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_cuenta) WHERE DATE(fechahora_pedido) = "'.$fecha.'" AND flag_cancelado=1';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
 $total = ( empty($f['total']) ? '0.00' : $f['total'] );
 $json['aux']['total_cancelado'] = numero($total);
 
-$c = 'SELECT SUM( `precio`) AS total FROM `compras` WHERE DATE( fechatiempo ) = "'.$fecha.'" AND via = "caja"';
+$c = 'SELECT SUM( `precio`) AS total FROM `compras` WHERE `fechatiempo` BETWEEN "'.$fecha.' 00:00:00" AND "'.$fecha.' 23:59:59" AND via = "caja"';
 $r = db_consultar($c);
 $f = db_fetch($r);
 
@@ -122,7 +120,7 @@ while ($f = db_fetch($r))
 }
 
 // Total a cuadrar: total desde el ultimo corte Z
-$c = 'SELECT '.$c_total.' FROM `ordenes` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_orden) WHERE fechahora_pedido >= (SELECT fechatiempo FROM cortez ORDER BY fechatiempo DESC LIMIT 1) AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0';
+$c = 'SELECT '.$c_total.' FROM `cuentas` AS t1 LEFT JOIN `pedidos` AS t2 USING (ID_cuenta) WHERE fechahora_pedido >= COALESCE((SELECT fechatiempo FROM cortez ORDER BY fechatiempo DESC LIMIT 1),"0") AND flag_pagado=1 AND flag_anulado=0 AND flag_cancelado=0';
 $r = db_consultar($c);
 $f = db_fetch($r);
 

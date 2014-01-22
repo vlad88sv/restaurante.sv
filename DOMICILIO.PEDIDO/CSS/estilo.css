@@ -1,9 +1,10 @@
 html, body
 {
     font-family: Arial;
-    font-size: 1.0em;
+    font-size: 12pt;
     margin:0;
     padding: 0;
+    overflow-y: scroll;
 }
 
 hr {
@@ -11,7 +12,7 @@ hr {
 }
 h1
 {
-    font-size: 1em;
+    font-size: 12pt;
     text-align: center;
     margin: 2px;
 }
@@ -26,6 +27,9 @@ h2
 a {
     font-style: normal;
     text-decoration: none;
+}
+
+a.mp {
     display: block;
     background-color: black;
     padding:15px 3px;
@@ -33,7 +37,6 @@ a {
     margin:3px;
     color:white;
 }
-
 
 table.ancha {
     width: 100%;
@@ -76,11 +79,30 @@ input[type="text"], input[type="number"], input[type="password"], button {
 input[type="text"], input[type="number"], input[type="password"], textarea {
     font-size: 1.1em;
     padding: 0;
+    margin: 1px 0;
     font-weight: bold;
     color: blue;
     background-color: #FFFFD1;
-    border: 1px solid black;
+    border: 2px solid lightskyblue;
+    border-radius: 4px;
+    padding: 5px;
 }
+
+input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus, textarea:focus {
+    background-color: white;
+    border: 2px solid red;
+}
+
+button.rsv:disabled {
+    background: white;
+}
+
+button.rsv {
+    height: 32px;
+    border: 2px solid black;
+    background: whitesmoke;
+}
+
 
 input[type=checkbox]
 {
@@ -91,6 +113,12 @@ input[type=checkbox]:focus
 {
     border: 1px solid red;
     outline:5px solid red;
+}
+
+input[type=checkbox]:checked
+{
+    border: 2px solid blue;
+    outline:2px solid blue;
 }
 
 ul {
@@ -179,7 +207,6 @@ ul {
     top:0px;
     bottom: 0;
     width:20%;
-    overflow-y: auto;
     border-left:1px solid grey;
     font-size:0.8em;
 }
@@ -318,7 +345,7 @@ div.pedido:before {
 }
 
 #botones_principales {
-    background-color: lightyellow;
+    background-color: lavenderblush;
     position:absolute;
     top: 0px;
     right: 0px;
@@ -338,14 +365,14 @@ div.pedido:before {
     position: relative;
 }
 
-#datos_cliente label, #datos_pago label {
+label.forma {
     min-width: 70px;
     display: inline-block;
     text-align: right;
     margin-right: 5px;
 }
 
-#cliente_direccion, #datos_facturacion {
+#cliente_direccion, #cliente_notas, #datos_facturacion {
     width: 80%;
     max-width: 640px;
     height:100px;
@@ -394,19 +421,37 @@ div.pedido:before {
 }
 
 #cambiar_vista {
-    background-color: lightyellow;
+    background-color: mintcream;
     border:2px solid cornflowerblue;
     border-radius: 5px;
-    padding:1px;
+    padding:2px;
     position:fixed;
-    top:0px;
-    left:0px;
+    top:2px;
+    left:44px;
     z-index:999;
     width:32px;
     height:32px;
 }
 
-#buscar_telefono {
-    height:22px;
-    border: 1px solid black;
+#estado_pedidos {
+    background-color: yellow;
+    border:2px solid cornflowerblue;
+    border-radius: 5px;
+    padding:2px;
+    position:fixed;
+    top:2px;
+    left:2px;
+    z-index:999;
+    width:32px;
+    height:32px;
+}
+
+#resultados_panel {
+    text-align: center;
+    font-size: 18pt;
+    font-weight: bold;
+}
+
+#resultados_panel input[type=radio] {
+    margin-left: 10px;
 }

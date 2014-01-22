@@ -17,16 +17,39 @@ if ($mesa_nueva == '0')
     return;
 }
 
-$cuenta_destino = db_obtener('ordenes', 'cuenta', 'flag_pagado=0 AND flag_anulado=0 AND ID_mesa="'.db_codex($mesa_nueva).'"');
+$cuenta_destino = rsv::cuenta_de_mesa($mesa_nueva);
 
 if ($cuenta_destino)
 {
-    $DATOS['cuenta'] = $cuenta_destino;
+    // Si la mesa existe entonces solo apuntamos los pedidos a la cuenta existente
+    $DATOS['ID_cuenta'] = $cuenta_destino;
+    db_actualizar_datos('pedidos', $DATOS, 'ID_cuenta="'.$cuenta.'"');
+    $cuenta = $cuenta_destino;
+    $motivo = 'Se fusionó una mesa a esta cuenta';
+} else {
+    // No existe ninguna mesa con ese número, solo tomemoslo
+    $DATOS['ID_mesa'] = $mesa_nueva;
+    db_actualizar_datos('cuentas', $DATOS, 'ID_cuenta="'.$cuenta.'"');
+    $motivo = 'Se cambio el número de mesa';
 }
 
-$DATOS['ID_mesa'] = $mesa_nueva;
 
-db_actualizar_datos('ordenes', $DATOS, 'cuenta="'.$cuenta.'"');
+rsv::integrar();
+
+
+// HISTORIAL
+unset($DATOS);
+
+$DATOS['fechahora'] = mysql_datetime();
+$DATOS['nota'] = $motivo;
+$DATOS['ID_pedido'] = 0;
+$DATOS['ID_cuenta'] = $cuenta;
+
+$DATOS['grupo'] = 'CUENTAS';
+$DATOS['accion'] = 'cambio de mesa';
+
+db_agregar_datos('historial',$DATOS);
+
 
 CacheDestruir();
 ?>

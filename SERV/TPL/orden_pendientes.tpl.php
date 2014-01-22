@@ -1,70 +1,96 @@
 <?php
 
+/** ACTIVACIONES **/
+// Aprovechemos esta llamada para chequear ordenes pendientes - hacerlo una vez cada 30 segundos
+if (CacheObtener('op_lock_activador') == false)
+{
+    CacheCrear('op_lock_activador', '1');
+    $c = 'UPDATE `pedidos` SET `flag_pausa` = 0 WHERE `flag_pausa` = 1 AND `fechahora_activacion` < NOW()';
+    db_consultar($c);
+}
+
+/*********************/
+
+$CRITERIO_BASE = '';
 $GRUPO = (empty($_POST['grupo']) ? '' : $_POST['grupo']);
 
 switch ($GRUPO)
 {       
     case 'horno':
-        $GRUPO = 'AND t0.nodo IN ("pizzas1","pizzas2","entradas_horno","pastas")';
+        $GRUPO = 'AND t1.nodo IN ("pizzas",pizzas1","pizzas2","entradas_horno","pastas")';
         break;
     
     case 'pizzas':
-        $GRUPO = 'AND t0.nodo IN ("pizzas1","pizzas2","entradas_horno")';
+        $GRUPO = 'AND t1.nodo IN ("pizzas","pizzas1","pizzas2","entradas_horno")';
         break;
 
     case 'pizzas1':
-        $GRUPO = 'AND t0.nodo IN ("pizzas1","entradas_horno")';
+        $GRUPO = 'AND t1.nodo IN ("pizzas","pizzas1","entradas_horno")';
         break;
 
     case 'pizzas2':
-        $GRUPO = 'AND t0.nodo IN ("pizzas2")';
+        $GRUPO = 'AND t1.nodo IN ("pizzas2")';
         break;    
 
     case 'pastas':
-        $GRUPO = 'AND t0.nodo IN ("pastas")';
+        $GRUPO = 'AND t1.nodo IN ("pastas")';
         break;
         
    case 'bebidas_ensaladas_postres_entradas':
-        $GRUPO = 'AND t0.nodo IN ("bebidas_preparadas","ensaladas","postres","entradas")';
+        $GRUPO = 'AND t1.nodo IN ("bebidas_preparadas","ensaladas","postres","entradas")';
         break;
     
     case 'nada':
         $GRUPO = 'AND 0';
         break;
     
+    case 'domicilio':
+        $GRUPO = '';
+        break;
+    
     case 'todos':
     default:
-        $GRUPO = 'AND t0.nodo IN ("pizzas1","pizzas2", "pastas","entradas_horno","bebidas_preparadas","ensaladas","postres","entradas")';
-        break;
+        $GRUPO = 'AND t1.nodo IN ("pizzas","pizzas1","pizzas2", "pastas","entradas_horno","bebidas_preparadas","ensaladas","postres","entradas")';
+        break;    
 }
 
-$CRITERIO_BASE = 't0.`flag_despachado` = 0';
+$CRITERIO_BASE = ' AND t1.`flag_pausa` = 0 AND t1.`flag_despachado` = 0';
+
+if (isset($_POST['modo_domicilio']))
+{
+    $CRITERIO_BASE = ' AND tc.`flag_pagado` = 0';
+}
 
 if (isset($_POST['ghost']))
 {
-    $CRITERIO_BASE = '(t0.`flag_despachado` = 0 OR fechahora_entregado > (NOW() - INTERVAL 5 MINUTE))';
+    $CRITERIO_BASE = ' AND (`flag_despachado` = 0 OR `fechahora_despachado` > (NOW() - INTERVAL 5 MINUTE))';
 }
 
 if (isset($_POST['nodo']))
 {
-    $CRITERIO_BASE .= ' AND flag_elaborado = 0'; 
+    $CRITERIO_BASE .= ' AND `flag_elaborado` = 0'; 
 }
 
-$campos = 'SELECT t0.ID_mesero, t4.usuario AS "nombre_mesero", t0.`fechahora_pedido` , unix_timestamp(t0.`fechahora_pedido`) AS "fechahora_pedido_uts" , t0.`fechahora_entregado` , unix_timestamp(t0.`fechahora_entregado`) AS "fechahora_entregado_uts" , t0.`fechahora_pagado` , t0.`flag_pagado` , t0.`flag_elaborado`, t0.`flag_despachado` , t0.`metodo_pago` , t0.`ID_orden` , t0.`ID_mesa` , t0.`ID_usuario` , `ID_pedido` , `ID_producto` , `precio_grabado` , t2.`nombre` AS "nombre_producto", `tmpID`, `flag_cancelado`, t2.ID_grupo, t3.descripcion AS "grupo_desc"
-FROM `ordenes` AS t0
-LEFT JOIN `pedidos` AS t1
-USING ( ID_orden )
+if (!empty($_POST['mesa']))
+{
+    $CRITERIO_BASE .= ' AND tc.`ID_mesa` = "'.db_codex($_POST['mesa']).'"'; 
+}
+
+$campos = 'SELECT tc.ID_cuenta, tc.ID_mesero, t1.nodo, t1.prioridad, t1.grupo, t4.usuario AS "nombre_mesero", t1.`fechahora_pedido` , unix_timestamp(t1.`fechahora_pedido`) AS "fechahora_pedido_uts" , t1.`fechahora_despachado` , unix_timestamp(t1.`fechahora_despachado`) AS "fechahora_despachado_uts" , tc.`fechahora_pagado` , tc.`flag_pagado` , t1.`flag_elaborado`, t1.`flag_despachado` , tc.`metodo_pago` , tc.`ID_mesa` , tc.`ID_usuario` , t1.`ID_pedido` , t1.`ID_producto` , t1.`precio_grabado` , t2.`nombre` AS "nombre_producto", t1.`tmpID`, t1.`flag_cancelado`, t2.ID_grupo, t3.descripcion AS "grupo_desc"
+FROM `pedidos` AS t1
+LEFT JOIN `cuentas` AS tc
+USING ( ID_cuenta )
 LEFT JOIN `productos` AS t2
 USING ( ID_producto )
 LEFT JOIN productos_grupos AS t3
 USING ( ID_grupo )
 LEFT JOIN usuarios AS t4
-ON t0.ID_mesero = t4.ID_usuarios
+ON tc.ID_mesero = t4.ID_usuarios
 ';
 
-$where = 'WHERE '.$CRITERIO_BASE.' AND t1.`flag_cancelado` = 0 AND t0.flag_anulado = 0 '.$GRUPO;
+$where = 'WHERE t1.`flag_cancelado` = 0 AND flag_anulado = 0 '.$CRITERIO_BASE.' '.$GRUPO;
 
-$order_by = 'ORDER BY t0.flag_despachado ASC, t0.fechahora_entregado DESC, t0.fechahora_pedido ASC, FIELD(prioridad, "alta", "media", "baja"), t2.ID_grupo,  t1.ID_producto ASC, t1.ID_pedido';
+$order_by = 'ORDER BY t1.flag_despachado ASC, t1.fechahora_despachado DESC, t1.fechahora_pedido ASC, FIELD(t1.prioridad, "alta", "media", "baja"), t2.ID_grupo,  t1.ID_producto ASC, t1.ID_pedido';
 
 $c = $campos.' '.$where.' '.$order_by;
 
@@ -78,10 +104,15 @@ if ($cache !== false)
     return;
 }
 
-//$json['sql'] = $c;
-//error_log($c);
-
+// No hubo hit en cache, hacemos la consulta y todo el procesamiento necesario
 $r = db_consultar($c);
+
+if (db_num_resultados($r) == 0)
+{
+    CacheCrear($llaveCache, '', false);
+    $json['aux']['pendientes'] = '';
+    return;
+}
 
 while ($r && $f = db_fetch($r))
 {
@@ -102,11 +133,49 @@ while ($r && $f = db_fetch($r))
         $f['ingredientes'][] = $fEliminados;
     }    
     
-    $grupo = 'id_'.sha1($f['ID_orden']);
+    if (empty($_POST['modo_cuenta']))
+    {
+        $grupo = ID_SERVIDOR.'x'.sha1($f['nodo'].$f['prioridad'].$f['grupo']);
+    } else {
+        $grupo = ID_SERVIDOR.'x'.sha1($f['ID_cuenta']);
+    }
     
     $json['aux']['pendientes'][$grupo][] = $f;
 }
 
-if (!$cache)
+/***************************/
+/* SERVIDORES EXTERNOS */
+if (0 && isset($__servidor_externo_pp) && is_array($__servidor_externo_pp) && count($__servidor_externo_pp) > 0) {
+
+    foreach ($__servidor_externo_pp as $ID_SERVIDOR => $SERVIDOR_EXTERNO) {
+        
+        $cacheDespacho = CacheObtener($llaveCache . $ID_SERVIDOR);
+        if ($cacheDespacho !== false) {
+            array_merge($cacheDespacho, $json['aux']['pendientes']);
+        } else {
+            $PARAMETROS = array_merge(array('solicitud_externa' => true), $_POST);
+
+            $ch = curl_init();
+
+            curl_setopt($ch, CURLOPT_URL, $SERVIDOR_EXTERNO);
+
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_POST, count($PARAMETROS));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $PARAMETROS);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $resultado = json_decode(curl_exec($ch), true);
+            curl_close($ch);
+
+            if (isset($resultado['aux']['pendientes'])) {
+                CacheCrear($llaveCache . $ID_SERVIDOR, $resultado['aux']['pendientes']);
+                $json['aux']['pendientes'] = array_merge($resultado['aux']['pendientes'], $json['aux']['pendientes']);
+            }
+        }
+    }
+}
+/***************************/
+if (! $cache)
     CacheCrear($llaveCache, @$json['aux']['pendientes'], false);
 ?>

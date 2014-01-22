@@ -1,1 +1,1 @@
-PHP: APC
+PHP: APC + php5-CURL

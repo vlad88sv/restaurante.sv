@@ -6,9 +6,15 @@ cmp_cache = {cache:true}; // objeto donde almacenamos la última actualización 
 
 function actualizar() {
 
-    rsv_solicitar('cuenta',{pendientes: 1},function(datos, slam){
+    rsv_solicitar('cuenta',{pendientes: 1},function(datos, slam, aut){
         
         if (slam === true) return;
+        
+        if (aut === true)
+        {
+            aut_solicitar();
+            return;
+        }
         
         $("#t_cuentas").html(datos.benchmark + "ms");
 
@@ -28,15 +34,12 @@ function actualizar() {
         $("#pedidos").html('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
         return;
        }
-       
-       var buffer_visual = '';
+    
        $("#pedidos").empty();
-       for(x in datos.aux.pendientes)
+       for(var x in datos.aux.cuentas)
        {
-        buffer_visual += cuenta_obtenerVisual(datos.aux.pendientes[x], 0);
+        $("#pedidos").append(cuenta_obtenerVisual(datos.aux,x, 0));
        }
-       
-       $("#pedidos").html(buffer_visual);
     
     }, false, true);
 }
@@ -135,7 +138,7 @@ $(function(){
                 pedidos.push($(objeto).val());
             });
         
-            rsv_solicitar('pedidos_avanzados',{pedidos: pedidos, cuenta: orden.attr('cuenta'), mesa: orden.attr('id_mesa'), FORZAR_CUENTA_NUEVA: true},function(datos){
+            rsv_solicitar('pedidos_avanzados',{pedidos: pedidos, mesa: orden.attr('id_mesa'), SEPARAR_CUENTA: true},function(datos){
                 // VOID
             });
 
@@ -170,7 +173,7 @@ $(function(){
                 pedidos.push($(objeto).val());
             });
         
-            rsv_solicitar('pedidos_avanzados',{pedidos: pedidos, cuenta: orden.attr('cuenta'), mesa: mesa, mesero: mesero},function(datos){
+            rsv_solicitar('pedidos_avanzados',{pedidos: pedidos, mesa: mesa, mesero: mesero},function(datos){
                 // VOID
             });
 
@@ -190,12 +193,10 @@ $(function(){
             return;
            }
 
-           var buffer_visual = '';
-           for(x in datos.aux.pendientes)
+           for(var x in datos.aux.cuentas)
            {
-            buffer_visual += cuenta_obtenerVisual(datos.aux.pendientes[x], 1);
+            $("#destino_historial").append(cuenta_obtenerVisual(datos.aux,x, 1));
            }
-           $("#destino_historial").html(buffer_visual);
 
         });
     });
@@ -387,7 +388,12 @@ $(function(){
             }
        });
     });
-    
+
+    $(document).on('click','.imp_domicilio', function(){        
+        var orden = $(this).parents('.orden');
+        rsv_solicitar('domicilio',{ imprimir: orden.attr('cuenta')}, function(){});
+    });
+
     $(document).on('contextmenu','.imp_fiscal, .imp_factura', function(event){
         event.preventDefault();
         return false;
@@ -421,6 +427,22 @@ $(function(){
        });
        return false;
     });
+
+
+    // Evento de fiscalizacion de domicilio
+    $(document).on('mousedown','.imp_fiscalizar', function(event){        
+        event.preventDefault();
+        
+        rsv_solicitar('cuenta',{ cuenta: orden.attr('cuenta'), facturacion: '1'},function(datos){
+            for(var x in datos.aux.pendientes)
+            {
+                var xml = crearXmlParaFacturin(datos.aux.pendientes[x], 1, (event.which == 1), false);
+                $.post('http://localhost:40001', {xml:xml}, function(data){alert(data);}, 'text');
+            }
+       });
+       return false;
+    });
+
 
     $(document).on('click','.quitar_propina', function(){
         if (!confirm('¿Realmente desea quitarle los sueños y esperanzas a los empleados?'))
@@ -674,6 +696,7 @@ $(function(){
             if (ID_corte > 0)
             {
                 alert('Corte Z realizado, ID de corte: ' + ID_corte + "\nPresione ENTER para imprimir.");
+                rsv_solicitar('cortez',{imprimir: ID_corte}, function(){});
                 
                 var corte = $('<div id="imp_corte"></div>');
                 corte.append('<div style="text-align:center;">Corte #'+ID_corte+'</div>');

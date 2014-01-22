@@ -12,6 +12,10 @@ if (isset($_POST['ver']))
         case 'comandas':
             $estacion = '"comandas"';
             break;
+
+        case 'domicilio':
+            $estacion = '"domicilio","cortez"';
+            break;
         
         case 'todos':
         default:

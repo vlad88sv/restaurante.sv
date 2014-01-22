@@ -14,7 +14,6 @@ function db_consultar($consulta){
     if ( !$db_link ) {
         db_conectar();
     }
-    DEPURAR($consulta,0);
     $resultado = @mysqli_query($db_link,$consulta);
     if ( mysqli_error($db_link) ) {
         error_log ('MySQL.Error:' . mysqli_error($db_link));
@@ -24,6 +23,15 @@ function db_consultar($consulta){
     return $resultado;
 
 }
+
+function db_num_resultados($resultado)
+{
+    if (!$resultado)
+        return 0;
+    else
+        return mysqli_num_rows($resultado);
+}
+
 
 function db_fetch($resultado)
 {

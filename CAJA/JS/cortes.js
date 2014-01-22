@@ -45,9 +45,9 @@ function actualizarCuentas() {
     
        var buffer_visual = '';
        $("#pedidos").empty();
-       for(x in datos.aux.pendientes)
+       for(var x in datos.aux.cuentas)
        {
-        buffer_visual += cuenta_obtenerVisual(datos.aux.pendientes[x], 0);
+        buffer_visual += cuenta_obtenerVisual(datos.aux,x, 0);
        }
        
        $("#contenedor_cuentas").html(buffer_visual);

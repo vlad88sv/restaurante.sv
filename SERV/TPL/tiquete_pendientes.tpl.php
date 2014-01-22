@@ -9,7 +9,7 @@ if (isset($_POST['imprimir']))
         error_log('tiquete_pendientes.tpl: se imprimio tiquete sin cuenta');
     } else {
         $cuenta = db_codex($_POST['cuenta']);
-        $c = 'UPDATE `ordenes` SET `flag_tiquetado`=1 WHERE `cuenta`="'.$cuenta.'"';
+        $c = 'UPDATE `cuentas` SET `flag_tiquetado`=1 WHERE `ID_cuenta`="'.$cuenta.'"';
         db_consultar($c);
         
         /****** HISTORIAL *******/
@@ -25,7 +25,7 @@ if (isset($_POST['imprimir']))
                 $DATOS['nota'] = $_POST['nota'];
 
             $DATOS['fechahora'] = mysql_datetime();
-            $DATOS['cuenta'] = $cuenta;
+            $DATOS['ID_cuenta'] = $cuenta;
 
             db_agregar_datos('historial',$DATOS);            
         }

@@ -50,15 +50,13 @@ function cocina_agregarPedido(_orden)
     orden.append('<div style="height:1.5em;"><span class="grupo"><span class="mesa">#'+_orden[0].ID_mesa+'</span>:<span class="mesero">' + _orden[0].nombre_mesero + '</span></span><span class="tiempo" /></div>');
     orden.append('<hr />');
     orden.append('<div class="pedidos"></div>');
-    orden.attr('id','cocina_'+_orden[0].cuenta);
-    orden.attr('id_orden',_orden[0].ID_orden);
     
     // Ghost in the shell
     
     if (_orden[0].flag_despachado == 1)
     {
 	orden.addClass('ghost');
-	orden.find('.tiempo').html('Entregada hace ' + timeSince(new Date(_orden[0].fechahora_entregado_uts*1000)));
+	orden.find('.tiempo').html('Hace ' + timeSince(new Date(_orden[0].fechahora_despachado_uts*1000)));
     } else {
 	orden.find('.tiempo').html(timeSince(new Date(_orden[0].fechahora_pedido_uts*1000)));
     }

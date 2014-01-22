@@ -19,7 +19,7 @@ if ($campo == '')
     return;
 }
 
-$c = "UPDATE ordenes SET $campo='$valor' WHERE cuenta = '$cuenta'";
+$c = "UPDATE cuentas SET $campo='$valor' WHERE ID_cuenta = '$cuenta'";
 db_consultar($c);
 $json['resultado'] = 'MODIFICACION OK';
 
@@ -27,9 +27,9 @@ if (!empty($_POST['motivo']))
 {
     $DATOS['fechahora'] = mysql_datetime();
     $DATOS['nota'] = $_POST['motivo'];
-    $DATOS['cuenta'] = $cuenta;
+    $DATOS['ID_cuenta'] = $cuenta;
     
-    $DATOS['grupo'] = 'ORDENES';
+    $DATOS['grupo'] = 'CUENTAS';
     $DATOS['accion'] = $campo;
     
     db_agregar_datos('historial',$DATOS);

@@ -34,6 +34,25 @@ function reiniciarInterfaz() {
     miniResumenOrden();
     ResumenOrden();
     obtener_lista_meseros();
+    
+    $("#cliente_telefono").val('');
+    $("#cliente_nombre").val('');
+    $("#cliente_direccion").val('');
+    $("#cliente_notas").val('');
+    $("#cliente_tarjeta").val('');
+    $("#cliente_tarjeta_expiracion").val('');
+    $("#cliente_vuelto").val('');
+    $('#domicilio_metodo_pago_tarjeta').prop('checked','checked');
+    $('#domicilio_documento_fiscal_consumidor_final').prop('checked','checked');
+    $('#domicilio_detalle_facturacion_consumo').prop('checked','checked');
+    $("#datos_facturacion__nombre").val('');
+    $("#datos_facturacion__dui").val('');
+    $("#datos_facturacion__nit").val('');
+    $("#datos_facturacion__nrc").val('');
+    $("#datos_facturacion__giro").val('');
+    $("#datos_facturacion__direccion").val('');
+    $('#flag_pausa').removeProp('checked');
+    $('#fechahora_activacion').val('');
 }
 
 function personalizar_producto_ingredientes_y_adicionales(str_producto)
@@ -159,8 +178,7 @@ function ResumenOrden()
         buffer += '<p>No hay ningún pedido agregado</p>';
         $("#resumen_completo").html(buffer);
         return;
-    }
-    
+    }    
     
     buffer += '<table class="estandar ancha bordes zebra" id="seleccion_producto">';
     for (x in _orden)
@@ -171,7 +189,7 @@ function ResumenOrden()
             adicionales += '<ul>';
             
             for (y in _orden[x].adicionales) {
-                adicionales += '<li>' + _adicionales[_orden[x].adicionales[y]].nombre + '</li>';
+                adicionales += '<li>' + _adicionales[_orden[x].adicionales[y]].nombre + ' $' + _adicionales[_orden[x].adicionales[y]].precio + '</li>';
             }
             
             adicionales += '</ul>';
@@ -205,11 +223,30 @@ function ResumenOrden()
     $("#resumen_completo").html(buffer);
 }
 
+function calcular_total_orden()
+{
+    var total = 0.00;
+    
+    for (x in _orden)
+    {
+        if (_orden[x].adicionales.length > 0) {
+            for (y in _orden[x].adicionales) {
+                total += parseFloat(_adicionales[_orden[x].adicionales[y]].precio);
+            }
+        }
+        
+        total += parseFloat(_orden[x].precio);        
+    }
+    
+    return total;
+}
+
 function miniResumenOrden()
 {
     var ordenador = {};
     var buffer = '<h1>Resumen de la orden</h1>';
     
+    buffer += '<p><b>Total:</b> <span style="color:red;">' + '$' + calcular_total_orden().toFixed(2) + '</span></p>';
     buffer += '<p><b>Teléfono:</b><br />' + $("#cliente_telefono").val() + '</p>';
     buffer += '<p><b>Cliente:</b><br />' + $("#cliente_nombre").val() + '</p>';
     buffer += '<p><b>Dirección:</b><br />' + $("#cliente_direccion").val() + '</p>';
@@ -244,6 +281,34 @@ function miniResumenOrden()
     }
     buffer += '</ul>';
     $('#info_principal').html(buffer);
+}
+
+function obtener_datos_domicilio()
+{
+    datos_domicilio = {};
+    
+    datos_domicilio['telefono'] = $("#cliente_telefono").val().replace(/[^0-9\\.]+/g, '');
+    datos_domicilio['nombre'] = $("#cliente_nombre").val();
+    datos_domicilio['direccion'] = $("#cliente_direccion").val();
+    datos_domicilio['notas'] = $("#cliente_notas").val();
+    datos_domicilio['tarjeta'] = $("#cliente_tarjeta").val();
+    datos_domicilio['expiracion'] = $("#cliente_tarjeta_expiracion").val();
+    datos_domicilio['vuelto'] = $("#cliente_vuelto").val();
+    datos_domicilio['metodo_pago'] = $('[name="domicilio_metodo_pago"]:checked').val();
+    datos_domicilio['documento_fiscal'] = $('[name="domicilio_documento_fiscal"]:checked').val();
+    datos_domicilio['detalle_facturacion'] = $('[name="domicilio_detalle_facturacion"]:checked').val();
+    datos_domicilio['facturacion_nombre'] = $("#datos_facturacion__nombre").val();
+    datos_domicilio['facturacion__dui'] = $("#datos_facturacion__dui").val();
+    datos_domicilio['facturacion_nit'] = $("#datos_facturacion__nit").val();
+    datos_domicilio['facturacion_nrc'] = $("#datos_facturacion__nrc").val();
+    datos_domicilio['facturacion_giro'] = $("#datos_facturacion__giro").val();
+    datos_domicilio['facturacion_direccion'] = $("#datos_facturacion__direccion").val();
+    
+    if ( ! datos_domicilio['telefono'] || ! datos_domicilio['nombre'] || ! datos_domicilio['direccion'] )
+        return false;
+    
+    return datos_domicilio;
+    
 }
 
 $(window).load(function(){
@@ -324,25 +389,17 @@ $(function(){
             return;
         }
         
-        var datos_domicilio = {};
+        var datos_domicilio = obtener_datos_domicilio();
         
-        datos_domicilio['telefono'] = $("#cliente_telefono").val();
-        datos_domicilio['nombre'] = $("#cliente_nombre").val();
-        datos_domicilio['direccion'] = $("#cliente_direccion").val();
-        datos_domicilio['tarjeta'] = $("#cliente_tarjeta").val();
-        datos_domicilio['expiracion'] = $("#cliente_tarjeta_expiracion").val();
-        datos_domicilio['vuelto'] = $("#cliente_vuelto").val();
-        datos_domicilio['metodo_pago'] = $('[name="domicilio_metodo_pago"]:checked').val();
-        datos_domicilio['documento_fiscal'] = $('[name="domicilio_documento_fiscal"]:checked').val();
-        datos_domicilio['detalle_facturacion'] = $('[name="domicilio_detalle_facturacion"]').val();
-        datos_domicilio['facturacion_nombre'] = $("#datos_facturacion__nombre").val();
-        datos_domicilio['facturacion__dui'] = $("#datos_facturacion__dui").val();
-        datos_domicilio['facturacion_nit'] = $("#datos_facturacion__nit").val();
-        datos_domicilio['facturacion_nrc'] = $("#datos_facturacion__nrc").val();
-        datos_domicilio['facturacion_giro'] = $("#datos_facturacion__giro").val();
-        datos_domicilio['facturacion_direccion'] = $("#datos_facturacion__direccion").val();
+        if (datos_domicilio === false)
+        {
+            alert("No ha ingresado teléfono, nombre o dirección.\nLa orden no fue enviada.");
+            return;
+        }
         
-        rsv_solicitar('ingresar_orden',{mesa: datos_domicilio['telefono'], mesero: ID_usuario, orden: _orden, domicilio: datos_domicilio}, function(){
+        var PAUSAR_ELABORACION = ( $('#flag_pausa').is(':checked') ? 'si' : 'no' );
+            
+        rsv_solicitar('ingresar_orden',{mesa: datos_domicilio['telefono'], mesero: 0, orden: _orden, domicilio: datos_domicilio, FORZAR_CUENTA_NUEVA: true, FORZAR_NO_PROPINA: true, GENERAR_IMPRESION_DOMICILIO:true, PAUSAR_ELABORACION: PAUSAR_ELABORACION, pedido_fechahora_activacion: $("#fechahora_activacion").val() }, function(){
             reiniciarInterfaz();
             $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
         }); 
@@ -556,11 +613,9 @@ $(function(){
     
     $(document).keydown(function(event){
         var keyCode = event.keyCode || event.which;
-        
-        console.log(keyCode);
-        
         var objetivo = $('.key[key="'+keyCode+'"]');
-        if ( event.altKey == false || event.ctrlKey == false || objetivo.length == 0) return;
+        
+        if ( event.altKey == false || event.ctrlKey == false || objetivo.length == 0 ) return;
         
         if (objetivo.hasClass('enfocar')) {
             objetivo.focus();
@@ -568,6 +623,12 @@ $(function(){
             objetivo.click();
         }
         event.stopPropagation();
+    });
+    
+    $(document).on('click', '#guardar_datos', function(){
+        rsv_solicitar('domicilio',{guardar_datos: obtener_datos_domicilio()}, function(){
+            
+        });
     });
         
     mostrar_grupo_productos();

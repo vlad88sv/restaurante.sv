@@ -1,4 +1,4 @@
-<script type="text/javascript" src="JS/date.js"></script>
+<script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/date.js"></script>
 <script type="text/javascript" src="JS/cortes.js"></script>
 <h1>Cortes</h1>
 <div style="text-align: center;">

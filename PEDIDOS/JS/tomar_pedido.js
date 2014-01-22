@@ -1,11 +1,12 @@
+// Caches
 _productos = {};
 _adicionales = {};
+_meseros = [];
+
+// Volatiles
 _orden = [];
 _b_orden = [];
-_meseros = [];
 ID_mesero_busqueda = '';
-
-localStorage.clear();
 
 function MostrarRejillaProductos(datos)
 {
@@ -32,10 +33,10 @@ function MostrarRejillaProductos(datos)
 function reiniciarInterfaz() {
     _orden = [];
     _b_orden = [];
+    ID_mesero_busqueda = '';
     mostrar_grupo_productos('1');
     miniResumenOrden();
     ResumenOrden();
-    obtener_lista_meseros();
 }
 
 function personalizar_producto_ingredientes_y_adicionales(str_producto)
@@ -126,7 +127,9 @@ function intentarProductoEnPedido(str_producto, str_detalle, str_precio)
     buffer += '<button class="filtro_adicionales" rel="2">Salsas</button> ';
     buffer += '<button class="filtro_adicionales" rel="3">Topping</button> ';
     buffer += '<button class="filtro_adicionales" rel="4">Ingredientes</button> '
-    buffer += '<button class="filtro_adicionales" rel="5">Quesos y sabores</button></div>';
+    buffer += '<button class="filtro_adicionales" rel="5">Quesos</button>';
+    buffer += '<button class="filtro_adicionales" rel="6">Sabores</button>';
+    buffer += '</div>';
     buffer += '<div style="bottom:0;top: 160px;left:0;right:0;overflow-y: auto;padding: 0 5px;position: absolute;">';
     buffer += '<div id="cpep_adicionables"></div>';
     buffer += '</div>';
@@ -306,74 +309,96 @@ $(function(){
     
     $('#enviar_orden_a_cocina').click(function(){
         
-        if (_orden.length == 0)
-        {
-            alert('No hay pedidos en la orden.');
-            return;
-        }
+        // Chequeemos si esta autorizado para enviar ordenes
         
-        ResumenOrden();
-        
-        var ID_mesa = 0;
-        
-        while ( ID_mesa == 0 ) {
-            ID_mesa = window.prompt('1. Número de MESA','0');
-            
-            if (!ID_mesa) {
-                alert ('Cancelando envío');
+        rsv_solicitar('aut',{permisos:['ingresar_orden']}, function(retorno){
+            if ( typeof(retorno.AUTORIZADO) === "undefined" )
+            {   
+                alert('HUBO UN ERROR CON EL SERVIDOR DE AUTORIZACIÓN, SU ORDEN NO PUEDE ENVIARSE.');
                 return;
             }
-
-            if (/^[0-9]+$/.test(ID_mesa) == false)
-            {
-                alert('Número de mesa incorrecto.');
-                ID_mesa = 0;
+            
+            if (retorno.AUTORIZADO == 'no') {
+                aut_solicitar();
+                return;
             }
-        }
         
-        
-        var ID_mesero_busqueda = "";
-        
-        rsv_solicitar('cuenta',{mesa: ID_mesa, pendientes: true}, function(datos){
-            if ( typeof datos.aux.pendientes != "undefined" )
+            if (_orden.length == 0)
             {
-                ID_mesero_busqueda = datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].ID_mesero;
-                
-                alert('¡Mesa con cuenta abierta!');
-
-                if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
-                    alert('¡parece que la va a meter donde no debe!');
-                }
+                alert('No hay pedidos en la orden.');
+                return;
             }
             
-            var ID_mesero = 0;
-            while ( ID_mesero == 0 ) {
-                var meseros = '';
+            ResumenOrden();
+            
+            var ID_mesa = 0;
+            
+            while ( ID_mesa == 0 ) {
+                ID_mesa = window.prompt('1. Número de MESA','0');
                 
-                for (x in _meseros)
-                {
-                    meseros += " * " + _meseros[x].ID_usuarios + ". " + _meseros[x].usuario + "\n"; 
-                    
-                }
-                
-                ID_mesero = window.prompt('2. Número de MESERO.' + "\n" + meseros, ID_mesero_busqueda );
-                
-                if (!ID_mesero) {
+                if (!ID_mesa) {
                     alert ('Cancelando envío');
                     return;
                 }
     
-                if (/^[0-9]+$/.test(ID_mesero) == false)
+                if (/^[0-9]+$/.test(ID_mesa) == false)
                 {
-                    alert('Número de mesero incorrecto.');
-                    ID_mesero = 0;
+                    alert('Número de mesa incorrecto.');
+                    ID_mesa = 0;
                 }
             }
             
-            rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: ID_mesero, orden: _orden}, function(){
-                reiniciarInterfaz();
-                $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
-            }); 
+            
+            var ID_mesero_busqueda = "";
+            
+            rsv_solicitar('cuenta',{mesa: ID_mesa, pendientes: true}, function(datos){
+                try {
+                    if ( typeof datos.aux.pendientes != "undefined" && datos.aux.pendientes != '')
+                    {
+                        ID_mesero_busqueda = datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].ID_mesero;
+    
+                        alert('¡Mesa con cuenta abierta!');
+    
+                        if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
+                            alert('¡parece que la va a meter donde no debe!');
+                        }
+                    }
+                } catch (error){
+                    ID_mesero_busqueda = 0;
+                }
+    
+                var ID_mesero = 0;
+                while ( ID_mesero == 0 ) {
+                    var meseros = '';
+                    
+                    for (x in _meseros)
+                    {
+                        meseros += " * " + _meseros[x].ID_usuarios + ". " + _meseros[x].usuario + "\n"; 
+                        
+                    }
+                    
+                    ID_mesero = window.prompt('2. Número de MESERO.' + "\n" + meseros, ID_mesero_busqueda );
+                    
+                    if (!ID_mesero) {
+                        ID_mesero = 0;
+                        ID_mesero_busqueda = 0;
+                        alert ('Cancelando envío');
+                        return;
+                    }
+        
+                    if (/^[0-9]+$/.test(ID_mesero) == false)
+                    {
+                        alert('Número de mesero incorrecto.');
+                        ID_mesero = 0;
+                    }
+                }
+                
+                rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: ID_mesero, orden: _orden}, function(){
+                    reiniciarInterfaz();
+                    $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
+                }); 
+            });
+        
         });
         
     });
@@ -598,8 +623,10 @@ $(function(){
         }
         event.stopPropagation();
     });
-            
+   
+    // Iniciar
+    localStorage.clear();
     mostrar_grupo_productos(1);
     obtener_lista_meseros();
-
+    
 });

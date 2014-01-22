@@ -8,7 +8,7 @@ $_html['titulo'] = '';
     <title>IMPRESIONES</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="es" />
-    <meta http-equiv="refresh" content="3600">
+    <meta http-equiv="refresh" content="600">
 
     <link rel="stylesheet" media="screen" href="CSS/estilo.css" />
     <link rel="stylesheet" media="print" href="CSS/estilo.impresion.css" />
@@ -26,6 +26,7 @@ $_html['titulo'] = '';
 <select style="position: fixed; bottom:0; right:0;z-index:99;" id="estacion" class="auto_guardar">
     <option value="tiquetes">Tiquetes y Facturas</option>
     <option value="comandas">Comandas</option>
+    <option value="domicilio">Domicilio</option>
     <option value="todo">Todo</option>
 </select>
 </div>

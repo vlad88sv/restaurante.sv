@@ -23,7 +23,7 @@ $_html['contenido'] = ob_get_clean();
     <script type="text/javascript">URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";</script>
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/jquery.js"></script>
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/jquery-jqprint.js"></script>
-    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/comun.js"></script>
+    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/comun.php"></script>
 </head> 
 <body> 
 <?php echo $_html['contenido']; ?>

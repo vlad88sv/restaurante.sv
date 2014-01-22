@@ -1,0 +1,99 @@
+.producto {
+    white-space: nowrap;
+    overflow: hidden;
+    color: black;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+.mesa {
+
+}
+
+#ajax_estado_pedidos {
+    height: 100%;
+    overflow: hidden;
+    text-wrap: none;
+    white-space: nowrap;
+}
+
+div.orden {
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    height: 100%;
+    margin: 3px;
+    padding: 3px;
+    display: inline-block !important;
+    vertical-align: top;
+    min-width: 200px;
+    overflow-y: auto;
+    position:relative;
+}
+
+div.orden_despachando {
+    background-color: black;
+}
+
+div.pedidos {
+    padding-bottom: 20px;
+}
+
+span.grupo {
+    position: absolute;
+    color: grey;
+    left: 10px;
+    top: 5px;
+}
+
+.adicionales ul, .ingredientes ul {
+    padding-left: 5px;
+    margin: 0;
+}
+
+.adicionales ul li, .ingredientes ul li {
+    padding-left: 5px;
+    margin-left: 20px;
+}
+    
+span.tiempo {
+    position: absolute;
+    color: red;
+    right: 10px;
+    top: 5px;
+}
+
+div.mesero {
+
+}
+
+div.pedido {
+    border-bottom: 1px solid grey;
+    margin-bottom: 1px;
+    padding: 0 1px;
+    position: relative;
+}
+
+div.mucho_tiempo {
+    border: 1px solid red !important;
+}
+
+.domicilio_div_resultado ul {
+    font-size: 16pt;
+}
+
+.domicilio_div_resultado ul li {
+    border-bottom: 1px solid gray;
+}
+
+/* css for timepicker */
+.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+.ui-timepicker-div dl { text-align: left; }
+.ui-timepicker-div dl dt { float: left; clear:left; padding: 0 0 0 5px; }
+.ui-timepicker-div dl dd { margin: 0 10px 10px 45%; }
+.ui-timepicker-div td { font-size: 90%; }
+.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+
+.ui-timepicker-rtl{ direction: rtl; }
+.ui-timepicker-rtl dl { text-align: right; padding: 0 5px 0 0; }
+.ui-timepicker-rtl dl dt{ float: right; clear: right; }
+.ui-timepicker-rtl dl dd { margin: 0 45% 10px 10px; }

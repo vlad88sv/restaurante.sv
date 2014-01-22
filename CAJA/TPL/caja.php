@@ -1,8 +1,8 @@
 <script type="text/javascript" src="JS/caja.js"></script>
 <script type="text/javascript" src="JS/master.chef.js"></script>
 <audio id="beep">
-    <source src="/SERV/SND/tim_tum.ogg">
-    <source src="/SERV/SND/tim_tum.mp3">
+    <source src="<?php echo URI_SERVIDOR; ?>/SND/tim_tum.ogg">
+    <source src="<?php echo URI_SERVIDOR; ?>/SND/tim_tum.mp3">
 </audio>
 <?php $_html['titulo'] = 'Caja'; ?>
 <div id="menu" style="z-index:555;padding-left:40px;height:32px;line-height:32px;background-color: grey; position:fixed;left:0px;right:0px;border:2px solid white;display:none;">
@@ -20,7 +20,7 @@
 <tr>
     <td id="pestana_pedido" style="vertical-align: top; border-right: 1px solid whitesmoke;padding-right: 5px;width:75%;">
         <h1>
-            CUENTAS ABIERTAS&nbsp;
+            CUENTAS ABIERTAS<br />
             [
             &nbsp;Mesa: <input autocomplete="off" id="id_mesa" type="text" value="" style="width:3.5em;" />&nbsp;
             <button id="btn_rapido_cuenta_tiquete" class="btn">Tiquete</button>&nbsp;

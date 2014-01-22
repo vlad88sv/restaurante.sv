@@ -3,14 +3,6 @@ $WHERE = '';
 
 if (isset($_POST['modo']) && $_POST['modo'] == 'inventario')
 {
-    $c = "SELECT ID_ingrediente, nombre, descripcion, proveedor, disponible, unidad, unidad2, divisor FROM `productos_ingredientes` LEFT JOIN `ingredientes` USING(ID_ingrediente) WHERE inventariable=1 GROUP BY ID_ingrediente";
-    $r = db_consultar($c);
-    
-    while ($r && $f = db_fetch($r))
-    {
-        $json['aux']['ingredientes'][] = $f;
-    }
-
     return;
 }
 

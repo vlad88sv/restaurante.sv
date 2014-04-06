@@ -40,6 +40,16 @@ foreach ($dsn as $ID_mesero => $bdsn)
 }
 
 /***********************************************/
+// Estadisticas de corte
+$c = 'SELECT SUM(COALESCE(`total_diferencia`,0)) AS "sum_diferencia", SUM(COALESCE(`total_pos`,0)) AS "sum_pos", SUM(COALESCE(`total_efectivo`,0)) AS "sum_efectivo", SUM(COALESCE(`total_compras`,0)) AS "sum_compras" FROM `cortez` WHERE DATE(`fechatiempo`) BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'"';
+$r = db_consultar($c);
+$f = db_fetch($r);
+
+$json['aux']['cortez_sum'] = $f;
+
+/***********************************************/
+
+/***********************************************/
 // Tiempo Promedio de Servicio (TPS)
 $c = 'SELECT (STDDEV(TIME_TO_SEC(TIMEDIFF(`fechahora_despachado`, `fechahora_pedido`))) / 60) AS stddev_tps, (AVG(TIME_TO_SEC(TIMEDIFF(`fechahora_despachado`, `fechahora_pedido`))) / 60) AS tps FROM `pedidos` WHERE  `fechahora_pedido` BETWEEN "'.$periodo_inicio.'" AND "'.$periodo_final.'" AND flag_despachado=1 AND nodo IN ("pizzas","pizzas1", "pizzas2", "pastas", "ensaladas", "entradas_horno") AND fechahora_despachado <> "0000-00-00 00:00:00"';
 $r = db_consultar($c);

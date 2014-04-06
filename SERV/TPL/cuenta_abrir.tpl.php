@@ -14,10 +14,10 @@ if (!empty($_POST['motivo']))
 {
     $DATOS['fechahora'] = mysql_datetime();
     $DATOS['nota'] = $_POST['motivo'];
-    $DATOS['ID_pedido'] = 0;
     $DATOS['ID_cuenta'] = $cuenta;
     
-    $DATOS['grupo'] = 'ORDENES';
+    $DATOS['flag_importante'] = '1';
+    $DATOS['grupo'] = 'CUENTA';
     $DATOS['accion'] = 'apertura';
     
     db_agregar_datos('historial',$DATOS);

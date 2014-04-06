@@ -74,6 +74,20 @@ function estadisticas() {
            agregar_info('Sin datos de rendimiento de cuentas por hora');
         }
         
+        if (typeof datos.aux.cortez_sum != 'undefined') {
+           var buffer = '';
+   
+           for (indice in datos.aux.cortez_sum)
+           {
+              buffer += "<li>" + indice + " : $" + datos.aux.cortez_sum[indice] + "</li>";
+           }
+           agregar_info('<h1>Datos de corte z</h1>');
+           agregar_info('<ul>' + buffer + '</ul>');
+        } else {
+           agregar_info('Sin datos de corte z para el periodo especificado');
+        }
+
+        
         if (typeof datos.aux.pizzas_por_dia != 'undefined') {
            var buffer = '';
    

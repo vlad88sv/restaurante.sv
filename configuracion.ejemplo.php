@@ -2,11 +2,26 @@
 setlocale                   (LC_ALL, 'es_SV.UTF-8');
 date_default_timezone_set   ('America/El_Salvador');
 
-define('NOMBRE_RESTAURANTE', 'La Pizzeria');
-define('ID_SERVIDOR', 'LAPIZZERIA');
-define('MODO_GLOBAL', 'DOMICILIO'); // MODOS: [ NORMAL | DOMICILIO ]
+define('NOMBRE_RESTAURANTE', 'La Antigua');
+define('ID_SERVIDOR', 'LAANTIGUA');
+define('MODO_GLOBAL', 'NORMAL'); // MODOS: [ NORMAL | DOMICILIO ]
 define('URI_SERVIDOR', '/SERV'); // URI relativa o absoluta hacia el servidor
 define('URI_AUT', '/AUT'); // URI relativa o absoluta hacia el autorizador
+define('SUCURSAL_EMPRESA','7G, S.A. de C.V.');
+define('SUCURSAL_DIRECCION', 'La Antigua, Antiguo Cuscatlán, 1a Cl. Pte., n.23'); // direccion de la sucursal
+define('SUCURSAL_TELEFONO', '(503) 2563-1948');
+
+
+define('NOMBRE_RESTAURANTE', 'El Restaurante');
+define('ID_SERVIDOR', 'ELRESTAURANTE');
+define('MODO_GLOBAL', 'NORMAL'); // MODOS: [ NORMAL | DOMICILIO ]
+define('URI_SERVIDOR', '/SERV'); // URI relativa o absoluta hacia el servidor
+define('URI_AUT', '/AUT'); // URI relativa o absoluta hacia el autorizador
+
+define('SUCURSAL_EMPRESA','7G, S.A. de C.V.'); // Nombre de empresa
+define('SUCURSAL_DIRECCION', 'San Salvador'); // direccion de la sucursal
+define('SUCURSAL_TELEFONO', '(503) 2222-2222'); // Telefono de empresa
+
 
 define('USAR_AUT', false); // forzar autorización para CAJA y PEDIDOS
 
@@ -24,8 +39,6 @@ $__listado_nodos['pizzas2'] = 'Pizzas 2';
 $__listado_nodos['pastas'] = 'Pastas';
 $__listado_nodos['bebidas_ensaladas_postres_entradas'] = 'Bebidas, Ensaladas, Postres y Entradas';
 $__listado_nodos['nada'] = 'Desactivar este nodo';
-
-$__caja['clave'] = ''; // Si se establece algo aqui, se utilizará como clave para CAJA
 
 //$JSOPS[] = 'despacho_aun_sin_elaborar';
 

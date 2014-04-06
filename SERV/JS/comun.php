@@ -1,5 +1,5 @@
 <?php
-header('Content-type: text/javascript');
+header('Content-type: text/javascript; charset=utf-8');
 require_once('../../configuracion.php');
 ?> 
 
@@ -10,9 +10,12 @@ MODO_GLOBAL = "<?php echo MODO_GLOBAL; ?>";
 JSOPS = [];
 
 <?php
-foreach ($JSOPS as $opcion)
+if (isset($JSOPS) && is_array($JSOPS))
 {
-    echo 'JSOPS.push("'.$opcion.'");'."\n";
+    foreach ($JSOPS as $opcion)
+    {
+        echo 'JSOPS.push("'.$opcion.'");'."\n";
+    }
 }
 ?>
 
@@ -107,8 +110,9 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
     var html = '';
     var controles_fiscales = ( true ? '<button class="imp_factura btn">Factura</button><button class="imp_fiscal btn">Fiscal</button>&nbsp;' : '<button class="imp_fiscalizar btn">Fiscalizar</button>&nbsp;');
     var control_domicilio = ( cuenta_tiene_domicilio ? '<button class="imp_domicilio btn">Domicilio</button>' : '');
+    var control_orden = '<button class="imp_orden btn">Orden</button>'
     var control_tiquete = ( ! cuenta_tiene_domicilio ? '<button class="imp_tiquete btn">Tiquete</button>' : '');
-    var controles = controles_fiscales + control_domicilio + control_tiquete + '<button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button>';
+    var controles = controles_fiscales + control_domicilio + control_orden + control_tiquete + '<button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button>';
 
     if ( modo == 0 && _cuenta.info.flag_tiquetado == '1')
     {
@@ -325,67 +329,6 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
     
 }
 
-function crearTiquete(_datos)
-{
-    var orden = $('<div class="orden" />');
-    orden.append('<p style="font-weight:bold;text-align:center;">7G, S.A. de C.V.</p>');
-    orden.append('<p style="text-align:center;">Plaza Los Castaños,<br />Av. Masferrer Nte.<br />San Salvador, San Salvador</p>');
-    orden.append('<p style="text-align:center;">Tel. Oficinas administrativas:<br />(503) 2243-6017</p>');
-    
-    var total = 0.00;
-    orden.append('<br /><br /><div style="height:1.5em;text-align:center;"><span class="grupo" style="height:1.5em;text-align:center;font-size: 16px; font-weight:bold;">Mesa #'+_datos[0].ID_mesa+'</span></div><br /><br />');
-    
-    for (x in _datos)
-    {
-        var pedido = $('<div class="pedido" style="padding:0px;margin:0px;"  />');
-        
-        pedido.append('<div class="producto" style="padding:0px;margin:0px;" />');
-        
-        pedido.find('.producto').html( _datos[x].nombre_producto.substring(0,23) + ' <div style="z-index:99;float:right;">$' + parseFloat(_datos[x].precio_grabado).toFixed(2) + '</div>' );
-                
-        if ('adicionales' in _datos[x] && _datos[x].adicionales.length > 0)
-        {
-            pedido.append('<div class="adicionales" ><ul style="padding:2px;"></ul></div>');
-            for (adicional in _datos[x].adicionales)
-            {
-                pedido.find('.adicionales ul').append('<li>' + _datos[x].adicionales[adicional].nombre.substring(0,13)  + ' <div style="float:right;z-index:99;">$' + parseFloat(_datos[x].adicionales[adicional].precio_grabado).toFixed(2) + '</div>' + '</li>');
-		total += parseFloat(_datos[x].adicionales[adicional].precio_grabado);
-            }
-        }
-
-        total += parseFloat(_datos[x].precio_grabado);
-        orden.append(pedido);   
-    }
-
-    var date 	= new Date();
-    var date    = date.getUTCFullYear() + '-' + ('00' + (date.getUTCMonth()+1)).slice(-2) + '-' + 
-            ('00' + date.getUTCDate()).slice(-2) + ' ' + 
-            ('00' + date.getUTCHours()).slice(-2) + ':' + 
-            ('00' + date.getUTCMinutes()).slice(-2) + ':' + 
-            ('00' + date.getUTCSeconds()).slice(-2);
-            
-    var precio_sin_iva = (total / 1.13).toFixed(2);
-    var iva = (_datos[0].flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
-    var propina = ( _datos[0].flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
-    
-    total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
-    
-    orden.append('<br />');
-    orden.append('<table style="width:100%;" class="totales"></table>');
-    orden.find('table.totales').append('<tr><td>SubTotal:</td><td>' + '$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</td></tr>' );
-    
-    if ( _datos[0].flag_nopropina == '0' )
-        orden.find('table.totales').append('<tr><td>Propina (10%):</td><td>' + '$' + parseFloat(propina).toFixed(2) + '</td></tr>' );
-
-    if ( _datos[0].flag_exento == '1' )
-        orden.find('table.totales').append('<tr><td>IVA</td><td>EXENTO</td></tr>' );
-    
-    orden.find('table.totales').append('<tr><td>Total:</td><td>' + '$' + total.toFixed(2) + '</td></tr>' );
-    orden.append('<br /><br /><br /><br /><p style="text-align:center;">La pizzería - Plaza Los Castaños<br />¡Gracias por su compra!<br /><br />' + date + '</p>');
-    
-    return orden.html();
-} // crearTiquete()
-
 function crearXmlParaFacturin(_datos, tipo, simple, directa)
 {
     var xml = $('<root><trabajo><general></general><productos></productos></trabajo></root>');
@@ -444,7 +387,7 @@ function cargarEstado() {
                     break;
             }
         }
-        //console.log(this.id + " :: " + resultado);
+        console.log(this.id + " :: " + resultado);
     });
 }
 
@@ -475,7 +418,7 @@ $(function(){
                 break;
         }
         
-        //console.log("Ha cambiado: " + this.nodeName + "-" + this.type);
+        console.log("Ha cambiado: " + this.nodeName + "-" + this.type);
     });
    
     $.expr[':'].icontains = function (n, i, m) {

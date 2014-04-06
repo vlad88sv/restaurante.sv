@@ -75,7 +75,8 @@ if ($_POST['tipo'] == 'cantidad')
         $DATOS['nota'] = $_POST['motivo'];
         $DATOS['ID_cuenta'] = $cuenta;
 
-        $DATOS['grupo'] = 'ORDENES';
+        $DATOS['flag_importante'] = '1';
+        $DATOS['grupo'] = 'CUENTA';
         $DATOS['accion'] = 'DESCUENTO CUPÓN';
 
         db_agregar_datos('historial',$DATOS);

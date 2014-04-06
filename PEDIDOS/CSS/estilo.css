@@ -236,10 +236,10 @@ ul {
     display: inline-block;
     background-color: cornflowerblue;
     color: snow;
-    font-size: 1.0em;
+    font-size: 0.9em;
     font-weight: bold;
-    border: 4px solid royalblue;
-    margin: 5px;
+    border: 3px solid royalblue;
+    margin: 2px;
     border-radius: 5px;
     width: auto;
     position: relative;
@@ -383,4 +383,15 @@ div.pedido:before {
 .btn:active {
 	position:relative;
 	top:1px;
+}
+
+#resultados {
+    width:100%;
+    table-layout: fixed;
+}
+
+#resultados td {
+    border: 1px solid grey;
+    text-align: center;
+    vertical-align: top;
 }

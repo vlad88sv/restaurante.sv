@@ -18,8 +18,9 @@ if (isset($_POST['ver']))
             break;
         
         case 'todos':
+        case 'todo':
         default:
-            $estacion = '"tiquetes","comandas"';
+            $estacion = '"tiquetes","comandas","domicilio","cortez"';
             break;
         
     }

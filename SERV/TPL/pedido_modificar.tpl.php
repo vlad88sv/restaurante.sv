@@ -50,9 +50,10 @@ if (!empty($_POST['nota']))
 {
     $DATOS['fechahora'] = mysql_datetime();
     $DATOS['nota'] = $_POST['nota'];
-    $DATOS['ID_pedido'] = $pedido;
+    $DATOS['ID_cuenta'] = $pedido;
     
-    $DATOS['grupo'] = 'PEDIDOS';
+    $DATOS['flag_importante'] = '1';
+    $DATOS['grupo'] = 'PEDIDO';
     $DATOS['accion'] = $campo;
     
     db_agregar_datos('historial',$DATOS);

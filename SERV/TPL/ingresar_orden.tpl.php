@@ -60,13 +60,19 @@ if ( isset($_POST['PAUSAR_ELABORACION']) && $_POST['PAUSAR_ELABORACION'] == 'si'
 }
 
 // ingresar_orden destruye el cache, asi que no hay necesidad de hacerlo aquí.
-rsv::ingresar_pedidos($cuenta, $_POST['orden'], $opciones);
+$grupo = rsv::ingresar_pedidos($cuenta, $_POST['orden'], $opciones);
 
 
 // En domicilio generamos la impresión de una sola vez
 if ( 1 && isset($_POST['GENERAR_IMPRESION_DOMICILIO']))
 {
     rsv::generar_impresion_domicilio($cuenta);
+}
+
+// En domicilio generamos la impresión de una sola vez
+if ( 1 && isset($_POST['GENERAR_IMPRESION_ORDEN_TRABAJO']))
+{
+    rsv::generar_impresion_orden_trabajo($cuenta, $grupo);
 }
 
 $json['post'] = $_POST;

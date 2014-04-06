@@ -190,8 +190,7 @@ $(function(){
                 for(x in datos.aux.pendientes)
                 {
                     var cuenta = datos.aux.pendientes[x][0].ID_cuenta;
-                    var html = crearTiquete(datos.aux.pendientes[x]);
-                    rsv_solicitar('tiquete_pendientes',{imprimir: html , cuenta: cuenta, estacion: 'comandas', nota: 'impresión de tiquete - desde despacho'},function(datos){});
+                    rsv_solicitar('impresiones',{ imprimir: 'tiquete', cuenta: cuenta, estacion: 'comandas', nota: 'impresión de tiquete - desde despacho'}, function(){});
                 }
 
                 anti_flood = 0;

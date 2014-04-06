@@ -29,7 +29,8 @@ if (!empty($_POST['motivo']))
     $DATOS['nota'] = $_POST['motivo'];
     $DATOS['ID_cuenta'] = $cuenta;
     
-    $DATOS['grupo'] = 'CUENTAS';
+    $DATOS['flag_importante'] = '1';
+    $DATOS['grupo'] = 'CUENTA';
     $DATOS['accion'] = $campo;
     
     db_agregar_datos('historial',$DATOS);

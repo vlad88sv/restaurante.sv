@@ -39,9 +39,10 @@ if ( isset($_POST['fecha']) )
     $fecha = mysql_date();
 }
 
+
 if ( isset($_POST['modificados']) ) 
 {
-    $where = ' AND 0';// AND ID_cuenta IN (SELECT ID_cuenta FROM historial) OR ID_pedido IN (SELECT ID_pedido FROM historial)';
+    $where = ' AND DATE(fechahora_pedido) = "'.$fecha.'" AND ID_cuenta IN (SELECT ID_cuenta FROM `historial` WHERE flag_importante = 1 )';    
 }
 
 if ( isset($_POST['historial']) && $_POST['historial'] == '1' )
@@ -129,6 +130,9 @@ foreach ( $json['aux']['pendientes'] AS $grupo => $cuenta)
         $json['aux']['cuentas'][$grupo]['domicilio'] = $fDomicilio;
     }
 }
+
+$json['cmp_cache'] = crc32(serialize($json['aux']['cuentas']) . serialize($json['aux']['pendientes']));
+$json['cachado'] = '0';
 
 CacheCrear($llaveCache, @$json['aux'], false);
 ?>

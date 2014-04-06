@@ -1,6 +1,6 @@
 <?php
 
-/* Migraci�n a uso de cuentas completa. */
+/* Migración a uso de cuentas completa. */
 
 if ( empty($_POST['cuenta']) )
     return;

@@ -14,7 +14,7 @@ $_html['contenido'] = ob_get_clean();
     <title><?php echo NOMBRE_RESTAURANTE; ?></title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="es" />
-    <meta http-equiv="refresh" content="3600">
+    <meta http-equiv="refresh" content="43200">
     
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" media="screen" href="CSS/estilo.css" />

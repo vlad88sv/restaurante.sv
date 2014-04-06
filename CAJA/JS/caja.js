@@ -18,7 +18,7 @@ function actualizar() {
         
         $("#t_cuentas").html(datos.benchmark + "ms");
 
-       if (cmp_cache == JSON.stringify(datos.aux.pendientes)) {
+       if (cmp_cache == datos.cmp_cache) {
         // No redendizar nada, con el beneficio de:
         // * No alterar el DOM y hacer mas facil Firedebuggear
         // * No procesar innecesariamente
@@ -27,7 +27,7 @@ function actualizar() {
         return;
        }
        
-       cmp_cache = JSON.stringify(datos.aux.pendientes);
+       cmp_cache = datos.cmp_cache;
        
        if ( typeof datos.aux.pendientes === "undefined" || datos.aux.pendientes === '' )
        {
@@ -379,14 +379,12 @@ $(function(){
 
     $(document).on('click','.imp_tiquete', function(){        
         var orden = $(this).parents('.orden');
-        
-        rsv_solicitar('cuenta',{ cuenta: orden.attr('cuenta'), facturacion: '1'},function(datos){
-            for(x in datos.aux.pendientes)
-            {
-                var html = crearTiquete(datos.aux.pendientes[x]);
-                rsv_solicitar('tiquete_pendientes',{imprimir: html , cuenta: orden.attr('cuenta'), estacion: 'tiquetes'},function(datos){});
-            }
-       });
+        rsv_solicitar('impresiones',{ imprimir: 'tiquete', cuenta: orden.attr('cuenta'), nota: 'Impresion de tiquetes', estacion: 'tiquetes'}, function(){});
+    });
+    
+    $(document).on('click','.imp_orden', function(){        
+        var orden = $(this).parents('.orden');
+        rsv_solicitar('impresiones',{ imprimir: 'orden_de_trabajo', cuenta: orden.attr('cuenta')}, function(){});
     });
 
     $(document).on('click','.imp_domicilio', function(){        
@@ -629,7 +627,16 @@ $(function(){
         });
     });
     
-    $('#ver_total').click(function(){        
+    $('#ver_total').click(function(){
+        
+        var clave = (new Date().getDate() + new Date().getDay()).toString();
+        var prueba = prompt('Ingrese la clave dinamica de acceso');
+        
+        if ( prueba.trim() !== clave ) {
+            alert('La clave ingresada es incorrecta!');
+            return;
+        }
+           
         rsv_solicitar('cortez',{fecha: $('#fecha_caja').val()},function(datos){
             var buffer = '';
             buffer += '<p>Total del día: $' + datos.aux.total + ' - <span style="color:#666;">solo cuentas cerradas</span></p>';

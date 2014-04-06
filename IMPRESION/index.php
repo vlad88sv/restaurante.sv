@@ -17,7 +17,7 @@ $_html['titulo'] = '';
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/jquery.js"></script>
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/jquery-jqprint.js"></script>
     <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/date.js"></script>
-    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/comun.js"></script>
+    <script type="text/javascript" src="<?php echo URI_SERVIDOR; ?>/JS/comun.php"></script>
     <script type="text/javascript" src="JS/impresion.js"></script>
 </head> 
 <body>

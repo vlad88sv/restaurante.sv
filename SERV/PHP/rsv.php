@@ -77,6 +77,7 @@ class rsv {
         CacheDestruir();
     }
 
+    // Retorna el uniqid() del grupo creado.
     static function ingresar_pedidos($CUENTA, $PRODUCTOS, $OPCIONES = array()){
 
         $DATOS_COMUNES['ID_cuenta'] = $CUENTA;
@@ -143,6 +144,8 @@ class rsv {
 
         // Vaciamos cache porque hemos cambiado la vista
         CacheDestruir();
+        
+        return $DATOS_COMUNES['grupo'];
     }
     
     static function domicilio_crear_registro($DOMICILIO)
@@ -176,7 +179,7 @@ class rsv {
         $buffer_total = 0;
         
         $CUENTA = db_codex($CUENTA);
-        $c = 'SELECT `ID_cuenta`, `ID_domicilio`, `ID_mesa`, `flag_pagado`, `flag_nopropina`, `flag_exento`, `flag_tiquetado`, `flag_anulado`, `metodo_pago`, `ID_mesero`, `ID_usuario`, `fechahora_pagado`, `fechahora_anulado`, `cuenta` FROM `cuentas` WHERE ID_cuenta="'.$CUENTA.'"';
+        $c = 'SELECT `ID_cuenta`, `ID_domicilio`, `ID_mesa`, `flag_pagado`, `flag_nopropina`, `flag_exento`, `flag_tiquetado`, `flag_anulado`, `metodo_pago`, `ID_mesero`, `ID_usuario`, `fechahora_pagado`, `fechahora_anulado` FROM `cuentas` WHERE ID_cuenta="'.$CUENTA.'"';
         $rCuenta = db_consultar($c);
         
         if (db_num_resultados($rCuenta) === 0)
@@ -199,8 +202,16 @@ class rsv {
         }
         
         mysqli_free_result($rCuenta);
+
+        $FILTRO = '';
         
-        $c = 'SELECT t1.`ID_pedido`, t1.`ID_producto`, t2.`nombre`, t1.`precio_grabado`, t1.`precio_original`, t1.`flag_cancelado`, t1.`tmpID`, t1.`fechahora_pedido`, t1.`fechahora_elaborado`, `fechahora_despachado`, `fechahora_activacion`, t1.`flag_elaborado`, t1.`flag_despachado`, t1.`flag_pausa`, t1.`prioridad`, t1.`nodo`, t1.`grupo`, t1.`ID_cuenta` FROM `pedidos` AS t1 LEFT JOIN `productos` AS t2 USING(ID_producto) WHERE ID_cuenta="'.$CUENTA.'" ORDER BY t1.`tmpID`';
+        if (!empty($OPCIONES['FILTRAR_GRUPO']))
+        {
+            $FILTRO = sprintf('AND grupo = "%s"',$OPCIONES['FILTRAR_GRUPO']);
+        }
+            
+        $c = 'SELECT t1.`ID_pedido`, t1.`ID_producto`, t2.`nombre`, t1.`precio_grabado`, t1.`precio_original`, t1.`flag_cancelado`, t1.`tmpID`, t1.`fechahora_pedido`, t1.`fechahora_elaborado`, `fechahora_despachado`, `fechahora_activacion`, t1.`flag_elaborado`, t1.`flag_despachado`, t1.`flag_pausa`, t1.`prioridad`, t1.`nodo`, t1.`grupo`, t1.`ID_cuenta`, t2.`ID_grupo` FROM `pedidos` AS t1 LEFT JOIN `productos` AS t2 USING(ID_producto) WHERE ID_cuenta="'.$CUENTA.'" '.$FILTRO.' ORDER BY t1.`tmpID`';
+        
         $rPedidos = db_consultar($c);
         
         $pedidos = array();
@@ -232,7 +243,7 @@ class rsv {
                 $pedidos[$fPedido['ID_pedido']]['remociones'][] = $fRemociones;
             }
 
-        }
+        } // fetch de pedidos
         
         $totales['total_con_iva_y_propina'] = $buffer_total;
         
@@ -248,11 +259,28 @@ class rsv {
             $totales['total_con_iva_y_propina'] *= 1.10;
         }
         
+        $totales['subtotal'] = numero($buffer_total / 1.13);
         $totales['total_con_iva_y_propina'] = numero($totales['total_con_iva_y_propina']);
         $totales['iva'] = numero($buffer_total - ($buffer_total / 1.13));
         $totales['propina'] = numero(($buffer_total * 1.10) - $buffer_total);
 
         mysqli_free_result($rPedidos);
+        
+        
+        // Mesero
+        $fCuenta['mesero'] = db_obtener_fila('usuarios', sprintf('ID_usuarios="%s"',$fCuenta['ID_mesero']));
+        
+        
+        // Grupos
+        $c = 'SELECT `ID_grupo`, `descripcion` FROM `productos_grupos` WHERE 1';
+        $rGrupos = db_consultar($c);
+        
+        while ($fGrupo = db_fetch($rGrupos))
+        {
+            $fCuenta['grupos'][$fGrupo['ID_grupo']] = $fGrupo['descripcion'];
+        }
+        
+        mysqli_free_result($rGrupos);
         
         return array($fCuenta, $pedidos, $totales);
     }
@@ -260,6 +288,8 @@ class rsv {
     static function generar_impresion_domicilio($CUENTA) {
 
         list($cuenta, $pedidos, $totales) = rsv::obtener_informacion_completa($CUENTA);
+        
+        if ($cuenta['ID_domicilio'] == '0') return;
         
         $impresion = '<h1 style="text-align:center;">La Pizzeria</h1>';
         $impresion .= '<p>Ref: '.str_pad($cuenta['ID_cuenta'], 6, '0', STR_PAD_LEFT).'</p>';
@@ -370,4 +400,205 @@ class rsv {
             db_agregar_datos('comandas', array('data' => $impresion, 'estacion' => 'cortez'));
         }
     }
+        
+    static function generar_impresion_orden_trabajo($CUENTA, $GRUPO = '') {
+
+        list($cuenta, $pedidos, $totales) = rsv::obtener_informacion_completa($CUENTA, array('FILTRAR_GRUPO' => $GRUPO));
+        
+        $grupos = array();        
+        
+        foreach($pedidos as $pedido)
+        {
+            
+            if ($pedido['flag_cancelado'] == '1')
+                continue;
+            
+            $buffer_pedido = '';
+            $extras = '';
+            
+            if (isset($pedido['adicionales']))
+            {
+                foreach ($pedido['adicionales'] as $adicional)
+                {
+                    $extras .= '&nbsp;+ '.$adicional['nombre'] . '<br />';
+                }
+            }
+
+            if (isset($pedido['remociones']))
+            {
+                foreach ($pedido['remociones'] as $adicional)
+                {                    
+                    $extras .= '&nbsp;- '.$adicional['nombre'] . '<br />';
+                }
+            }
+            
+            $buffer_pedido = '<span style="font-weight:bold;">' . $pedido['nombre'] . '</span><br />';
+            
+            $grupos[$pedido['ID_grupo']][] = $buffer_pedido.$extras;
+            
+        }
+
+        $impresion = '<h1 style="text-align:center;">'.NOMBRE_RESTAURANTE.'</h1>';
+        $impresion .= '<p>Mesa: ' . $cuenta['ID_mesa'] . '</p>';
+        $impresion .= '<p>Mesero: '.$cuenta['mesero']['usuario'].'</p>';
+        
+        $impresion .= '<br />';
+        
+
+        if ( ( isset($grupos[1]) && is_array($grupos[1]) ) || ( isset($grupos[2]) && is_array($grupos[2]) ) )
+        {
+            $buffer = $impresion;
+            
+            if ( isset($grupos[1]) && is_array($grupos[1]) )
+            {
+                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Maíz</div>';
+                $unicos = array_count_values($grupos[1]);
+                foreach ($unicos as $nombre => $cantidad)
+                {
+                    $buffer .= $cantidad . ' x '.$nombre;
+                }
+            }
+            
+            if ( isset($grupos[2]) && is_array($grupos[2]) )
+            {
+                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Arroz</div>';
+                $unicos = array_count_values($grupos[2]);
+                foreach ($unicos as $nombre => $cantidad)
+                {
+                    $buffer .= $cantidad . ' x '.$nombre;
+                }
+            }
+            
+            db_agregar_datos('comandas', array('data' => $buffer, 'estacion' => 'comandas'));
+        }
+
+        // Grupos 3 y 4
+        if ( ( isset($grupos[3]) && is_array($grupos[3]) ) || ( isset($grupos[4]) && is_array($grupos[4]) ) )
+        {
+            $buffer = $impresion;
+            
+            if ( isset($grupos[3]) && is_array($grupos[3]) )
+            {
+                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Antojos</div>';
+                $unicos = array_count_values($grupos[3]);
+                foreach ($unicos as $nombre => $cantidad)
+                {
+                    $buffer .= $cantidad . ' x '.$nombre;
+                }
+            }
+            
+            if ( isset($grupos[4]) && is_array($grupos[4]) )
+            {
+                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Bebidas</div>';
+                $unicos = array_count_values($grupos[4]);
+                foreach ($unicos as $nombre => $cantidad)
+                {
+                    $buffer .= $cantidad . ' x '.$nombre;
+                }
+            }
+            
+            db_agregar_datos('comandas', array('data' => $buffer, 'estacion' => 'comandas'));
+        }
+    } // generar_impresion_orden_trabajo
+    
+    static function generar_impresion_tiquete($CUENTA, $CONTEXTO, $ESTACION) {
+        
+        list($cuenta, $pedidos, $totales) = rsv::obtener_informacion_completa($CUENTA);
+        
+        // Actualizamos el estado de tiquetado
+        $c = 'UPDATE `cuentas` SET `flag_tiquetado`=1 WHERE `ID_cuenta`="'.$CUENTA.'"';
+        db_consultar($c);
+        // ------------
+        
+        $grupos = array();
+
+        $impresion = '<div class="orden">';
+
+        $impresion .= '<p style="font-weight:bold;text-align:center;">'.SUCURSAL_EMPRESA.'</p>';
+        $impresion .= '<p style="text-align:center;">'.NOMBRE_RESTAURANTE.'</p>';
+        $impresion .= '<p style="text-align:center;">Tel. Oficinas administrativas:<br />'.SUCURSAL_TELEFONO.'</p>';
+
+        $impresion .= '<br /><br /><div style="height:1.5em;text-align:center;"><span class="grupo" style="height:1.5em;text-align:center;font-size: 16px; font-weight:bold;">Mesa #'.$cuenta['ID_mesa'].'</span></div><br /><br />';
+
+        foreach($pedidos as $pedido)
+        {
+            
+            if ($pedido['flag_cancelado'] == '1')
+                continue;
+            
+            $buffer_pedido = '';
+            $extras = '';
+            
+            if (isset($pedido['adicionales']))
+            {
+                $extras .= '<div class="adicionales" ><ul style="padding:2px;">';
+                
+                foreach ($pedido['adicionales'] as $adicional)
+                {
+                    $extras .= '<li>+ '.substr($adicional['nombre'], 0, 13) . ' <div style="float:right;z-index:99;">$' . numero($adicional['precio_grabado']) . '</div>' . '</li>';
+                }
+                
+                $extras .= '</ul></div>';
+            }
+            
+            $buffer_pedido = '<div class="pedido" style="padding:0px;margin:0px;">';
+                $buffer_pedido .= '<div class="producto" style="padding:0px;margin:0px;">';
+                    $buffer_pedido .= '{{cantidad}} x ' . substr($pedido['nombre'], 0, 23);
+                    $buffer_pedido .= ' <div style="z-index:99;float:right;">$' . numero($pedido['precio_grabado']) . '</div>';
+                $buffer_pedido .= '</div>'; // .producto
+                $buffer_pedido .= $extras;
+            $buffer_pedido .= '</div>'; // .pedido
+            
+            $grupos[$pedido['ID_grupo']][] = $buffer_pedido;
+            
+        }
+        
+        $impresion .= '<br />';
+        
+        ksort($grupos);
+
+        foreach($grupos as $indice => $grupo)
+        {
+            $impresion .= '<br />';
+            $impresion .= '<br /><div style="text-align:center;font-size:12pt;">'.$cuenta['grupos'][$indice].'</div>';
+            $unicos = array_count_values($grupo);
+            foreach ($unicos as $producto => $cantidad)
+            {
+                $impresion .= str_replace('{{cantidad}}', $cantidad, $producto);
+            }
+        }
+        
+        $impresion .= '<br />';
+        
+        $impresion .= '<table style="width:100%;" class="totales">';
+            $impresion .= '<tr><td>SubTotal:</td><td>' . '$' . $totales['subtotal'] . '</td></tr>';
+            if ( $cuenta['flag_exento'] == '1' )
+                $impresion .= '<tr><td>IVA</td><td>EXENTO</td></tr>';
+            else
+                $impresion .= '<tr><td>IVA</td><td>'. '$' . $totales['iva'] .'</td></tr>';
+
+            if ( $cuenta['flag_nopropina'] == '0' )
+                $impresion .= '<tr><td>Propina (10%):</td><td>' . '$' . $totales['propina'] . '</td></tr>';
+
+            
+            $impresion .= '<tr><td>Total:</td><td>' . '$' . $totales['total_con_iva_y_propina'] . '</td></tr>';
+            
+        $impresion .= '</table>'; // Fin tabla de totales
+        
+        $impresion .= '<br /><br /><br /><br /><p style="text-align:center;">'.SUCURSAL_DIRECCION.'<br />¡Gracias por su compra!<br /><br />' . date('Y/m/d H:i:s') . '</p>';
+        
+        db_agregar_datos('comandas', array('data' => $impresion, 'estacion' => $ESTACION));
+
+        // HISTORIAL
+        $DATOS['grupo'] = 'ORDENES';
+        $DATOS['accion'] = 'TIQUETE';
+        $DATOS['nota'] = $CONTEXTO;
+        $DATOS['fechahora'] = mysql_datetime();
+        $DATOS['ID_cuenta'] = $CUENTA;
+        db_agregar_datos('historial',$DATOS);
+        // ----------
+        
+        CacheDestruir();
+
+    } // generar_impresion_tiquete
 }

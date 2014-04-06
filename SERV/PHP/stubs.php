@@ -9,7 +9,13 @@ function numero($numero)
 
 function CacheDestruir()
 {
-    $toDelete = new APCIterator('user', '/^'.ID_CACHE.'/' , APC_ITER_VALUE);
+    if (extension_loaded('apcu'))
+    {
+        $toDelete = new APCIterator('/^'.ID_CACHE.'/' , APC_ITER_VALUE); 
+    } else {
+        $toDelete = new APCIterator('user', '/^'.ID_CACHE.'/' , APC_ITER_VALUE); 
+    }
+    
     apc_delete($toDelete); 
 }
 
@@ -22,7 +28,7 @@ function CacheCrear($llave, $valor, $destructivo = false)
 }
 
 function CacheObtener($llave)
-{
+{    
     $cache = apc_fetch(ID_CACHE . crc32($llave));
     return $cache;
 }

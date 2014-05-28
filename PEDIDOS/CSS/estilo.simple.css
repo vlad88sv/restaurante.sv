@@ -1,5 +1,5 @@
 .agregar_producto {
-    font-size: 0.8em !important;
+    font-size: 0.7em !important;
     font-weight: bold !important;
     border: 2px solid royalblue !important;
     margin: 1px !important;
@@ -18,7 +18,7 @@
 }
 
 .agregar_producto .nombre {
-    min-width:140px;
+    min-width:100px;
     text-align:left;
     margin-right:2px;
 }
@@ -27,4 +27,12 @@
     width:65px;
     padding-right:1px;
     text-align:right;
+}
+
+
+button.flecha {
+    height: auto;
+    line-height: auto;
+    width: 12px;
+    text-align: center;
 }

@@ -32,7 +32,7 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
     
     if (slam_defense && slam && _ajax[llave] === true)
     {
-        console.log ("Diferido: " + peticion + " :: " + _ajax[llave]);
+        //console.log ("Diferido: " + peticion + " :: " + _ajax[llave]);
         funcion(false,true);
         return false;
     }
@@ -121,7 +121,7 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
 
     if (modo == 1)
     {
-        controles = controles_fiscales + control_domicilio + control_tiquete +  '<button class="abrir_cuenta btn">Abrir</button><button class="anular_cuenta btn">Anular</button>';
+        controles = controles_fiscales + control_domicilio + control_tiquete +  '<button class="abrir_cuenta btn">Abrir</button>';
         html += '<div class="cuenta">Cuenta: '+_cuenta.info.ID_cuenta+' | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
        
         if (_cuenta.info.flag_anulado == '1')
@@ -430,7 +430,7 @@ $(function(){
 
     $.ajaxSetup({
         cache: false,
-        timeout: 5000,
+        timeout: 10000,
         complete: function (jqXHR, textStatus) {
             if (textStatus == "success") {
                 $("#ajax_error").hide();

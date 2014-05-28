@@ -160,7 +160,7 @@ $(function(){
 	event.preventDefault();
 	
 	if ($('#mesa').val() == "" || $('#mesa').val() == "0") {
-	   rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">**NO INGRESO # MESA**</div>' , cuenta: ( "MESA - " + $('#mesa').val() ), no_historial: true, estacion: 'comandas'},function(datos){});
+	   rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">**NO INGRESO # MESA**</div>' , estacion: 'comandas'},function(datos){});
 	   $('#mesa').val('');
 	   return;
 	}
@@ -169,14 +169,14 @@ $(function(){
 	    
 	    if ( typeof datos.aux['pendientes'] == "undefined" )
 	    {
-		rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">**MESA NO EXISTE**</div>' , cuenta: ( "MESA - " + $('#mesa').val() ), no_historial: true, estacion: 'comandas'},function(datos){});
+		rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">**MESA NO EXISTE**</div>' , stacion: 'comandas'},function(datos){});
 	    }
 	    
             for(x in datos.aux.pendientes)
             {
 		var cuenta = datos.aux.pendientes[x][0].cuenta;
                 var html = crearTiquete(datos.aux.pendientes[x]);
-                rsv_solicitar('tiquete_pendientes',{imprimir: html , cuenta: cuenta, estacion: 'comandas', nota: 'impresión de tiquete - desde despacho'},function(datos){});
+                rsv_solicitar('impresiones',{imprimir: 'datos', datos: html , cuenta: cuenta, estacion: 'comandas', nota: 'impresión de tiquete - desde despacho'},function(datos){});
             }
 	    $('#mesa').val('');
        });

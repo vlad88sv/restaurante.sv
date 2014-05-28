@@ -1,11 +1,12 @@
 _t_id_pedido = 0; // Variable donde se almacena temporalmente el ID de pedido en edición
 keys = {};
 menu_visible = false;
-cmp_cache = {cache:true}; // objeto donde almacenamos la última actualización real
-
+cmp_cache = 0; // objeto donde almacenamos la última actualización real
+clave = (new Date().getDate() + new Date().getDay()).toString(); // Clave dinamica
 
 function actualizar() {
 
+    
     rsv_solicitar('cuenta',{pendientes: 1},function(datos, slam, aut){
         
         if (slam === true) return;
@@ -49,7 +50,7 @@ function cuadrarCorte() {
     var total_efectivo = parseFloat($.trim($("#total_efectivo").val()));
     var total_pos = parseFloat($.trim($("#total_pos").val()));
     var total_compras = parseFloat($.trim($("#total_compras").val()));
-    var total_diferencia = total_a_cuadrar - (total_efectivo + total_pos + total_compras);
+    var total_diferencia = total_a_cuadrar - (total_efectivo + total_pos + total_compras) ;
     
     $("#total_diferencia").val(total_diferencia.toFixed(2));
     
@@ -183,16 +184,17 @@ $(function(){
     $("#ver_historial").click(function(){    
        var fecha = $('#fecha_caja').val();
         
-        $.modal('<h1>Historial de '+fecha+'</h1><br /><div style="position:absolute;top:30px;bottom:0;left:0;right:0;overflow-y:auto;"><div id="destino_historial"></div></div>');
+        $.modal('<div style="position:absolute;top:30px;bottom:0;left:0;right:0;overflow-y:auto;"><div id="destino_historial"><h1>Historial de '+fecha+'</h1><br /></div></div>');
 
         rsv_solicitar('cuenta',{mesa:$("#id_mesa").val(), historial: 1, fecha: fecha},function(datos){
            
-           if ( typeof datos.aux.pendientes === "undefined" )
+           
+           if ( typeof datos.aux.cuentas === "undefined" || datos.aux.cuentas === "" )
            {
-            $("#destino_historial").html('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
+            $("#destino_historial").append('<div style="text-align:center;color:yellow;">Nada encontrado!</div>');
             return;
            }
-
+           
            for(var x in datos.aux.cuentas)
            {
             $("#destino_historial").append(cuenta_obtenerVisual(datos.aux,x, 1));
@@ -220,6 +222,7 @@ $(function(){
     }
 
     $("#btn_rapido_cuenta_cerrar, #btn_rapido_cuenta_tiquete").click(function(){
+        
         var mesa = $('#id_mesa').val();
         
         if ( mesa == "" || mesa == "0" ) {
@@ -268,7 +271,7 @@ $(function(){
         }
         
         rsv_solicitar('cuenta_abrir',{cuenta:orden.attr('cuenta'), motivo: motivo},function(datos){
-            
+            cmp_cache = null;
         });
     });
     
@@ -333,6 +336,18 @@ $(function(){
     });
 
     $('#pedidos').on('click','.anular_cuenta', function(){
+        
+        if ( JSOPS.indexOf('sin_clave') === -1 )
+        {
+            var prueba = prompt('Ingrese la clave dinamica');
+
+            if ( prueba == null || prueba.trim() !== clave ) {
+                alert('La clave ingresada es incorrecta!');
+                Beep();
+                return;
+            }
+        }
+        
         if (!confirm('¿Realmente desea anular esta orden?'))
             return;
                        
@@ -353,18 +368,33 @@ $(function(){
         }
         
         rsv_solicitar('cuenta_anular',{mesa:orden.attr('id_mesa'), cuenta: orden.attr('cuenta'), motivo: motivo},function(datos){
-            
+            cmp_cache = null;
         });
     });
     
     $('#pedidos').on('click','.cerrar_cuenta', function(){
+        
+        
+        if ( JSOPS.indexOf('sin_clave') === -1 )
+        {
+            var prueba = prompt('Ingrese la clave dinamica');
+
+            if ( prueba == null || prueba.trim() !== clave ) {
+                alert('La clave ingresada es incorrecta!');
+                Beep();
+                return;
+            }
+        }
+        
         if (!confirm('¿Realmente desea cerrar esta cuenta?'))
             return;
    
         var orden = $(this).parents('.orden');
         var cuenta = orden.attr('cuenta');
            
-        rsv_solicitar('cuenta_cerrar',{mesa: orden.attr('id_mesa'), cuenta: orden.attr('cuenta')},function(datos){});
+        rsv_solicitar('cuenta_cerrar',{mesa: orden.attr('id_mesa'), cuenta: orden.attr('cuenta')},function(datos){
+            cmp_cache = null;
+        });
          
          if ($("#habilitar_facturin").is(":checked")) {
             rsv_solicitar('cuenta',{ cuenta: cuenta, facturacion: '1'},function(datos){
@@ -374,12 +404,16 @@ $(function(){
                 }
            });
          }
+         
+         
         
     });
 
     $(document).on('click','.imp_tiquete', function(){        
         var orden = $(this).parents('.orden');
-        rsv_solicitar('impresiones',{ imprimir: 'tiquete', cuenta: orden.attr('cuenta'), nota: 'Impresion de tiquetes', estacion: 'tiquetes'}, function(){});
+        rsv_solicitar('impresiones',{ imprimir: 'tiquete', cuenta: orden.attr('cuenta'), nota: 'Impresion de tiquetes', estacion: 'tiquetes'}, function(){
+            cmp_cache = null;
+        });
     });
     
     $(document).on('click','.imp_orden', function(){        
@@ -462,6 +496,7 @@ $(function(){
 
         var orden = $(this).parents('.orden');
         rsv_solicitar('cuenta_modificar',{cuenta: orden.attr('cuenta'), campo: 'flag_nopropina', valor: '1', motivo: motivo},function(datos){
+            cmp_cache = null;
         });
     });
     
@@ -486,6 +521,7 @@ $(function(){
 
         var orden = $(this).parents('.orden');
         rsv_solicitar('cuenta_modificar',{cuenta: orden.attr('cuenta'), campo: 'flag_exento', valor: '1', motivo: motivo},function(datos){
+            cmp_cache = null;
         });
     });
 
@@ -498,7 +534,7 @@ $(function(){
         buffer += '<h1>Edición de pedido</h1><p>ID de pedido: '+_t_id_pedido+'</p>';
         buffer += '<h1>Cambio de precio</h1><p>Nuevo precio: <input type="text" style="width:75px;" value="0.00" id="pedido_valor_nuevo_precio" /> Razón: <input type="text" style="width:450px;font-size:0.9em;" value="" id="pedido_valor_nuevo_precio_razon" /><button id="pedido_cambiar_precio">Cambiar</button></p>';
         buffer += '</div>';
-        $.modal(buffer);    
+        $.modal(buffer);
     });    
 
 
@@ -522,7 +558,7 @@ $(function(){
         var id_adicional = $(this).parents('li').attr('id_adicional');
         
         rsv_solicitar('adicional_modificar',{pedido_adicional: id_adicional, campo: 'precio_grabado', valor: precio, nota: motivo },function(datos){
-            // VOID
+            cmp_cache = null;
         });
         
     });    
@@ -551,7 +587,7 @@ $(function(){
         var id_pedido = $(this).parents('.pedido').attr('id_pedido');
         
         rsv_solicitar('pedido_modificar',{pedido: id_pedido, campo: 'flag_cancelado', valor: '1', nota: motivo },function(datos){
-            // VOID
+            cmp_cache = null;
         });
     });    
 
@@ -629,11 +665,11 @@ $(function(){
     
     $('#ver_total').click(function(){
         
-        var clave = (new Date().getDate() + new Date().getDay()).toString();
-        var prueba = prompt('Ingrese la clave dinamica de acceso');
+        var prueba = prompt('Ingrese la clave dinamica');
         
-        if ( prueba.trim() !== clave ) {
+        if ( prueba == null || prueba.trim() !== clave ) {
             alert('La clave ingresada es incorrecta!');
+            Beep();
             return;
         }
            
@@ -659,8 +695,8 @@ $(function(){
                 buffer += '<form id="frm_cortez">';
                 buffer += '<table>';
                 buffer += '<tr><td>Total a cuadrar:</td><td><input id="total_a_cuadrar" name="total_a_cuadrar" type="text" readonly="readonly" value="'+datos.aux.total_cuadrar+'" /></td></tr>';
-                buffer += '<tr><td>Total efectivo:</td><td><input id="total_efectivo" name="total_efectivo" type="text" value="" /></td></tr>';
-                buffer += '<tr><td>Total POS:</td><td><input id="total_pos" name="total_pos" type="text" value="" /></td></tr>';
+                buffer += '<tr><td>Total efectivo:</td><td><input id="total_efectivo" name="total_efectivo" type="text" value="0" /></td></tr>';
+                buffer += '<tr><td>Total POS:</td><td><input id="total_pos" name="total_pos" type="text" value="0" /></td></tr>';
                 buffer += '<tr><td>Total compras:</td><td><input id="total_compras" name="total_compras" readonly="readonly" type="text" value="'+datos.aux.total_compras_cuadrar+'" /></td></tr>';
                 buffer += '<tr><td>Diferencia:</td><td><input id="total_diferencia" name="total_diferencia" readonly="readonly" type="text" value="" /></td></tr>';
                 buffer += '<tr><td>En caja:</td><td><input id="total_caja" name="total_caja" type="text" value="0.00" /></td></tr>';
@@ -698,6 +734,12 @@ $(function(){
     });
     
     $(document).on('click',"#cortar", function(){
+        if ( ! $.isNumeric($("#total_efectivo").val()) || ! $.isNumeric($("#total_pos").val()) )
+        {
+            alert('Hay un número mal escrito o faltante, el corte no puede realizarse.');
+            return;
+        }
+        
         rsv_solicitar('cortez',{ cortar: true, datos: $("#frm_cortez").serialize() },function(datos){
             var ID_corte = parseFloat(datos.aux.ID_corte);
             if (ID_corte > 0)
@@ -738,10 +780,10 @@ $(function(){
     $('#historial_cortez').click(function(){
         rsv_solicitar('cortez',{historial: true},function(datos){
             var buffer = '<table class="estandar ancha bordes resalte">';
-            buffer += '<tr><th>Fecha</th><th>Total</th><th>Diferencia</th><th>Efectivo</th><th>POS</th><th>Compras</th><th>Caja</th><th>Estado</th></tr>';
+            buffer += '<tr><th>Fecha</th><th>Total</th><th>Diferencia 1<th>Diferencia 2</th><th>Efectivo</th><th>POS</th><th>Compras</th><th>Caja</th><th>Estado</th></tr>';
             for(y in datos.aux.historial)
             {
-                buffer += '<tr>' + '<td>'+ datos.aux.historial[y].fechatiempo + '</td>' + '<td>'+ datos.aux.historial[y].total_a_cuadrar + '</td>' + '<td>'+ datos.aux.historial[y].total_diferencia + '</td>' + '<td>'+ datos.aux.historial[y].total_efectivo + '</td>' + '<td>'+ datos.aux.historial[y].total_pos + '</td>' + '<td>'+ datos.aux.historial[y].total_compras + '</td>' + '<td>'+ datos.aux.historial[y].total_caja + '</td>' + '<td>'+ datos.aux.historial[y].estado + '</td>' + '</tr>' ;
+                buffer += '<tr ' + (datos.aux.historial[y].sospechoso == '1' ? 'style="background-color:red"' : '') +' >' + '<td>'+ datos.aux.historial[y].fechatiempo + '</td>' + '<td>'+ datos.aux.historial[y].total_a_cuadrar + '</td>'  + '<td>'+ datos.aux.historial[y].total_diferencia2 + '</td>' + '<td>'+ datos.aux.historial[y].total_diferencia + '</td>' + '<td>'+ datos.aux.historial[y].total_efectivo + '</td>' + '<td>'+ datos.aux.historial[y].total_pos + '</td>' + '<td>'+ datos.aux.historial[y].total_compras + '</td>' + '<td>'+ datos.aux.historial[y].total_caja + '</td>' + '<td>'+ datos.aux.historial[y].estado + '</td>' + '</tr>' ;
             }
             buffer += '</table>';
             

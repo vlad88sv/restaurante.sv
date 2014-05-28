@@ -13,7 +13,7 @@ class rsv {
         // y tienen que ser un error definitivamente, mejor que "desaparezcan" y no creen
         // problemas mayores
 
-        $c = 'DELETE FROM pedidos WHERE ID_cuenta = 0';
+        $c = 'DELETE FROM pedidos WHERE ID_cuenta  NOT IN (SELECT ID_cuenta FROM cuentas)';
         db_consultar($c);
 
         // Tenemos que...
@@ -246,20 +246,23 @@ class rsv {
         } // fetch de pedidos
         
         $totales['total_con_iva_y_propina'] = $buffer_total;
-        
+        $totales['subtotal'] = $buffer_total;
+                
         if ($fCuenta['flag_exento'] == '1')
         {
             // Es exento de IVA: SI
             $totales['total_con_iva_y_propina'] /= 1.13;
+            $totales['subtotal'] /= 1.13;
         }
         
         if ($fCuenta['flag_nopropina'] == '0')
         {
             // Tiene propina: SI
-            $totales['total_con_iva_y_propina'] *= 1.10;
+            $totales['total_con_iva_y_propina'] += numero(($buffer_total * 1.10) - $buffer_total);
         }
         
-        $totales['subtotal'] = numero($buffer_total / 1.13);
+        
+        $totales['subtotal'] = numero($totales['subtotal']);
         $totales['total_con_iva_y_propina'] = numero($totales['total_con_iva_y_propina']);
         $totales['iva'] = numero($buffer_total - ($buffer_total / 1.13));
         $totales['propina'] = numero(($buffer_total * 1.10) - $buffer_total);
@@ -432,15 +435,19 @@ class rsv {
                 }
             }
             
-            $buffer_pedido = '<span style="font-weight:bold;">' . $pedido['nombre'] . '</span><br />';
+            $buffer_pedido =  $pedido['nombre'] . '<br />';
             
             $grupos[$pedido['ID_grupo']][] = $buffer_pedido.$extras;
             
         }
+        
+        $impresion = '<h1>ORDEN DE TRABAJO</h1>';
+        $impresion .= '<h1 style="text-align:center;">'.NOMBRE_RESTAURANTE.'</h1>';
+        $impresion .= '<br /><br /><br /><br />';
 
-        $impresion = '<h1 style="text-align:center;">'.NOMBRE_RESTAURANTE.'</h1>';
-        $impresion .= '<p>Mesa: ' . $cuenta['ID_mesa'] . '</p>';
-        $impresion .= '<p>Mesero: '.$cuenta['mesero']['usuario'].'</p>';
+        
+        $impresion .= 'Mesa: ' . $cuenta['ID_mesa'] . '<br />';
+        $impresion .= 'Mesero: '.$cuenta['mesero']['usuario'] . '<br />';
         
         $impresion .= '<br />';
         
@@ -451,7 +458,7 @@ class rsv {
             
             if ( isset($grupos[1]) && is_array($grupos[1]) )
             {
-                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Maíz</div>';
+                $buffer .= '<br /><div style="text-align:center;font-size:40pt;">Maíz</div>';
                 $unicos = array_count_values($grupos[1]);
                 foreach ($unicos as $nombre => $cantidad)
                 {
@@ -461,13 +468,15 @@ class rsv {
             
             if ( isset($grupos[2]) && is_array($grupos[2]) )
             {
-                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Arroz</div>';
+                $buffer .= '<br /><div style="text-align:center;font-size:40pt;">Arroz</div>';
                 $unicos = array_count_values($grupos[2]);
                 foreach ($unicos as $nombre => $cantidad)
                 {
                     $buffer .= $cantidad . ' x '.$nombre;
                 }
             }
+            
+            $buffer = '<br /><div style="font-size:17pt;">'.$buffer.'</div>';
             
             db_agregar_datos('comandas', array('data' => $buffer, 'estacion' => 'comandas'));
         }
@@ -479,7 +488,7 @@ class rsv {
             
             if ( isset($grupos[3]) && is_array($grupos[3]) )
             {
-                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Antojos</div>';
+                $buffer .= '<br /><div style="text-align:center;font-size:40pt;">Antojos</div>';
                 $unicos = array_count_values($grupos[3]);
                 foreach ($unicos as $nombre => $cantidad)
                 {
@@ -487,15 +496,17 @@ class rsv {
                 }
             }
             
-            if ( isset($grupos[4]) && is_array($grupos[4]) )
+            if (0 && isset($grupos[4]) && is_array($grupos[4]) )
             {
-                $buffer .= '<br /><div style="text-align:center;font-size:15pt;">Bebidas</div>';
+                $buffer .= '<br /><div style="text-align:center;font-size:40pt;">Bebidas</div>';
                 $unicos = array_count_values($grupos[4]);
                 foreach ($unicos as $nombre => $cantidad)
                 {
                     $buffer .= $cantidad . ' x '.$nombre;
                 }
             }
+            
+            $buffer = '<br /><div style="font-size:17pt;">'.$buffer.'</div>';
             
             db_agregar_datos('comandas', array('data' => $buffer, 'estacion' => 'comandas'));
         }
@@ -518,7 +529,7 @@ class rsv {
         $impresion .= '<p style="text-align:center;">'.NOMBRE_RESTAURANTE.'</p>';
         $impresion .= '<p style="text-align:center;">Tel. Oficinas administrativas:<br />'.SUCURSAL_TELEFONO.'</p>';
 
-        $impresion .= '<br /><br /><div style="height:1.5em;text-align:center;"><span class="grupo" style="height:1.5em;text-align:center;font-size: 16px; font-weight:bold;">Mesa #'.$cuenta['ID_mesa'].'</span></div><br /><br />';
+        $impresion .= '<br /><div style="height:1.5em;text-align:center;"><span class="grupo" style="height:1.5em;text-align:center;font-size: 16px; font-weight:bold;">Mesa #'.$cuenta['ID_mesa'].'</span></div>';
 
         foreach($pedidos as $pedido)
         {
@@ -540,48 +551,59 @@ class rsv {
                 
                 $extras .= '</ul></div>';
             }
-            
-            $buffer_pedido = '<div class="pedido" style="padding:0px;margin:0px;">';
-                $buffer_pedido .= '<div class="producto" style="padding:0px;margin:0px;">';
-                    $buffer_pedido .= '{{cantidad}} x ' . substr($pedido['nombre'], 0, 23);
-                    $buffer_pedido .= ' <div style="z-index:99;float:right;">$' . numero($pedido['precio_grabado']) . '</div>';
-                $buffer_pedido .= '</div>'; // .producto
-                $buffer_pedido .= $extras;
-            $buffer_pedido .= '</div>'; // .pedido
-            
-            $grupos[$pedido['ID_grupo']][] = $buffer_pedido;
+         
+            if (defined('TIQUETE_AGRUPADO') && TIQUETE_AGRUPADO)
+            {
+                $buffer_pedido = '<div class="pedido" style="padding:0px;margin:0px;">';
+                    $buffer_pedido .= '<div class="producto" style="padding:0px;margin:0px;">';
+                        $buffer_pedido .= '{{cantidad}} x ' . substr($pedido['nombre'], 0, 15);
+                        $buffer_pedido .= ' <div style="z-index:99;float:right;">$' . numero($pedido['precio_grabado']) . '</div>';
+                    $buffer_pedido .= '</div>'; // .producto
+                    $buffer_pedido .= $extras;
+                $buffer_pedido .= '</div>'; // .pedido
+
+                $grupos[$pedido['ID_grupo']][] = $buffer_pedido;
+            } else {
+                $impresion .= '<div class="pedido" style="padding:0px;margin:0px;">';
+                    $impresion .= '<div class="producto" style="padding:0px;margin:0px;">';
+                        $impresion .= substr($pedido['nombre'], 0, 15);
+                        $impresion .= ' <div style="z-index:99;float:right;">$' . numero($pedido['precio_grabado']) . '</div>';
+                    $impresion .= '</div>'; // .producto
+                    $impresion .= $extras;
+                $impresion .= '</div>'; // .pedido
+            }
             
         }
         
         $impresion .= '<br />';
         
-        ksort($grupos);
+        
+        if (defined('TIQUETE_AGRUPADO') && TIQUETE_AGRUPADO) {
+         
+            ksort($grupos);
 
-        foreach($grupos as $indice => $grupo)
-        {
-            $impresion .= '<br />';
-            $impresion .= '<br /><div style="text-align:center;font-size:12pt;">'.$cuenta['grupos'][$indice].'</div>';
-            $unicos = array_count_values($grupo);
-            foreach ($unicos as $producto => $cantidad)
+            foreach($grupos as $indice => $grupo)
             {
-                $impresion .= str_replace('{{cantidad}}', $cantidad, $producto);
+                $impresion .= '<br /><div style="text-align:center;font-size:12pt;">'.$cuenta['grupos'][$indice].'</div>';
+                $unicos = array_count_values($grupo);
+                foreach ($unicos as $producto => $cantidad)
+                {
+                    $impresion .= str_replace('{{cantidad}}', $cantidad, $producto);
+                }
             }
         }
         
         $impresion .= '<br />';
         
         $impresion .= '<table style="width:100%;" class="totales">';
-            $impresion .= '<tr><td>SubTotal:</td><td>' . '$' . $totales['subtotal'] . '</td></tr>';
+            $impresion .= '<tr><td>SubTotal:</td><td>' . '$' . str_pad($totales['subtotal'], 6, ' ', STR_PAD_LEFT) . '</td></tr>';
             if ( $cuenta['flag_exento'] == '1' )
                 $impresion .= '<tr><td>IVA</td><td>EXENTO</td></tr>';
-            else
-                $impresion .= '<tr><td>IVA</td><td>'. '$' . $totales['iva'] .'</td></tr>';
 
             if ( $cuenta['flag_nopropina'] == '0' )
-                $impresion .= '<tr><td>Propina (10%):</td><td>' . '$' . $totales['propina'] . '</td></tr>';
-
-            
-            $impresion .= '<tr><td>Total:</td><td>' . '$' . $totales['total_con_iva_y_propina'] . '</td></tr>';
+                $impresion .= '<tr><td>Propina (10%):</td><td>' . '$' . str_pad($totales['propina'], 6, ' ', STR_PAD_LEFT) . '</td></tr>';
+           
+            $impresion .= '<tr><td>Total:</td><td>' . '$' . str_pad($totales['total_con_iva_y_propina'], 6, ' ', STR_PAD_LEFT) . '</td></tr>';
             
         $impresion .= '</table>'; // Fin tabla de totales
         

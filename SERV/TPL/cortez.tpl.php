@@ -23,7 +23,7 @@ if ( isset($_POST['historial']))
     if ( isset($_POST['fecha']) )
         $fecha = ' AND DATE(fechatiempo) = "'.$_POST['fecha'].'"';
 
-    $c = 'SELECT `ID_cortez`, `fechahora_recibido`, `fechahora_remesado`, `total_a_cuadrar`, `total_diferencia`, `total_efectivo`, `total_pos`, `total_compras`, `total_caja`, `inventario`, `ID_usuario`, `fechatiempo`, `estado`, `remesa` FROM `cortez` WHERE 1 '.$fecha.' ORDER BY fechatiempo DESC';
+    $c = 'SELECT `ID_cortez`, `fechahora_recibido`, `fechahora_remesado`, IF(`total_diferencia` = (`total_a_cuadrar` - (`total_efectivo` + `total_pos` + `total_compras`)), 0, 1) AS "sospechoso", (`total_a_cuadrar` - (`total_efectivo` + `total_pos` + `total_compras`)) AS "total_diferencia2", `total_a_cuadrar`, `total_diferencia`, `total_efectivo`, `total_pos`, `total_compras`, `total_caja`, `inventario`, `ID_usuario`, `fechatiempo`, `estado`, `remesa` FROM `cortez` WHERE 1 '.$fecha.' ORDER BY fechatiempo DESC';
     $r = db_consultar($c);
     
     while ($r && $f = db_fetch($r))

@@ -24,10 +24,10 @@ $_html['titulo'] = '';
 <h1>Impresiones</h1>
 <div style="position: fixed; top:0; right:0; left:0; bottom:0; overflow-y: auto; margin:5px;padding:5px;border:1px solid black;" id="ajaxi" >
 <select style="position: fixed; bottom:0; right:0;z-index:99;" id="estacion" class="auto_guardar">
+    <option value="todo">Todo</option>
     <option value="tiquetes">Tiquetes y Facturas</option>
     <option value="comandas">Comandas</option>
     <option value="domicilio">Domicilio</option>
-    <option value="todo">Todo</option>
 </select>
 </div>
 </body>

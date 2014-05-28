@@ -45,12 +45,15 @@ switch ($campo) {
         break;
 }
 
+// Como la operacion pudo haber sido cambio de cuenta, obtenemos la cuenta actual
+$ID_cuenta = db_obtener('pedidos', 'ID_cuenta', 'ID_pedido="'.$pedido.'"');
 
 if (!empty($_POST['nota']))
 {
     $DATOS['fechahora'] = mysql_datetime();
     $DATOS['nota'] = $_POST['nota'];
-    $DATOS['ID_cuenta'] = $pedido;
+    $DATOS['ID_cuenta'] = $ID_cuenta;
+    $DATOS['ID_pedido'] = $pedido;
     
     $DATOS['flag_importante'] = '1';
     $DATOS['grupo'] = 'PEDIDO';

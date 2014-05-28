@@ -169,7 +169,7 @@ $(function(){
         if (anti_flood == 2)
         {
             anti_flood++;
-            rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">SE HA BLOQUEADO LA IMPRESORA POR SEGURIDAD<br />Verificar que la tecla "Intro" del teclado NO este presionada o atascada.<br />El impresor estará bloqueado hasta que ingresen un número de cuenta existente.</div>' , cuenta: ( "MESA - " + $('#mesa').val() ), no_historial: true, estacion: 'domicilio'},function(datos){});
+            rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">SE HA BLOQUEADO LA IMPRESORA POR SEGURIDAD<br />Verificar que la tecla "Intro" del teclado NO este presionada o atascada.<br />El impresor estará bloqueado hasta que ingresen un número de cuenta existente.</div>' , estacion: 'comandas'},function(datos){});
             return;
         }
 
@@ -188,7 +188,7 @@ $(function(){
         
 	if (cuenta == "" || cuenta == "0" ) {
 	   if (anti_flood < 2)
-            rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">**NO INGRESO # CUENTA**</div>' , cuenta: ( "MESA - " + cuenta ), no_historial: true, estacion: 'domicilio'},function(datos){});
+            rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">**NO INGRESO # CUENTA**</div>' , estacion: 'domicilio'},function(datos){});
 	   
            $('#mesa').val('');
            anti_flood++;
@@ -199,7 +199,7 @@ $(function(){
 	    
 	    if (  anti_flood < 2 && typeof datos.aux['pendientes'] == "undefined" )
 	    {
-		rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">**CUENTA NO EXISTE**</div>' , cuenta: ( "CUENTA - " + cuenta ), no_historial: true, estacion: 'domicilio'},function(datos){});
+		rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">**CUENTA NO EXISTE**</div>', estacion: 'domicilio'},function(datos){});
                 anti_flood++;
 	    }
 	    
@@ -213,7 +213,7 @@ $(function(){
                     
                     if ( modo == 1 ) {
                         rsv_solicitar('cuenta_cerrar',{cuenta: cuenta},function(datos){});
-                        rsv_solicitar('tiquete_pendientes',{imprimir: ('<div style="text-align:center;height:5cm;">¡CUENTA CERRADA!<br />CUENTA: ' + cuenta + '</div>') , cuenta: cuenta, no_historial: true, estacion: 'domicilio'},function(datos){});
+                        rsv_solicitar('impresiones',{imprimir: 'datos', datos: ('<div style="text-align:center;height:5cm;">¡CUENTA CERRADA!<br />CUENTA: ' + cuenta + '</div>') , cuenta: cuenta, estacion: 'domicilio'},function(datos){});
                     }
                 }
                 anti_flood = 0;

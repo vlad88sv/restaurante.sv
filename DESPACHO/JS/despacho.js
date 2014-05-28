@@ -34,6 +34,8 @@ function timeSince(date) {
 }
 
 function Beep() {
+    $('#beep').get(0).pause();
+    $('#beep').get(0).currenttime = 0;
     $('#beep').get(0).play();
 }
 
@@ -163,13 +165,13 @@ $(function(){
         if (anti_flood == 2)
         {
             anti_flood++;
-            rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">SE HA BLOQUEADO LA IMPRESORA POR SEGURIDAD<br />Verificar que la tecla "Intro" del teclado NO este presionada o atascada.<br />El impresor estará bloqueado hasta que ingresen un número de cuenta existente.</div>' , cuenta: ( "MESA - " + $('#mesa').val() ), no_historial: true, estacion: 'comandas'},function(datos){});
+            rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">SE HA BLOQUEADO LA IMPRESORA POR SEGURIDAD<br />Verificar que la tecla "Intro" del teclado NO este presionada o atascada.<br />El impresor estará bloqueado hasta que ingresen un número de cuenta existente.</div>' , estacion: 'comandas'},function(datos){});
             return;
         }
         
 	if ($('#mesa').val() == "" || $('#mesa').val() == "0") {
             if ( anti_flood < 2 )
-                rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">**NO INGRESO # MESA**</div>' , cuenta: ( "MESA - " + $('#mesa').val() ), no_historial: true, estacion: 'comandas'},function(datos){});
+                rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">**NO INGRESO # MESA**</div>' , estacion: 'comandas'},function(datos){});
             
             $('#mesa').val('');
             anti_flood++;
@@ -180,7 +182,7 @@ $(function(){
 	    
 	    if ( anti_flood < 2 && typeof datos.aux['pendientes'] == "undefined" )
 	    {
-		rsv_solicitar('tiquete_pendientes',{imprimir: '<div style="text-align:center;height:5cm;">**MESA NO EXISTE**<br />Ingresó: '+$('#mesa').val()+'</div>' , cuenta: ( "MESA - " + $('#mesa').val() ), no_historial: true, estacion: 'comandas'},function(datos){});
+		rsv_solicitar('impresiones',{imprimir: 'datos', datos: '<div style="text-align:center;height:5cm;">**MESA NO EXISTE**<br />Ingresó: '+$('#mesa').val()+'</div>' , estacion: 'comandas'},function(datos){});
                 anti_flood++;
 	    }
             

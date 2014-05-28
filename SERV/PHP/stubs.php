@@ -11,12 +11,13 @@ function CacheDestruir()
 {
     if (extension_loaded('apcu'))
     {
-        $toDelete = new APCIterator('/^'.ID_CACHE.'/' , APC_ITER_VALUE); 
+        apc_clear_cache();
     } else {
         $toDelete = new APCIterator('user', '/^'.ID_CACHE.'/' , APC_ITER_VALUE); 
+        apc_delete($toDelete); 
     }
     
-    apc_delete($toDelete); 
+    
 }
 
 function CacheCrear($llave, $valor, $destructivo = false)

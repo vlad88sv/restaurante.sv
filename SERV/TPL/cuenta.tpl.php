@@ -65,10 +65,13 @@ ORDER BY ( t0.ID_mesa + 0 ) ASC, t1.`fechahora_pedido` ASC, t1.`tmpID`';
 
 $llaveCache = $c;
 $cache = CacheObtener($llaveCache);
+
 if ($cache !== false)
 {
     $json['aux']['cuentas'] = @$cache['cuentas'];
     $json['aux']['pendientes'] = @$cache['pendientes'];
+    $json['cmp_cache'] = sha1(json_encode($json['aux']['cuentas']) . json_encode($json['aux']['pendientes']));
+
     $json['cachado'] = true;
     return;
 }
@@ -131,8 +134,9 @@ foreach ( $json['aux']['pendientes'] AS $grupo => $cuenta)
     }
 }
 
-$json['cmp_cache'] = crc32(serialize($json['aux']['cuentas']) . serialize($json['aux']['pendientes']));
+$json['cmp_cache'] = sha1(json_encode($json['aux']['cuentas']) . json_encode($json['aux']['pendientes']));
 $json['cachado'] = '0';
+
 
 CacheCrear($llaveCache, @$json['aux'], false);
 ?>

@@ -14,45 +14,15 @@ if (CacheObtener('op_lock_activador') == false)
 $CRITERIO_BASE = '';
 $GRUPO = (empty($_POST['grupo']) ? '' : $_POST['grupo']);
 
-switch ($GRUPO)
-{       
-    case 'horno':
-        $GRUPO = 'AND t1.nodo IN ("pizzas",pizzas1","pizzas2","entradas_horno","pastas")';
-        break;
-    
-    case 'pizzas':
-        $GRUPO = 'AND t1.nodo IN ("pizzas","pizzas1","pizzas2","entradas_horno")';
-        break;
 
-    case 'pizzas1':
-        $GRUPO = 'AND t1.nodo IN ("pizzas","pizzas1","entradas_horno")';
-        break;
+if (empty ($__listado_nodos_sql[$GRUPO]))
+    return;
 
-    case 'pizzas2':
-        $GRUPO = 'AND t1.nodo IN ("pizzas2")';
-        break;    
 
-    case 'pastas':
-        $GRUPO = 'AND t1.nodo IN ("pastas")';
-        break;
-        
-   case 'bebidas_ensaladas_postres_entradas':
-        $GRUPO = 'AND t1.nodo IN ("bebidas_preparadas","ensaladas","postres","entradas")';
-        break;
-    
-    case 'nada':
-        $GRUPO = 'AND 0';
-        break;
-    
-    case 'domicilio':
-        $GRUPO = '';
-        break;
-    
-    case 'todos':
-    default:
-        $GRUPO = 'AND t1.nodo IN ("pizzas","pizzas1","pizzas2", "pastas","entradas_horno","bebidas_preparadas","ensaladas","postres","entradas")';
-        break;    
-}
+
+$GRUPO = $__listado_nodos_sql[$GRUPO];
+
+error_log($GRUPO);
 
 $CRITERIO_BASE = ' AND t1.`flag_pausa` = 0 AND t1.`flag_despachado` = 0';
 

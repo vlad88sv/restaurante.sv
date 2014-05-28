@@ -23,7 +23,7 @@ function MostrarRejillaProductos(datos)
             
             _productos[datos.aux[x].ID_producto] = datos.aux[x];
             
-            $("#resultado_" + datos.aux[x].ID_grupo).append('<div tabindex="'+indice+'" producto="'+datos.aux[x].ID_producto+'" nombre="' + datos.aux[x].nombre + '" precio="' + datos.aux[x].precio + '" ' + (datos.aux[x].disponible == 0 ? 'style="text-decoration:line-through"' : '') +' class="agregar_producto"><div class="nombre">' + datos.aux[x].nombre + '</div>&nbsp;<div class="precio">$' + parseFloat(datos.aux[x].precio).toFixed(2)  + '</div></div>');
+            $("#resultado_" + datos.aux[x].ID_grupo).append('<div tabindex="'+indice+'" producto="'+datos.aux[x].ID_producto+'" nombre="' + datos.aux[x].nombre + '" precio="' + datos.aux[x].precio + '" ' + (datos.aux[x].disponible == 0 ? 'style="text-decoration:line-through"' : '') +' class="agregar_producto"><div class="nombre">' + datos.aux[x].nombre + '</div>&nbsp;<div class="precio">$' + parseFloat(datos.aux[x].precio).toFixed(2)  + '&nbsp;&nbsp;<button ' + (datos.aux[x].complementar == '1' ? 'disabled="disabled"' : '') + ' class="flecha">' + (datos.aux[x].complementar == '1' ? 'X' : '+') + '</button></div></div>');
             
             indice++;
         }
@@ -108,6 +108,28 @@ function obtener_lista_meseros()
         }        
     }, true);
 }
+
+function cantidadParaProductoEnPedido(str_producto, str_detalle, str_precio)
+{
+    _b_orden = {timestamp: Math.floor(+new Date() / 1000), ID: str_producto, precio: str_precio, detalle: str_detalle, adicionales: [], ingredientes: []};
+    
+    var buffer = '';   
+    buffer += '<div style="text-align:center;" class="botones_grandes">';
+    buffer += '<button class="agregar_por_cantidad" rel="2">x2</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="3">x3</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="4">x4</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="5">x5</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="6">x6</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="7">x7</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="8">x8</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="9">x9</button><br />';
+    buffer += '<button class="agregar_por_cantidad" rel="10">x10</button><br />';
+    buffer += '</div>';
+    
+    $.modal(buffer, {opacity: 0, focus: false} );
+
+    
+}
  
 function intentarProductoEnPedido(str_producto, str_detalle, str_precio)
 {
@@ -151,61 +173,6 @@ function convertirProductoEnPedido(buffer_de_orden, cantidad)
     }
     miniResumenOrden();
     $("#buscar_producto").focus();
-}
-
-function ResumenOrden()
-{
-    var buffer = '';
-    
-    if (_orden.length == 0)
-    {
-        $('#info_principal').append('<hr /' + '<p>No hay ningún pedido agregado</p>');
-        return;
-    }
-    
-    buffer += '<h1>Resumen de la orden</h1>';
-    
-    buffer += '<table class="estandar ancha bordes zebra" id="seleccion_producto">';
-    for (x in _orden)
-    {
-        var adicionales = '';
-        if (_orden[x].adicionales.length > 0) {
-            adicionales += '<b>Agregar:</b>';
-            adicionales += '<ul>';
-            
-            for (y in _orden[x].adicionales) {
-                adicionales += '<li>' + _adicionales[_orden[x].adicionales[y]].nombre + '</li>';
-            }
-            
-            adicionales += '</ul>';
-        }
-        
-        var quitar = '';
-        if (_orden[x].ingredientes.length > 0) {
-            quitar += '<b>Quitar:</b>';
-            quitar += '<ul>';
-            
-            for (y in _orden[x].ingredientes) {
-                quitar += '<li>' + _adicionales[_orden[x].ingredientes[y]].nombre + '</li>';
-            }
-            
-            quitar += '</ul>';
-        }
-        
-        buffer += '<tr ID_orden="' + x + '">';
-        buffer += '<td>' + (parseInt(x)+1) + '</td>';
-        buffer += '<td><div style="color:blue;font-weight:bold;">' + _orden[x].detalle + '</div><div>' + adicionales + '</div><div>' + quitar + '</div></td>';
-        buffer += '<td>' + _orden[x].precio + '</td>';
-        buffer += '<td><button class="btn_eliminar_pedido">Eliminar</button></td>';
-        buffer += '</tr>';
-        
-    }
-    buffer += '</table>';
-    
-    
-    _orden[x].precio
-    
-    $('#info_principal').append('<hr /'+ buffer);
 }
 
 function miniResumenOrden()
@@ -310,6 +277,8 @@ $(function(){
     
     $('#enviar_orden_a_cocina').click(function(){
         
+        $('#notificaciones').empty();
+        
         // Chequeemos si esta autorizado para enviar ordenes
         
         rsv_solicitar('aut',{permisos:['ingresar_orden']}, function(retorno){
@@ -330,22 +299,14 @@ $(function(){
                 return;
             }
             
-            ResumenOrden();
-            
             var ID_mesa = 0;
             
             while ( ID_mesa == 0 ) {
                 ID_mesa = window.prompt('1. Número de MESA','0');
                 
                 if (!ID_mesa) {
-                    alert ('Cancelando envío');
+                    $('#notificaciones').html('ENVIO CANCELADO');
                     return;
-                }
-    
-                if (/^[0-9]+$/.test(ID_mesa) == false)
-                {
-                    alert('Número de mesa incorrecto.');
-                    ID_mesa = 0;
                 }
             }
             
@@ -357,8 +318,6 @@ $(function(){
                     if ( typeof datos.aux.pendientes != "undefined" && datos.aux.pendientes != '')
                     {
                         ID_mesero_busqueda = datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].ID_mesero;
-    
-                        alert('¡Mesa con cuenta abierta!');
     
                         if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
                             alert('¡parece que la va a meter donde no debe!');
@@ -383,7 +342,7 @@ $(function(){
                     if (!ID_mesero) {
                         ID_mesero = 0;
                         ID_mesero_busqueda = 0;
-                        alert ('Cancelando envío');
+                        $('#notificaciones').html('ENVIO CANCELADO');
                         return;
                     }
         
@@ -396,7 +355,7 @@ $(function(){
                 
                 rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: ID_mesero, orden: _orden, GENERAR_IMPRESION_ORDEN_TRABAJO: 1}, function(){
                     reiniciarInterfaz();
-                    $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
+                    $('#notificaciones').html('ORDEN ENVIADA');
                 }); 
             });
         
@@ -404,6 +363,12 @@ $(function(){
         
     });
     
+    $(document).on('click', 'button.flecha', function(event){
+        event.stopPropagation();
+        var producto = $(this).parents('.agregar_producto');
+        var ID_producto = producto.attr('producto');
+        cantidadParaProductoEnPedido(ID_producto, producto.attr('nombre'), producto.attr('precio'));
+    });
     
     $(document).on('keydown', '.agregar_producto', function(event){
         event.preventDefault();
@@ -415,28 +380,40 @@ $(function(){
         if (keyCode > 48 && keyCode < 58) {
             convertirProductoEnPedido(_b_orden, parseInt(keyCode) - 48);
         }
-
         
         if (keyCode > 96 && keyCode < 106) {
             convertirProductoEnPedido(_b_orden, parseInt(keyCode) - 96);
         }
         
         if (keyCode == 13) {
-            convertirProductoEnPedido(_b_orden);
+            agregar_producto_accion_directa(this);
         }
         
         if (keyCode == 32) {
-            intentarProductoEnPedido(ID_producto, $(this).attr('nombre'), $(this).attr('precio'));
-        }
-        
-        if (keyCode == 37) {
+            agregar_producto_accion_indirecta(this);
+        }        
+                
+        // Arriba
+        if (keyCode == 38) {
             var tab = parseInt($(this).attr('tabindex'));
             $(".agregar_producto[tabindex='"+(tab-1)+"']").focus();
         }
         
-        if (keyCode == 39) {
+        
+        // Abajo
+        if (keyCode == 40) {
             var tab = parseInt($(this).attr('tabindex'));
             $(".agregar_producto[tabindex='"+(tab+1)+"']").focus();
+        }
+        
+        // Izquierda
+        if (keyCode == 37) {
+            $(this).parents('td').prev('td').find('.agregar_producto:visible').eq(0).focus();
+        }
+        
+        // Derecha
+        if (keyCode == 39) {
+            $(this).parents('td').next('td').find('.agregar_producto:visible').eq(0).focus();
         }
         
         event.stopPropagation();
@@ -447,13 +424,12 @@ $(function(){
         var ID_producto = $(objeto).attr('producto');
         var _b_orden = {ID: ID_producto, precio: $(objeto).attr('precio'), detalle: $(objeto).attr('nombre'), adicionales: [], ingredientes: []};
         
-        var cantidad = prompt('¿Cantidad?','1');
-        
-        for (var i=0; i<cantidad; i++)
+        if (_productos[$(objeto).attr('producto')].complementar == '1')
         {
+            intentarProductoEnPedido(ID_producto, $(objeto).attr('nombre'), $(objeto).attr('precio'));
+        } else {
             convertirProductoEnPedido(_b_orden);
         }
-        
     }
     
     function agregar_producto_accion_indirecta(objeto){
@@ -462,7 +438,7 @@ $(function(){
     }
     
     $(document).on('click', '.agregar_producto', function(){
-        if (_productos[$(this).attr('producto')].complementar == '0' && $("#modo_tactil").is(':checked')) {
+        if ($("#modo_tactil").is(':checked')) {
             agregar_producto_accion_directa(this);
         } else {
             agregar_producto_accion_indirecta(this);
@@ -477,6 +453,15 @@ $(function(){
         } else {
             agregar_producto_accion_directa(this);
         }
+    });
+    
+    $(document).on('click', '.agregar_por_cantidad', function(){
+
+        _b_orden.ingredientes = [];
+        _b_orden.adicionales = [];
+        
+        convertirProductoEnPedido(_b_orden, $(this).attr('rel'));
+        $.modal.close();
     });
     
     $(document).on('click', '#agregar_producto_aceptar', function(){
@@ -518,11 +503,6 @@ $(function(){
         
         _orden.splice($(this).closest('tr').attr('ID_orden'),1);
         miniResumenOrden();
-        ResumenOrden();
-    });
-    
-    $('#ver_resumen').click(function(event){
-        ResumenOrden();
     });
     
     $(document).on('click', '.agregar_producto', function(event){
@@ -613,7 +593,7 @@ $(function(){
     $(document).keydown(function(event){
         var keyCode = event.keyCode || event.which;
         
-        console.log(keyCode);
+        //console.log(keyCode);
         
         var objetivo = $('.key[key="'+keyCode+'"]');
         if ( event.altKey == false || event.ctrlKey == false || objetivo.length == 0) return;
@@ -625,6 +605,7 @@ $(function(){
         }
         event.stopPropagation();
     });
+
    
     // Iniciar
     localStorage.clear();

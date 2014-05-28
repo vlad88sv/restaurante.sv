@@ -395,3 +395,7 @@ div.pedido:before {
     text-align: center;
     vertical-align: top;
 }
+
+.botones_grandes button {
+    min-width: 100px;
+}

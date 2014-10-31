@@ -1,5 +1,6 @@
 <?php
 require_once('../configuracion.php');
+require_once('../inicio.php');
 
 $_html['titulo'] = '';
 $_GET['TPL'] =  ( empty($_GET['TPL']) ? 'tomar.pedido' : $_GET['TPL'] );

@@ -18,11 +18,8 @@ $GRUPO = (empty($_POST['grupo']) ? '' : $_POST['grupo']);
 if (empty ($__listado_nodos_sql[$GRUPO]))
     return;
 
-
-
 $GRUPO = $__listado_nodos_sql[$GRUPO];
 
-error_log($GRUPO);
 
 $CRITERIO_BASE = ' AND t1.`flag_pausa` = 0 AND t1.`flag_despachado` = 0';
 

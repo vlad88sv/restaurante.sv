@@ -22,5 +22,8 @@
     }
     </style>
 </head>
-<h1>La Pizzeria - 7G S.A. de C.V.</h1>
+<?php
+require_once('configuracion.php');
+echo '<h1>'.SUCURSAL_EMPRESA.'</h1>';
+?>
 </html>

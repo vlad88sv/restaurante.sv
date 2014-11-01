@@ -58,41 +58,19 @@ function rsv_solicitar(peticion, data, funcion, cache, slam) {
     //console.log( "Iniciado :: " + peticion + " :: " + _ajax[llave]);
     
     $.post(URI_SERVIDOR + '/?REFERENCIA='+peticion, $.extend(objetivo,data), function(retorno){
+    
         if(typeof(Storage)!=="undefined" && cache == true){
             localStorage.setItem(llave, JSON.stringify(retorno));
         }
         
-        if ( typeof(retorno.AUT) !== "undefined" )
-        {
-            // DATOS; SLAM; AUT (fallo);
-            $("#ajax_aut_texto").html(retorno.AUT_M);
-            funcion(false,false,true);
-        } else {
-            funcion(retorno);
-        }
-        
-        
+        funcion(retorno);
+
     }, 'json').always(function(){
         //console.log( "Completado :: " + peticion + " :: " + _ajax[llave]);
         delete _ajax[llave];
     });
     
     return true;
-}
-
-function aut_solicitar() {
-    
-    var html = '';
-    
-    html += '<h1>AUTORIZACION REQUERIDA</h1>';
-    html += '<div style="text-align:center;">';
-    html += 'Una o mas acciones realizadas fueron detenidas por falta de permisos.<br /><br />';
-    html += '<a class="btn" target="_blank" href="' + URI_AUT + '">Autorización</a>';
-    html += '<br /><p>Una ves realizada la autorización puede cerrar esta ventana</p>.';
-    html += '<a class="btn facebox_cerrar" href="#">Cerrar ventana</a>';
-    html += '</div>';   
-    
-    $.modal(html);
 }
 
 function cuenta_obtenerVisual(_datos, _grupo, modo)

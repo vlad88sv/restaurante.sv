@@ -1,8 +1,7 @@
 <?php
 $permisos[] = 'cuentas';
-sesion::verificar($permisos);
 
-if ( ! sesion::$autorizado )
+if ( ! sesion::verificar($permisos) )
 {
     $json['AUTORIZADO'] = 'no';
     $json['permisos'] = @$_SESSION['permisos'];

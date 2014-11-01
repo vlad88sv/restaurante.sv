@@ -12,9 +12,6 @@ class sesion {
         if ( @$_SESSION['iniciado'] === true )
         {
             self::$autenticado = true;
-            $_SESSION['rnd'] = time();
-            $cookieLifetime = 365 * 24 * 60 * 60; // A year in seconds
-            setcookie(session_name(),session_id(),time()+$cookieLifetime);
         }
     }
     
@@ -32,7 +29,7 @@ class sesion {
             return false;
         }
         
-        self::$autorizado = ( count(array_intersect($permisos, @$_SESSION['permisos'])) == count($permisos) );
+        return ( self::$autorizado = ( count(array_intersect($permisos, @$_SESSION['permisos'])) == count($permisos) ) );
         
     }
     

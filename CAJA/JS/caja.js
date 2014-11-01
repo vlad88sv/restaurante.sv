@@ -11,12 +11,6 @@ function actualizar() {
         
         if (slam === true) return;
         
-        if (aut === true)
-        {
-            aut_solicitar();
-            return;
-        }
-        
         $("#t_cuentas").html(datos.benchmark + "ms");
 
        if (cmp_cache == datos.cmp_cache) {

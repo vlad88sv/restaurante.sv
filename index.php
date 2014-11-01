@@ -1,3 +1,7 @@
+<?php
+require_once('configuracion.php');
+require_once('inicio.php');
+?>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />

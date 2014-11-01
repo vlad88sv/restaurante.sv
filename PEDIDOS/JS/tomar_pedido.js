@@ -308,99 +308,83 @@ $(function(){
     });
     
     $('#enviar_orden_a_cocina').click(function(){
+              
         
-        // Chequeemos si esta autorizado para enviar ordenes
-        
-        rsv_solicitar('aut',{permisos:['ingresar_orden']}, function(retorno){
-            if ( typeof(retorno.AUTORIZADO) === "undefined" )
-            {   
-                alert('HUBO UN ERROR CON EL SERVIDOR DE AUTORIZACIÓN, SU ORDEN NO PUEDE ENVIARSE.');
+        if (_orden.length == 0)
+        {
+            alert('No hay pedidos en la orden.');
+            return;
+        }
+
+        ResumenOrden();
+
+        var ID_mesa = 0;
+
+        while ( ID_mesa == 0 ) {
+            ID_mesa = window.prompt('1. Número de MESA','0');
+
+            if (!ID_mesa) {
+                alert ('Cancelando envío');
                 return;
             }
-            
-            if (retorno.AUTORIZADO == 'no') {
-                aut_solicitar();
-                return;
-            }
-        
-            if (_orden.length == 0)
+
+            if (/^[0-9]+$/.test(ID_mesa) == false)
             {
-                alert('No hay pedidos en la orden.');
-                return;
+                alert('Número de mesa incorrecto.');
+                ID_mesa = 0;
             }
-            
-            ResumenOrden();
-            
-            var ID_mesa = 0;
-            
-            while ( ID_mesa == 0 ) {
-                ID_mesa = window.prompt('1. Número de MESA','0');
-                
-                if (!ID_mesa) {
+        }
+
+
+        var ID_mesero_busqueda = "";
+
+        rsv_solicitar('cuenta',{mesa: ID_mesa, pendientes: true}, function(datos){
+            try {
+                if ( typeof datos.aux.pendientes != "undefined" && datos.aux.pendientes != '')
+                {
+                    ID_mesero_busqueda = datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].ID_mesero;
+
+                    alert('¡Mesa con cuenta abierta!');
+
+                    if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
+                        alert('¡parece que la va a meter donde no debe!');
+                    }
+                }
+            } catch (error){
+                ID_mesero_busqueda = 0;
+            }
+
+            var ID_mesero = 0;
+            while ( ID_mesero == 0 ) {
+                var meseros = '';
+
+                for (x in _meseros)
+                {
+                    meseros += " * " + _meseros[x].ID_usuarios + ". " + _meseros[x].usuario + "\n"; 
+
+                }
+
+                ID_mesero = window.prompt('2. Número de MESERO.' + "\n" + meseros, ID_mesero_busqueda );
+
+                if (!ID_mesero) {
+                    ID_mesero = 0;
+                    ID_mesero_busqueda = 0;
                     alert ('Cancelando envío');
                     return;
                 }
-    
-                if (/^[0-9]+$/.test(ID_mesa) == false)
+
+                if (/^[0-9]+$/.test(ID_mesero) == false)
                 {
-                    alert('Número de mesa incorrecto.');
-                    ID_mesa = 0;
+                    alert('Número de mesero incorrecto.');
+                    ID_mesero = 0;
                 }
             }
-            
-            
-            var ID_mesero_busqueda = "";
-            
-            rsv_solicitar('cuenta',{mesa: ID_mesa, pendientes: true}, function(datos){
-                try {
-                    if ( typeof datos.aux.pendientes != "undefined" && datos.aux.pendientes != '')
-                    {
-                        ID_mesero_busqueda = datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].ID_mesero;
-    
-                        alert('¡Mesa con cuenta abierta!');
-    
-                        if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
-                            alert('¡parece que la va a meter donde no debe!');
-                        }
-                    }
-                } catch (error){
-                    ID_mesero_busqueda = 0;
-                }
-    
-                var ID_mesero = 0;
-                while ( ID_mesero == 0 ) {
-                    var meseros = '';
-                    
-                    for (x in _meseros)
-                    {
-                        meseros += " * " + _meseros[x].ID_usuarios + ". " + _meseros[x].usuario + "\n"; 
-                        
-                    }
-                    
-                    ID_mesero = window.prompt('2. Número de MESERO.' + "\n" + meseros, ID_mesero_busqueda );
-                    
-                    if (!ID_mesero) {
-                        ID_mesero = 0;
-                        ID_mesero_busqueda = 0;
-                        alert ('Cancelando envío');
-                        return;
-                    }
-        
-                    if (/^[0-9]+$/.test(ID_mesero) == false)
-                    {
-                        alert('Número de mesero incorrecto.');
-                        ID_mesero = 0;
-                    }
-                }
-                
-                rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: ID_mesero, orden: _orden}, function(){
-                    reiniciarInterfaz();
-                    $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
-                }); 
-            });
-        
-        });
-        
+
+            rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: ID_mesero, orden: _orden}, function(){
+                reiniciarInterfaz();
+                $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
+            }); 
+        });        
     });
     
     

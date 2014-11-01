@@ -5,9 +5,8 @@
 // 3. Array de extras/adicionales que se van a _agregar_
 
 $permisos[] = 'ingresar_pedidos';
-sesion::verificar($permisos);
 
-if ( ! sesion::$autorizado )
+if ( ! sesion::verificar($permisos) )
 {
     $json['AUT'] = 'no';
     $json['permisos'] = @$_SESSION['permisos'];

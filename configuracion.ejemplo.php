@@ -11,7 +11,7 @@ define('NOMBRE_RESTAURANTE', 'El Restaurante');
 define('ID_SERVIDOR', 'ELRESTAURANTE');
 define('MODO_GLOBAL', 'NORMAL'); // MODOS: [ NORMAL | DOMICILIO ]
 define('URI_SERVIDOR', '/SERV'); // URI relativa o absoluta hacia el servidor
-define('URI_AUT', '/AUT'); // URI relativa o absoluta hacia el autorizador
+define('URI_AUT', '/'); // URI relativa o absoluta hacia el autorizador
 
 define('SUCURSAL_EMPRESA','7G, S.A. de C.V.'); // Nombre de empresa
 define('SUCURSAL_DIRECCION', 'San Salvador'); // direccion de la sucursal

@@ -4,7 +4,7 @@
     <tr>
         <td style="text-align:left;">Búscar: <input class="key enfocar" key="88" type="text" id="buscar_producto" value="" /></td>
         <td style="text-align: right;vertical-align: middle;">
-            [ <input type="checkbox" id="modo_tactil" value="1" /> <label style="font-size:10pt" for="modo_tactil">táctil</label> ]&nbsp; 
+            <div style="display:none">[ <input type="checkbox" id="modo_tactil" value="1" /> <label style="font-size:10pt" for="modo_tactil">táctil</label> ]&nbsp;</div>
             <button class="key" key="66" id="borrar_orden"><b>B</b>orrar</button>&nbsp;
             <button class="key" key="82" id="ver_resumen"><b>R</b>esumen</button>
             <button class="key" key="69" id="enviar_orden_a_cocina"><b>E</b>nviar</button>
@@ -16,17 +16,10 @@
 <div id="info_principal"></div>
 
 <table id="menu_productos">
-    <tr>
-        <td><a class="mp key" rel="2" key="49" href="#">1.ENTRADAS</a></td>
-        <td><a class="mp key" rel="1" key="50" href="#">2.PIZZAS</a></td>
-        <td><a class="mp key" rel="3" key="51" href="#">3.PASTAS</a></td>
-        <td><a class="mp key" rel="8" key="52" href="#">4.ENSALADAS</a></td>
-        <td><a class="mp key" rel="4" key="53" href="#">5.POSTRES</a></td>
-        <td><a class="mp key" rel="5" key="54" href="#">6.ESPEC</a></td>
-        <td><a class="mp key" rel="6" key="55" href="#">7.BEBIDAS</a></td>
-        <td><a class="mp key" rel="7" key="56" href="#">8.CERVEZA</a></td>
-        <td><a class="mp key" rel="9" key="57" href="#">9.TINTO</a></td>
-        <td><a class="mp key" rel="10" key="48" href="#">0.BLANCO</a></td>
-        <td><a class="mp key" rel="11" key="171" href="#">*.CHAMPAGNE</a></td>
+    <tbody><tr>
+        <td><a href="#" key="49" rel="1" class="mp key grupo1">1.MAIZ</a></td>
+        <td><a href="#" key="50" rel="2" class="mp key grupo2">2.ARROZ</a></td>
+        <td><a href="#" key="51" rel="3" class="mp key grupo3">3.ANTOJITOS</a></td>
+        <td><a href="#" key="52" rel="4" class="mp key grupo4">4.BEBIDA</a></td>
     </tr>
-</table>
+</tbody></table>

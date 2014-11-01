@@ -163,8 +163,9 @@ ul {
 
 #menu_productos  {
     position: fixed;
+    table-layout: fixed;
     bottom: 1px;
-    width: 100%;
+    width: 78%;
 }
 
 #menu_productos td {
@@ -173,11 +174,13 @@ ul {
 
 #menu_productos td a {
     display: block;
+	border: 2px solid black;
     height: 20px;
     line-height: 20px;
     width: 100%;
     text-align: center;
-    font-size:0.6em;
+    font-size:1em;
+	text-shadow: 1px 1px #555;
 }
 
 #content {
@@ -234,17 +237,29 @@ ul {
 
 .agregar_producto {
     display: inline-block;
-    background-color: cornflowerblue;
-    color: snow;
-    font-size: 0.9em;
-    font-weight: bold;
-    border: 3px solid royalblue;
-    margin: 2px;
-    border-radius: 5px;
-    width: auto;
+    font-size: 14px;
+    border: 3px solid black;
+    margin: 1px;
+    width: 200px;
+    height: 60px;
+    line-height:60px;
     position: relative;
-    padding: 4px;
     cursor: pointer;
+    text-align:center;
+    font-family: Helvetica, Arial, sans serif;
+    padding: 8px 12px; 
+    border-radius: 3px; 
+    -moz-border-radius: 3px; 
+    box-shadow: inset 0px 0px 2px #fff;
+    -o-box-shadow: inset 0px 0px 2px #fff;
+    -webkit-box-shadow: inset 0px 0px 2px #fff;
+    -moz-box-shadow: inset 0px 0px 2px #fff;
+}
+.agregar_producto:active {
+    box-shadow: inset 0px 0px 3px #999;
+    -o-box-shadow: inset 0px 0px 3px #999;
+    -webkit-box-shadow: inset 0px 0px 3px #999;
+    -moz-box-shadow: inset 0px 0px 3px #999;
 }
 
 .agregar_producto:hover, .agregar_producto:focus {
@@ -260,13 +275,15 @@ ul {
 }
 
 .agregar_producto .nombre {
-    min-width:140px;
-    text-align:left;
-    margin-right:2px;
+    width:185px;
+    text-align:center;
+    font-weight: bold;
 }
 
 .agregar_producto .precio {
-    width:65px;
+	display: none;
+    width:0px;
+
     padding-right:1px;
     text-align:right;
 }
@@ -398,4 +415,81 @@ div.pedido:before {
 
 .botones_grandes button {
     min-width: 100px;
+}
+
+.grupo1 {
+    color: #41788c;
+    border: 1px solid #6fb1c7;
+    background-image: -moz-linear-gradient(#aae5f7, #73d0f1);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#73d0f1), to(#aae5f7));
+    background-image: -webkit-linear-gradient(#aae5f7, #73d0f1);
+    background-image: -o-linear-gradient(#aae5f7, #73d0f1);
+    text-shadow: 1px 1px 1px #bfeafb;
+    background-color: #73d0f1;
+}
+.grupo1:hover{
+    border: 1px solid #4690ad;
+    background-image: -moz-linear-gradient(#73d0f1, #aae5f7);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#aae5f7), to(#73d0f1));
+    background-image: -webkit-linear-gradient(#73d0f1, #aae5f7);
+    background-image: -o-linear-gradient(#73d0f1, #aae5f7);
+    background-color: #aae5f7;
+}
+.grupo2 {
+    color: #5a742d;
+    border: 1px solid #95b959;
+    background-image: -moz-linear-gradient(#cae387, #a5cb5e);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#a5cb5e), to(#cae387));
+    background-image: -webkit-linear-gradient(#cae387, #a5cb5e);
+    background-image: -o-linear-gradient(#cae387, #a5cb5e);
+    text-shadow: 1px 1px 1px #dff4bc;
+    background-color: #a5cb5e;
+}
+.grupo2:hover {
+    border: 1px solid #687e30;
+    background-image: -moz-linear-gradient(#a5cb5e, #cae387);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#cae387), to(#a5cb5e));
+    background-image: -webkit-linear-gradient(#a5cb5e, #cae387);
+    background-image: -o-linear-gradient(#a5cb5e, #cae387);
+    background-color: #cae387; 
+}
+.grupo3 {
+    color: #986a39;
+    border: 1px solid #e6b650;
+    background-image: -moz-linear-gradient(#ffd974, #febf4d);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#febf4d), to(#ffd974));
+    background-image: -webkit-linear-gradient(#ffd974, #febf4d);
+    background-image: -o-linear-gradient(#ffd974, #febf4d);
+    text-shadow: 1px 1px 1px #fbe5ac;
+    background-color: #febf4d;
+}
+
+.grupo3:hover {
+    border: 1px solid #c1913d;
+    background-image: -moz-linear-gradient(#febf4d, #ffd974);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffd974), to(#febf4d));
+    background-image: -webkit-linear-gradient(#febf4d, #ffd974);
+    background-image: -o-linear-gradient(#febf4d, #ffd974);
+    background-color: #ffd974;   
+}
+
+.grupo4 {
+    color: #57646d;
+    border: 1px solid #929ba2;
+    background-image: -moz-linear-gradient(#bbcbd8, #8ea5b5);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#8ea5b5), to(#bbcbd8));
+    background-image: -webkit-linear-gradient(#bbcbd8, #8ea5b5);
+    background-image: -o-linear-gradient(#bbcbd8, #8ea5b5);
+    text-shadow: 1px 1px 1px #c6d4df;
+    color: #000;
+    background-color: #8ea5b5;
+}
+
+.grupo4:hover {
+    border: 1px solid #656f78;
+    background-image: -moz-linear-gradient(#8ea5b5, #bbcbd8);
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#bbcbd8), to(#8ea5b5));
+    background-image: -webkit-linear-gradient(#8ea5b5, #bbcbd8);
+    background-image: -o-linear-gradient(#8ea5b5, #bbcbd8);
+    background-color: #bbcbd8;    
 }

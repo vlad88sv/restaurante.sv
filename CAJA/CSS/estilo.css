@@ -134,14 +134,10 @@ div#pedidos {
     cursor: pointer;
 }
 
-.contenedor_mesa_mesero {
-    width: 200px;
-}
-
 .cambio_mesa {
     font-weight: bold !important;
-    font-size: 1.4em !important;
     color: red !important;
+    cursor: pointer;
 }
 
 div.orden {
@@ -176,24 +172,12 @@ span.grupo {
     color: yellow;
 }
 
-div.contenedor_encabezado_orden
-{
-    background-color: springgreen;
-    margin-bottom: 2px;
-    border-radius:5px;
-    border: 3px solid #000000;
-    padding: 2px;
-}
-
-table.encabezado_orden {
-    background: none;
+.encabezado_orden {
+    background: white;
+    border: 1px solid yellow;
     color: black;
     width: 100%;
     border-collapse: collapse;
-}
-
-table.encabezado_orden td {
-    vertical-align:middle;
 }
 
 .contenedor_botones button {
@@ -235,15 +219,22 @@ table.encabezado_orden td {
 .precio {
     font-size: 1.4em;
     font-weight: bold;
-    color: blue;
+    color: #F87433;
     text-align: right;
-    padding-right: 5px;
 }
 
 .precio_precalculo {
     font-size: 0.9em;
-    text-align: center;
+    text-align: right;
     font-family: monospace;
+}
+
+.precio_precalculo table {
+    width: 100%;
+}
+
+.precio_precalculo span {
+    cursor: pointer;
 }
 
 div.pedido {

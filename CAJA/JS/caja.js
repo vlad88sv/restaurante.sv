@@ -496,7 +496,7 @@ $(function(){
     
 
     $(document).on('click','.quitar_iva', function(){
-        if (!confirm("¿Hacer esta cuenta exenta de I.V.A.?\nNota: si agrega más productos deberá ejecutar esta opción nuevamente."))
+        if (!confirm("¿Hacer esta cuenta exenta de I.V.A.?"))
             return;
         
         var motivo = '';

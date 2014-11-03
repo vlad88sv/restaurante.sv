@@ -2,7 +2,9 @@
 header('Content-type: text/javascript; charset=utf-8');
 require_once('../../configuracion.php');
 ?> 
-
+<?php if(0): ?>
+<script type="text/javascript">
+<?php endif; ?>
 URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";
 URI_AUT = "<?php echo URI_AUT; ?>";
 MODO_GLOBAL = "<?php echo MODO_GLOBAL; ?>";
@@ -17,9 +19,7 @@ if (isset($JSOPS) && is_array($JSOPS))
         echo 'JSOPS.push("'.$opcion.'");'."\n";
     }
 }
-?>
-
-
+?>  
 _ajax = {};
 slam_defense = true;
 ult_AUT_M = '';
@@ -97,29 +97,26 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
        orden.addClass('pago_pendiente');
     }
 
+    var html_cuenta = '';
     if (modo == 1)
     {
         controles = controles_fiscales + control_domicilio + control_tiquete +  '<button class="abrir_cuenta btn">Abrir</button>';
-        html += '<div class="cuenta">Cuenta: '+_cuenta.info.ID_cuenta+' | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
+        html_cuenta += '<div class="cuenta">Mesa #<span class="cambio_mesa">'+_cuenta.info.ID_mesa+'</span> | Cuenta: '+_cuenta.info.ID_cuenta+' | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
        
         if (_cuenta.info.flag_anulado == '1')
         {
-            html += '<div class="vineta" style="background-color:white;color:red;text-align:center;">¡esta cuenta fue anulada!</div>';
+            html_cuenta += '<div class="vineta" style="background-color:white;color:red;text-align:center;">¡esta cuenta fue anulada!</div>';
         }
         
     } else {
-        html += '<div class="cuenta">Cuenta <b>#'+_cuenta.info.ID_cuenta+'</b> | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
+        html_cuenta += '<div class="cuenta">Mesa #<span class="cambio_mesa">'+_cuenta.info.ID_mesa+'</span> | Cuenta <b>#'+_cuenta.info.ID_cuenta+'</b> | atendida por <b>'+_cuenta.info.nombre_mesero+'</b></div>';
     }
 
-    html += '<div class="contenedor_encabezado_orden">';
-    html += '<table class="encabezado_orden">';
-    html += '<tr>';
-    html += '<td class="contenedor_mesa_mesero"><button class="cambio_mesa btn">'+_cuenta.info.ID_mesa+'</button></td>';
-    html += '<td class="precio_precalculo"></td>';
-    html += '<td class="precio"></td>';
-    html += '</tr>';
-    html += '</table>';
-    html += '</div>';
+    var contenedor_cuenta = '';
+    contenedor_cuenta += '<div class="encabezado_orden">';
+    contenedor_cuenta += '<div class="precio_precalculo"></div>';
+    contenedor_cuenta += '<div class="precio"></td>';
+    contenedor_cuenta += '</div>';
     html += '<div class="cuenta contenedor_botones" style="text-align:center;">' + controles + '</div>';
     
     // Información de domicilio
@@ -152,10 +149,12 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
         }
     }
     
-    orden.append(html);    
-
     var notificaciones = $('<div class="cuenta_notificaciones" style="text-align:center;" />');
-    orden.append(notificaciones);
+    orden.append(html_cuenta);    
+    orden.append('<table style="width:100%"><tr><td class="contenedor_acciones" style="vertical-align:top;">' + html + '</td><td>' + contenedor_cuenta + '</td></tr></table>');    
+
+    
+    orden.find('.contenedor_acciones').append(notificaciones);
     
     orden.attr('id','o_'+_cuenta.info.ID_cuenta);
     orden.attr('id_mesa',_cuenta.info.ID_mesa);
@@ -298,7 +297,14 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
     var precio_sin_iva = (total / 1.13).toFixed(2);
     var iva = (_cuenta.info.flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
     var propina = ( _cuenta.info.flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
-    orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;color:red;font-weight:bold;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
+    
+    var precalculo = '<table>';
+    precalculo += '<tr><td>Sub</td><td><span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span></td><td>+</td></tr>';
+    precalculo += '<tr><td>TAX</td><td><span class="quitar_iva" title="IVA\nClic para quitar IVA">$' + iva + '</span></td><td>+</td></tr>';
+    //precalculo += '<tr><td>Subtotal 2</td><td><span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span></td><td>+</td></tr>';
+    precalculo += '<tr><td>Tip</td><td><span class="quitar_propina" title="Propina\nClic para quitar propina">$' + propina + '</span></td><td>+</td></tr>';
+    precalculo += '</table>';
+    orden.find('.precio_precalculo').html( precalculo );
     
     total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
     orden.find('.precio').html( '<span title="Total con IVA y con propina">$' + total.toFixed(2) + '</span>' );

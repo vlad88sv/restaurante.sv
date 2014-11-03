@@ -5,7 +5,7 @@ class sesion {
     
     static function preparar() {
         
-        session_name("RSVSESION");
+        session_set_cookie_params(strtotime('+1 day'), '/');
         session_start();
         
        // Verificar si esta iniciado

@@ -1,4 +1,4 @@
-<script type="text/javascript" src="JS/tomar_pedido.js"></script>
+<script type="text/javascript" src="JS/tomar_pedido.php"></script>
 <?php $_html['titulo'] = 'Tomar pedido'; ?>
 <table style="width:100%;margin: 0px;border-bottom: 4px solid black;">
     <tr>

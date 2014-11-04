@@ -1,3 +1,11 @@
+<?php
+header('Content-type: text/javascript; charset=utf-8');
+require_once('../../configuracion.php');
+require_once('../../inicio.php');
+?> 
+<?php if(0): ?>
+<script type="text/javascript">
+<?php endif; ?>
 // Caches
 _productos = {};
 _adicionales = {};
@@ -335,7 +343,7 @@ $(function(){
             }
         }
 
-
+<?php if (!USAR_AUT || (sesion::$autenticado && @$_SESSION['datos']['nivel'] === 'gerente')): ?>
         var ID_mesero_busqueda = "";
 
         rsv_solicitar('cuenta',{mesa: ID_mesa, pendientes: true}, function(datos){
@@ -347,7 +355,7 @@ $(function(){
                     alert('¡Mesa con cuenta abierta!');
 
                     if (datos.aux.pendientes[Object.keys(datos.aux.pendientes)[0]][0].flag_tiquetado == "1") {
-                        alert('¡parece que la va a meter donde no debe!');
+                        alert('¡Precaución, ya se imprimió el tiquete de esta cuenta!');
                     }
                 }
             } catch (error){
@@ -385,6 +393,12 @@ $(function(){
                 $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
             }); 
         });        
+<?php else: ?>
+        rsv_solicitar('ingresar_orden',{mesa: ID_mesa, mesero: <?php echo @$_SESSION['datos']['ID_usuarios'] ?: 0; ?>, orden: _orden}, function(){
+            reiniciarInterfaz();
+            $('#info_principal').html('<div style="color:red;font-size:14px;font-weight:bold;text-align:center;">ORDEN ENVIADA</div>');
+        }); 
+<?php endif; ?>
     });
     
     

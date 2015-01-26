@@ -114,7 +114,7 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
     var control_domicilio = ( cuenta_tiene_domicilio ? '<button class="imp_domicilio btn">Domicilio</button>' : '');
     var control_orden = '<button class="imp_orden btn">Orden</button>'
     var control_tiquete = ( ! cuenta_tiene_domicilio ? '<button class="imp_tiquete btn">Tiquete</button>' : '');
-    var controles = controles_fiscales + control_domicilio + control_orden + control_tiquete + '<button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button>';
+    var controles = controles_fiscales + control_domicilio + control_orden + control_tiquete + '<button class="cerrar_cuenta btn">Cerrar</button><button class="anular_cuenta btn">Anular</button>&nbsp;<button class="descuento_p_cuenta btn">Descuento</button><button class="cupon_cuenta btn">Cupon</button><button class="btn_vip btn">VIP</button>';
 
     if ( modo == 0 && _cuenta.info.flag_tiquetado == '1')
     {

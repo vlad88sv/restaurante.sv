@@ -335,6 +335,48 @@ $(function(){
         
     });
 
+    $('#pedidos').on('click','.btn_vip', function(){
+        var orden = $(this).parents('.orden');
+        
+        var tarjeta = '';
+        
+        tarjeta = prompt('Dezlice la tarjeta premium *VIP* deluxe.');
+        tarjeta = $.trim(tarjeta);
+
+        if (tarjeta === '')
+        {
+            alert('Abortando operacion');
+            return;
+        }
+        
+        $.post('http://vip.lapizzeria.com.sv',{tarjeta:tarjeta, operacion:'buscar'}, 'json').done(function(data){
+            if (data.tarjeta.error === '1')
+            {
+                alert('La tarjeta VIP solicitada no existe. Abortando.');
+                return;
+            }
+            
+            if (data.tarjeta.balance === '0')
+            {
+                alert('La tarjeta VIP ya no cuenta con balance');
+                return;
+            }
+            
+            if (confirm('El balance de la tarjeta es $'+data.tarjeta.balance + ' - ¿continuar?.'))
+            {
+                var cantidad = prompt('Cantidad a deducir del balance');
+                
+                rsv_solicitar('cuenta_descuento',{cuenta: orden.attr('cuenta'), tipo: 'cantidad', valor: cantidad, motivo: 'Tarjeta VIP utilizada: ' + tarjeta},function(){
+                    cmp_cache = null;
+                    $.post('http://vip.lapizzeria.com.sv',{tarjeta:tarjeta, operacion:'descontar', cantidad:cantidad});
+                });
+            }
+        }).fail(function(){
+            alert('ERROR: intente nuevamente');
+        });
+        
+    });
+
     $('#pedidos').on('click','.anular_cuenta', function(){
         
         if ( JSOPS.indexOf('sin_clave') === -1 )

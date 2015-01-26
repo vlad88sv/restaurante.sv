@@ -6,6 +6,8 @@ db_conectar(); // Iniciamos la conexión a la base de datos.
 function db_conectar(){
     global $db_link;
     $db_link = @mysqli_connect(db__host, db__usuario, db__clave, db__db) or die("<div>Fue imposible conectarse a la base de datos.<br />" . mysqli_connect_error() . '<br />'. @mysqli_error($db_link) . "</div>");
+    
+    db_consultar('SET NAMES utf8');
 }
 
 function db_consultar($consulta){

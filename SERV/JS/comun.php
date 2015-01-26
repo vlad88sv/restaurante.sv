@@ -2,7 +2,9 @@
 header('Content-type: text/javascript; charset=utf-8');
 require_once('../../configuracion.php');
 ?> 
-
+<?php if(0): ?>
+<script type="text/javascript">    
+<?php endif; ?>
 URI_SERVIDOR = "<?php echo URI_SERVIDOR; ?>";
 URI_AUT = "<?php echo URI_AUT; ?>";
 MODO_GLOBAL = "<?php echo MODO_GLOBAL; ?>";

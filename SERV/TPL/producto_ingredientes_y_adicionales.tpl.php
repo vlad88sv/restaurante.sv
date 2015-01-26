@@ -7,9 +7,9 @@ if (isset($_POST['modo']) && $_POST['modo'] == 'inventario')
 }
 
 $WHERE = '';
-if (isset($_POST['producto']) && is_numeric($_POST['producto']))
+if (isset($_REQUEST['producto']) && is_numeric($_REQUEST['producto']))
 {
-    $WHERE .= "AND t2.`ID_producto` = '".$_POST['producto']."' OR t1.ID_grupo = '-1' OR t1.ID_grupo = (SELECT ID_grupo FROM `productos` AS tt1 WHERE tt1.ID_producto='".$_POST['producto']."')";
+    $WHERE .= "AND t2.`ID_producto` = '".$_REQUEST['producto']."' OR t1.ID_grupo = '-1' OR t1.ID_grupo = (SELECT ID_grupo FROM `productos` AS tt1 WHERE tt1.ID_producto='".$_REQUEST['producto']."')";
 }
 
 $c = "SELECT `ID_adicional`, `precio`, `ID_grupo`, `disponible`, `nombre`, `afinidad`

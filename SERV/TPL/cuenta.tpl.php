@@ -132,6 +132,21 @@ foreach ( $json['aux']['pendientes'] AS $grupo => $cuenta)
         $fDomicilio['notas'] = ($fDomicilio['notas'] == '' ? 'Ninguna ingresada' : $fDomicilio['notas']);
         $json['aux']['cuentas'][$grupo]['domicilio'] = $fDomicilio;
     }
+    
+    // Descuentos al total
+    // Historial de cuentas
+    $c = 'SELECT `ID_descuento`, `ID_cuenta`, `cantidad`, `fecha`, `razon` FROM `cuenta_descuento` WHERE `ID_cuenta`="'.$cuenta[0]['ID_cuenta'].'"';
+    $rDescuentos = db_consultar($c);
+    
+    $json['aux']['cuentas'][$grupo]['totales']['descuentos'] = 0;
+    
+    while ($rDescuentos && $fDescuentos = db_fetch($rDescuentos))
+    {
+        $json['aux']['cuentas'][$grupo]['descuentos'][] = $fDescuentos;
+        $json['aux']['cuentas'][$grupo]['totales']['descuentos'] += $fDescuentos['cantidad'];
+    }
+    
+    
 }
 
 $json['cmp_cache'] = sha1(json_encode($json['aux']['cuentas']) . json_encode($json['aux']['pendientes']));

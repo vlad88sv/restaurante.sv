@@ -57,17 +57,12 @@ if ($_POST['tipo'] == 'cantidad')
     }
     
     // Ingresamos la orden de descuento
-    $PEDIDO['fechahora_pedido'] = mysql_datetime();
-    $PEDIDO['flag_elaborado'] = 1;
-    $PEDIDO['flag_despachado'] = 1;
-    $PEDIDO['nodo'] = 'especial';
-    $PEDIDO['tmpID'] = 0;
-    $PEDIDO['ID_producto'] = 113; // Número mágico de producto Descuento
-    $PEDIDO['precio_original'] = ($cantidad * -1); // Cantidad negativa
-    $PEDIDO['precio_grabado'] = ($cantidad * -1);
-    $PEDIDO['ID_cuenta'] = $cuenta;
+    $DESCUENTO['fecha'] = mysql_datetime();
+    $DESCUENTO['cantidad'] = $cantidad;
+    $DESCUENTO['ID_cuenta'] = $cuenta;
+    $DESCUENTO['razon'] = @$_POST['motivo'];
 
-    db_agregar_datos('pedidos', $PEDIDO);
+    db_agregar_datos('cuenta_descuento', $DESCUENTO);
     
     if (!empty($_POST['motivo']))
     {
@@ -77,7 +72,7 @@ if ($_POST['tipo'] == 'cantidad')
 
         $DATOS['flag_importante'] = '1';
         $DATOS['grupo'] = 'CUENTA';
-        $DATOS['accion'] = 'DESCUENTO CUPÓN';
+        $DATOS['accion'] = 'DESCUENTO CUPÓN O VIP';
 
         db_agregar_datos('historial',$DATOS);
     }

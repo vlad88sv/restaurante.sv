@@ -322,9 +322,9 @@ function cuenta_obtenerVisual(_datos, _grupo, modo)
     var precio_sin_iva = (total / 1.13).toFixed(2);
     var iva = (_cuenta.info.flag_exento == '0' ? (total - precio_sin_iva).toFixed(2) : 0);
     var propina = ( _cuenta.info.flag_nopropina == '0' ? ((total * 1.10) - total).toFixed(2) : 0 );
-    orden.find('.precio_precalculo').html( '<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span> → <span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span> + <span class="quitar_propina" style="cursor: pointer;color:red;font-weight:bold;" title="Propina\nClic para quitar propina">$' + propina + '</span>' );
+    orden.find('.precio_precalculo').html( '(((<span style="cursor: not-allowed;" title="Total sin IVA">$' + precio_sin_iva + '</span> + <span class="quitar_iva" style="cursor: pointer;" title="IVA\nClic para quitar IVA">$' + iva + '</span>) = <span style="cursor: not-allowed;color:blue;font-weight:bold;" title="Total con IVA sin propina">$' + (parseFloat(precio_sin_iva) + parseFloat(iva)).toFixed(2) + '</span>) + <span class="quitar_propina" style="cursor: pointer;color:red;font-weight:bold;" title="Propina\nClic para quitar propina">$' + propina + '</span>) - $'+ _cuenta.totales.descuentos.toFixed(2) + '  = ' );
     
-    total = (parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) );
+    total = ((parseFloat(precio_sin_iva) + parseFloat(iva) + parseFloat(propina) )) - parseFloat(_cuenta.totales.descuentos);
     orden.find('.precio').html( '<span title="Total con IVA y con propina">$' + total.toFixed(2) + '</span>' );
     
     return orden[0].outerHTML;

@@ -335,45 +335,77 @@ $(function(){
         
     });
 
-    $('#pedidos').on('click','.btn_vip', function(){
-        var orden = $(this).parents('.orden');
+    $(document).on('keydown', '#txtVip', function(event){
+        if ( event.which === 13 ) {
+            event.preventDefault();
+            
+            $.modal.close();
+            
+            var cuenta = $(this).attr('cuenta');
+            
+            var tarjeta = $.trim($(this).val());
         
-        var tarjeta = '';
-        
-        tarjeta = prompt('Dezlice la tarjeta premium *VIP* deluxe.');
-        tarjeta = $.trim(tarjeta);
+            if (tarjeta === '')
+            {
+                alert('Abortando operacion');
+                return;
+            }
 
-        if (tarjeta === '')
-        {
-            alert('Abortando operacion');
-            return;
+            tarjeta = tarjeta.match(/^%([0-9]{16})_$/);
+            
+            console.log(tarjeta);
+            
+            if ( !tarjeta )
+            {
+                alert('Tarjeta invalida. Abortando operacion');
+                return;                
+            }
+                       
+            tarjeta = tarjeta[1];
+            
+            $.post('http://vip.lapizzeria.com.sv',{tarjeta:tarjeta, operacion:'buscar'}, 'json').done(function(data){
+                if (data.tarjeta.error === '1')
+                {
+                    alert('La tarjeta VIP solicitada no existe. Abortando.');
+                    return;
+                }
+
+                if (parseFloat(data.tarjeta.balance) === 0.00)
+                {
+                    alert('La tarjeta VIP ya no cuenta con saldo. Abortando.');
+                    return;
+                }
+
+                if (confirm('El balance de la tarjeta es $'+data.tarjeta.balance + ' - ¿continuar?.'))
+                {
+                    var cantidad = prompt('Cantidad a deducir del balance');
+                                       
+                    if ( !cantidad || parseFloat(cantidad) === 0.00 )
+                    {
+                        alert('Abortando operacion');
+                        return;
+                    }
+
+                    rsv_solicitar('cuenta_descuento',{cuenta: cuenta, tipo: 'cantidad', valor: cantidad, motivo: 'Tarjeta VIP utilizada: ' + (tarjeta.slice(0, 12) + "XXXX")},function(){
+                        cmp_cache = null;
+                        $.post('http://vip.lapizzeria.com.sv',{tarjeta:tarjeta, operacion:'descontar', cantidad:cantidad});
+                    });
+                }
+            }).fail(function(){
+                alert('ERROR: intente nuevamente');
+            });
+        
         }
         
-        $.post('http://vip.lapizzeria.com.sv',{tarjeta:tarjeta, operacion:'buscar'}, 'json').done(function(data){
-            if (data.tarjeta.error === '1')
-            {
-                alert('La tarjeta VIP solicitada no existe. Abortando.');
-                return;
-            }
-            
-            if (data.tarjeta.balance === '0')
-            {
-                alert('La tarjeta VIP ya no cuenta con balance');
-                return;
-            }
-            
-            if (confirm('El balance de la tarjeta es $'+data.tarjeta.balance + ' - ¿continuar?.'))
-            {
-                var cantidad = prompt('Cantidad a deducir del balance');
-                
-                rsv_solicitar('cuenta_descuento',{cuenta: orden.attr('cuenta'), tipo: 'cantidad', valor: cantidad, motivo: 'Tarjeta VIP utilizada: ' + tarjeta},function(){
-                    cmp_cache = null;
-                    $.post('http://vip.lapizzeria.com.sv',{tarjeta:tarjeta, operacion:'descontar', cantidad:cantidad});
-                });
-            }
-        }).fail(function(){
-            alert('ERROR: intente nuevamente');
-        });
+    });
+    
+    $('#pedidos').on('click','.btn_vip', function(){
+        var buffer = '<h1>Descuento por tarjeta VIP</h1>';
+        buffer += '<p style="text-align:center;">Deslice tarjeta</p>';
+        
+        buffer += '<input id="txtVip" cuenta="'+$(this).parents('.orden').attr('cuenta')+'" type="text" style="width:1px;height:1px;border:none;color:black;background:black;" />';
+        
+        $.modal(buffer, { minHeight: '100px', minWidth: '300px'});
         
     });
 
